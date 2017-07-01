@@ -14,3 +14,7 @@ be  even  more compelling)  an  equally  good  answer with fewer bits.
 Since  current systems  are bandwidth-limited, using smaller operands means higher speed and less power use.
 Because they work like floats, not intervals, they can be regarded as a drop-in replacement
 for floats"   
+<p>
+Read more to find out about the Posit binary representation:
+![alt text](https://github.com/beckerdo/Posit/blob/master/positformat.png "Posit binary representation")
+
