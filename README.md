@@ -16,4 +16,4 @@ Because they work like floats, not intervals, they can be regarded as a drop-in 
 for floats"   
 <p>
 Read more to find out about the Posit binary representation:
-![Posit format](beckerdo.github.com/Posit/positformat.png)
+![Posit format](https://github.com/beckerdo/Posit/blob/master/positformat.png)
