@@ -17,4 +17,4 @@ for floats"
 <p>
 Read more to find out about the Posit binary representation:
 <p>
-![Posit-format](positformat.png)
+!(positformat.png)
