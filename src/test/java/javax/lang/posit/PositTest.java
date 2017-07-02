@@ -103,10 +103,15 @@ public class PositTest {
 	    int BIT_INDEX_MASK = BITS_PER_WORD - 1;
 	    System.out.println( "BitSet info: ADDRESS_BITS_PER_WORD=6,BITS_PER_WORD="+ BITS_PER_WORD + ",BIT_INDEX_MASK=0b" + Integer.toBinaryString(BIT_INDEX_MASK));
 
+	    int SIZE = 4;
+	    BitSet bitSet = new BitSet(SIZE);
+	    bitSet.set( 1 );
+		System.out.println( "BitSet weirdness:  bitSet=" + bitSet + ", bitSet.length=" + bitSet.length() + ", bitSet.size=" + bitSet.size() + ", bitSetSize=" + SIZE ); 
+	    
 	    boolean OUTPUT = false;
 	    if (OUTPUT) {
 		for (int length = 0; length < 32; length++) {
-			BitSet bitSet = new BitSet(length);
+			bitSet = new BitSet(length);
 			for ( int odds = 0; odds < length; odds++) {
 				if (odds % 2 == 1)
 				   bitSet.set(odds);
