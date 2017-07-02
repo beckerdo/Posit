@@ -1,6 +1,7 @@
 package javax.lang.posit;
 
 import java.io.IOException;
+import java.util.BitSet;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -31,118 +32,59 @@ public final class Posit extends Number implements Comparable<Posit> {
 	/** log exceptions */
 	public static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(Posit.class);
 
-	// Some float constants to fill in when done.
+	// Some constants for posits
     /**
-     * A constant holding the positive infinity of type
-     * {@code float}. It is equal to the value returned by
-     * {@code Float.intBitsToFloat(0x7f800000)}.
+     * A constant holding infinity of type {@code Posit}.
+     * For Posits, infinity is the special case 1 followed by zeros.
+     * All Posit infinity representations, whether 1 bit, or many,
+     * are considered equal.
      */
-    public static final float POSITIVE_INFINITY = 1.0f / 0.0f;
+//    public static final Posit INFINITY = new Posit("∞");
 
     /**
-     * A constant holding the negative infinity of type
-     * {@code float}. It is equal to the value returned by
-     * {@code Float.intBitsToFloat(0xff800000)}.
+     * A constant holding zero of type {@code Posit}.
+     * For Posits, zero is the special case of all zeroes.
+     * All Posit zero representations, whether 1 bit, or many,
+     * are considered equal.
      */
-    public static final float NEGATIVE_INFINITY = -1.0f / 0.0f;
+//    public static final Posit ZERO = new Posit("0");
 
     /**
-     * A constant holding a Not-a-Number (NaN) value of type
-     * {@code float}.  It is equivalent to the value returned by
-     * {@code Float.intBitsToFloat(0x7fc00000)}.
+     * A constant holding a Not-a-Number (NaN) value of type {@code Posit}.
      */
-    public static final float NaN = 0.0f / 0.0f;
+//    public static final Posit NaN = new Posit("NaN");
 
+    
     /**
-     * A constant holding the largest positive finite value of type
-     * {@code float}, (2-2<sup>-23</sup>)&middot;2<sup>127</sup>.
-     * It is equal to the hexadecimal floating-point literal
-     * {@code 0x1.fffffeP+127f} and also equal to
-     * {@code Float.intBitsToFloat(0x7f7fffff)}.
+     * internal representation
      */
-    public static final float MAX_VALUE = 0x1.fffffeP+127f; // 3.4028235e+38f
+    private BitSet bitSet;
 
-    /**
-     * A constant holding the smallest positive normal value of type
-     * {@code float}, 2<sup>-126</sup>.  It is equal to the
-     * hexadecimal floating-point literal {@code 0x1.0p-126f} and also
-     * equal to {@code Float.intBitsToFloat(0x00800000)}.
-     *
-     * @since 1.6
+    
+    /** BitSet has the weirdest size rules.
+     * Size returns the internal representation size.
+     * Length returns the highest 1 set.
+     * Tracking on our own.
      */
-    public static final float MIN_NORMAL = 0x1.0p-126f; // 1.17549435E-38f
-
-    /**
-     * A constant holding the smallest positive nonzero value of type
-     * {@code float}, 2<sup>-149</sup>. It is equal to the
-     * hexadecimal floating-point literal {@code 0x0.000002P-126f}
-     * and also equal to {@code Float.intBitsToFloat(0x1)}.
-     */
-    public static final float MIN_VALUE = 0x0.000002P-126f; // 1.4e-45f
-
-    /**
-     * Maximum exponent a finite {@code float} variable may have.  It
-     * is equal to the value returned by {@code
-     * Math.getExponent(Float.MAX_VALUE)}.
-     *
-     * @since 1.6
-     */
-    public static final int MAX_EXPONENT = 127;
-
-    /**
-     * Minimum exponent a normalized {@code float} variable may have.
-     * It is equal to the value returned by {@code
-     * Math.getExponent(Float.MIN_NORMAL)}.
-     *
-     * @since 1.6
-     */
-    public static final int MIN_EXPONENT = -126;
-
-    /**
-     * The number of bits used to represent a {@code float} value.
-     *
-     * @since 1.5
-     */
-    public static final int SIZE = 32;
-
-    /**
-     * The number of bytes used to represent a {@code float} value.
-     *
-     * @since 1.8
-     */
-    public static final int BYTES = SIZE / Byte.SIZE;
+    private int bitSetSize;
 
     // Constructors
     /**
-     * Constructs a newly allocated {@code Float} object that
-     * represents the primitive {@code float} argument.
+     * Constructs a newly allocated {@code Posit} object 
+     * with the internal representation given by the String.
+     * The length of the String is the number of bits in
+     * the Posit.
+     * The first character is the sign bit.
+     * The next N characters are the regime bits.
+     * The next S characters are the exponent bits, if any.
+     * The next F characters are the fraction bits, if any.
      *
-     * @param   value   the value to be represented by the {@code Float}.
-     */
-    public Posit(float value) {
-    }
-
-    /**
-     * Constructs a newly allocated {@code Float} object that
-     * represents the argument converted to type {@code float}.
-     *
-     * @param   value   the value to be represented by the {@code Float}.
-     */
-    public Posit(double value) {
-    }
-
-    /**
-     * Constructs a newly allocated {@code Float} object that
-     * represents the floating-point value of type {@code float}
-     * represented by the string. The string is converted to a
-     * {@code float} value as if by the {@code valueOf} method.
-     *
-     * @param      s   a string to be converted to a {@code Float}.
+     * @param   s  a string of the format ("0","1")*
      * @throws  NumberFormatException  if the string does not contain a
      *               parsable number.
-     * @see        java.lang.Float#valueOf(java.lang.String)
      */
     public Posit(String s) throws NumberFormatException {
+    	parseBinary(s);
     }
 
     
@@ -200,84 +142,6 @@ public final class Posit extends Number implements Comparable<Posit> {
 	}
 
 	// Float-like interface
-    /**
-     * Returns a hexadecimal string representation of the
-     * {@code float} argument. All characters mentioned below are
-     * ASCII characters.
-     *
-     * <ul>
-     * <li>If the argument is NaN, the result is the string
-     *     "{@code NaN}".
-     * <li>Otherwise, the result is a string that represents the sign and
-     * magnitude (absolute value) of the argument. If the sign is negative,
-     * the first character of the result is '{@code -}'
-     * ({@code '\u005Cu002D'}); if the sign is positive, no sign character
-     * appears in the result. As for the magnitude <i>m</i>:
-     *
-     * <ul>
-     * <li>If <i>m</i> is infinity, it is represented by the string
-     * {@code "Infinity"}; thus, positive infinity produces the
-     * result {@code "Infinity"} and negative infinity produces
-     * the result {@code "-Infinity"}.
-     *
-     * <li>If <i>m</i> is zero, it is represented by the string
-     * {@code "0x0.0p0"}; thus, negative zero produces the result
-     * {@code "-0x0.0p0"} and positive zero produces the result
-     * {@code "0x0.0p0"}.
-     *
-     * <li>If <i>m</i> is a {@code float} value with a
-     * normalized representation, substrings are used to represent the
-     * significand and exponent fields.  The significand is
-     * represented by the characters {@code "0x1."}
-     * followed by a lowercase hexadecimal representation of the rest
-     * of the significand as a fraction.  Trailing zeros in the
-     * hexadecimal representation are removed unless all the digits
-     * are zero, in which case a single zero is used. Next, the
-     * exponent is represented by {@code "p"} followed
-     * by a decimal string of the unbiased exponent as if produced by
-     * a call to {@link Integer#toString(int) Integer.toString} on the
-     * exponent value.
-     *
-     * <li>If <i>m</i> is a {@code float} value with a subnormal
-     * representation, the significand is represented by the
-     * characters {@code "0x0."} followed by a
-     * hexadecimal representation of the rest of the significand as a
-     * fraction.  Trailing zeros in the hexadecimal representation are
-     * removed. Next, the exponent is represented by
-     * {@code "p-126"}.  Note that there must be at
-     * least one nonzero digit in a subnormal significand.
-     *
-     * </ul>
-     *
-     * </ul>
-     *
-     * <table border>
-     * <caption>Examples</caption>
-     * <tr><th>Floating-point Value</th><th>Hexadecimal String</th>
-     * <tr><td>{@code 1.0}</td> <td>{@code 0x1.0p0}</td>
-     * <tr><td>{@code -1.0}</td>        <td>{@code -0x1.0p0}</td>
-     * <tr><td>{@code 2.0}</td> <td>{@code 0x1.0p1}</td>
-     * <tr><td>{@code 3.0}</td> <td>{@code 0x1.8p1}</td>
-     * <tr><td>{@code 0.5}</td> <td>{@code 0x1.0p-1}</td>
-     * <tr><td>{@code 0.25}</td>        <td>{@code 0x1.0p-2}</td>
-     * <tr><td>{@code Float.MAX_VALUE}</td>
-     *     <td>{@code 0x1.fffffep127}</td>
-     * <tr><td>{@code Minimum Normal Value}</td>
-     *     <td>{@code 0x1.0p-126}</td>
-     * <tr><td>{@code Maximum Subnormal Value}</td>
-     *     <td>{@code 0x0.fffffep-126}</td>
-     * <tr><td>{@code Float.MIN_VALUE}</td>
-     *     <td>{@code 0x0.000002p-126}</td>
-     * </table>
-     * @param   f   the {@code float} to be converted.
-     * @return a hex string representation of the argument.
-     * @since 1.5
-     * @author Joseph D. Darcy
-     */
-    public static String toHexString(float f) {
-    	return "0xPosit";
-    }
-
     /**
      * Returns a {@code Float} object holding the
      * {@code float} value represented by the argument string
@@ -384,108 +248,68 @@ public final class Posit extends Number implements Comparable<Posit> {
      * {@code float}, <code>1.000000<b>1</b>f</code> results.
      *
      * <p>To avoid calling this method on an invalid string and having
-     * a {@code NumberFormatException} be thrown, the documentation
-     * for {@link Double#valueOf Double.valueOf} lists a regular
-     * expression which can be used to screen the input.
+     * a {@code NumberFormatException} be thrown, the regular
+     * expression below can be used to screen the input string:
+     *
+     * <pre>{@code
+     *  final String Digits     = "(\\p{Digit}+)";
+     *  final String HexDigits  = "(\\p{XDigit}+)";
+     *  // an exponent is 'e' or 'E' followed by an optionally
+     *  // signed decimal integer.
+     *  final String Exp        = "[eE][+-]?"+Digits;
+     *  final String fpRegex    =
+     *      ("[\\x00-\\x20]*"+  // Optional leading "whitespace"
+     *       "[+-]?(" + // Optional sign character
+     *       "NaN|" +           // "NaN" string
+     *       "Infinity|" +      // "Infinity" string
+     *
+     *       // A decimal floating-point string representing a finite positive
+     *       // number without a leading sign has at most five basic pieces:
+     *       // Digits . Digits ExponentPart FloatTypeSuffix
+     *       //
+     *       // Since this method allows integer-only strings as input
+     *       // in addition to strings of floating-point literals, the
+     *       // two sub-patterns below are simplifications of the grammar
+     *       // productions from section 3.10.2 of
+     *       // The Java Language Specification.
+     *
+     *       // Digits ._opt Digits_opt ExponentPart_opt FloatTypeSuffix_opt
+     *       "((("+Digits+"(\\.)?("+Digits+"?)("+Exp+")?)|"+
+     *
+     *       // . Digits ExponentPart_opt FloatTypeSuffix_opt
+     *       "(\\.("+Digits+")("+Exp+")?)|"+
+     *
+     *       // Hexadecimal strings
+     *       "((" +
+     *        // 0[xX] HexDigits ._opt BinaryExponent FloatTypeSuffix_opt
+     *        "(0[xX]" + HexDigits + "(\\.)?)|" +
+     *
+     *        // 0[xX] HexDigits_opt . HexDigits BinaryExponent FloatTypeSuffix_opt
+     *        "(0[xX]" + HexDigits + "?(\\.)" + HexDigits + ")" +
+     *
+     *        ")[pP][+-]?" + Digits + "))" +
+     *       "[fFdD]?))" +
+     *       "[\\x00-\\x20]*");// Optional trailing "whitespace"
+     *
+     *  if (Pattern.matches(fpRegex, myString))
+     *      Double.valueOf(myString); // Will not throw NumberFormatException
+     *  else {
+     *      // Perform suitable alternative action
+     *  }
+     * }</pre>.
      *
      * @param   s   the string to be parsed.
-     * @return  a {@code Float} object holding the value
+     * @return  a {@code Posit} object holding the value
      *          represented by the {@code String} argument.
      * @throws  NumberFormatException  if the string does not contain a
      *          parsable number.
      */
-    public static Float valueOf(String s) throws NumberFormatException {
-        return new Float(parseFloat(s));
+    public static Posit valueOf(String s) throws NumberFormatException {
+        return new Posit(s);
     }
 
     /**
-     * Returns a {@code Float} instance representing the specified
-     * {@code float} value.
-     * If a new {@code Float} instance is not required, this method
-     * should generally be used in preference to the constructor
-     * {@link #Float(float)}, as this method is likely to yield
-     * significantly better space and time performance by caching
-     * frequently requested values.
-     *
-     * @param  f a float value.
-     * @return a {@code Float} instance representing {@code f}.
-     * @since  1.5
-     */
-    public static Float valueOf(float f) {
-        return new Float(f);
-    }
-
-    /**
-     * Returns a new {@code float} initialized to the value
-     * represented by the specified {@code String}, as performed
-     * by the {@code valueOf} method of class {@code Float}.
-     *
-     * @param  s the string to be parsed.
-     * @return the {@code float} value represented by the string
-     *         argument.
-     * @throws NullPointerException  if the string is null
-     * @throws NumberFormatException if the string does not contain a
-     *               parsable {@code float}.
-     * @see    java.lang.Float#valueOf(String)
-     * @since 1.2
-     */
-    public static float parseFloat(String s) throws NumberFormatException {
-        return 0.0f;
-    }
-
-    /**
-     * Returns {@code true} if the specified number is a
-     * Not-a-Number (NaN) value, {@code false} otherwise.
-     *
-     * @param   v   the value to be tested.
-     * @return  {@code true} if the argument is NaN;
-     *          {@code false} otherwise.
-     */
-    public static boolean isNaN(float v) {
-        return (v != v);
-    }
-
-    /**
-     * Returns {@code true} if the specified number is infinitely
-     * large in magnitude, {@code false} otherwise.
-     *
-     * @param   v   the value to be tested.
-     * @return  {@code true} if the argument is positive infinity or
-     *          negative infinity; {@code false} otherwise.
-     */
-    public static boolean isInfinite(float v) {
-        return (v == POSITIVE_INFINITY) || (v == NEGATIVE_INFINITY);
-    }
-
-
-    /**
-     * Returns {@code true} if the argument is a finite floating-point
-     * value; returns {@code false} otherwise (for NaN and infinity
-     * arguments).
-     *
-     * @param f the {@code float} value to be tested
-     * @return {@code true} if the argument is a finite
-     * floating-point value, {@code false} otherwise.
-     * @since 1.8
-     */
-     public static boolean isFinite(float f) {
-    	 return true;
-         // return Math.abs(f) <= FloatConsts.MAX_VALUE;
-    }
-
-     /**
-     * Returns {@code true} if this {@code Float} value is a
-     * Not-a-Number (NaN), {@code false} otherwise.
-     *
-     * @return  {@code true} if the value represented by this object is
-     *          NaN; {@code false} otherwise.
-     */
-    public boolean isNaN() {
-    	return true;
-    }
-
-    /**
-     * Returns {@code true} if this {@code Float} value is
+     * Returns {@code true} if this {@code Posit} value is
      * infinitely large in magnitude, {@code false} otherwise.
      *
      * @return  {@code true} if the value represented by this object is
@@ -497,137 +321,27 @@ public final class Posit extends Number implements Comparable<Posit> {
     }
 
     /**
-     * Returns a representation of the specified floating-point value
-     * according to the IEEE 754 floating-point "single format" bit
-     * layout.
+     * Returns {@code true} if this {@code Posit} value is
+     * infinitely large in magnitude, {@code false} otherwise.
      *
-     * <p>Bit 31 (the bit that is selected by the mask
-     * {@code 0x80000000}) represents the sign of the floating-point
-     * number.
-     * Bits 30-23 (the bits that are selected by the mask
-     * {@code 0x7f800000}) represent the exponent.
-     * Bits 22-0 (the bits that are selected by the mask
-     * {@code 0x007fffff}) represent the significand (sometimes called
-     * the mantissa) of the floating-point number.
-     *
-     * <p>If the argument is positive infinity, the result is
-     * {@code 0x7f800000}.
-     *
-     * <p>If the argument is negative infinity, the result is
-     * {@code 0xff800000}.
-     *
-     * <p>If the argument is NaN, the result is {@code 0x7fc00000}.
-     *
-     * <p>In all cases, the result is an integer that, when given to the
-     * {@link #intBitsToFloat(int)} method, will produce a floating-point
-     * value the same as the argument to {@code floatToIntBits}
-     * (except all NaN values are collapsed to a single
-     * "canonical" NaN value).
-     *
-     * @param   value   a floating-point number.
-     * @return the bits that represent the floating-point number.
+     * @return  {@code true} if the value represented by this object is
+     *          positive infinity or negative infinity;
+     *          {@code false} otherwise.
      */
-    public static int floatToIntBits(float value) {
-    	return 0;
+    public boolean isZero() {
+    	return true;
     }
 
     /**
-     * Returns a representation of the specified floating-point value
-     * according to the IEEE 754 floating-point "single format" bit
-     * layout, preserving Not-a-Number (NaN) values.
-     *
-     * <p>Bit 31 (the bit that is selected by the mask
-     * {@code 0x80000000}) represents the sign of the floating-point
-     * number.
-     * Bits 30-23 (the bits that are selected by the mask
-     * {@code 0x7f800000}) represent the exponent.
-     * Bits 22-0 (the bits that are selected by the mask
-     * {@code 0x007fffff}) represent the significand (sometimes called
-     * the mantissa) of the floating-point number.
-     *
-     * <p>If the argument is positive infinity, the result is
-     * {@code 0x7f800000}.
-     *
-     * <p>If the argument is negative infinity, the result is
-     * {@code 0xff800000}.
-     *
-     * <p>If the argument is NaN, the result is the integer representing
-     * the actual NaN value.  Unlike the {@code floatToIntBits}
-     * method, {@code floatToRawIntBits} does not collapse all the
-     * bit patterns encoding a NaN to a single "canonical"
-     * NaN value.
-     *
-     * <p>In all cases, the result is an integer that, when given to the
-     * {@link #intBitsToFloat(int)} method, will produce a
-     * floating-point value the same as the argument to
-     * {@code floatToRawIntBits}.
-     *
-     * @param   value   a floating-point number.
-     * @return the bits that represent the floating-point number.
-     * @since 1.3
-     */
-    public static native int floatToRawIntBits(float value);
-
-    /**
-     * Returns the {@code float} value corresponding to a given
-     * bit representation.
-     * The argument is considered to be a representation of a
-     * floating-point value according to the IEEE 754 floating-point
-     * "single format" bit layout.
-     *
-     * <p>If the argument is {@code 0x7f800000}, the result is positive
-     * infinity.
-     *
-     * <p>If the argument is {@code 0xff800000}, the result is negative
-     * infinity.
-     *
-     * <p>If the argument is any value in the range
-     * {@code 0x7f800001} through {@code 0x7fffffff} or in
-     * the range {@code 0xff800001} through
-     * {@code 0xffffffff}, the result is a NaN.  No IEEE 754
-     * floating-point operation provided by Java can distinguish
-     * between two NaN values of the same type with different bit
-     * patterns.  Distinct values of NaN are only distinguishable by
-     * use of the {@code Float.floatToRawIntBits} method.
-     *
-     * <p>In all other cases, let <i>s</i>, <i>e</i>, and <i>m</i> be three
-     * values that can be computed from the argument:
-     *
-     * <blockquote><pre>{@code
-     * int s = ((bits >> 31) == 0) ? 1 : -1;
-     * int e = ((bits >> 23) & 0xff);
-     * int m = (e == 0) ?
-     *                 (bits & 0x7fffff) << 1 :
-     *                 (bits & 0x7fffff) | 0x800000;
-     * }</pre></blockquote>
-     *
-     * Then the floating-point result equals the value of the mathematical
-     * expression <i>s</i>&middot;<i>m</i>&middot;2<sup><i>e</i>-150</sup>.
-     *
-     * <p>Note that this method may not be able to return a
-     * {@code float} NaN with exactly same bit pattern as the
-     * {@code int} argument.  IEEE 754 distinguishes between two
-     * kinds of NaNs, quiet NaNs and <i>signaling NaNs</i>.  The
-     * differences between the two kinds of NaN are generally not
-     * visible in Java.  Arithmetic operations on signaling NaNs turn
-     * them into quiet NaNs with a different, but often similar, bit
-     * pattern.  However, on some processors merely copying a
-     * signaling NaN also performs that conversion.  In particular,
-     * copying a signaling NaN to return it to the calling method may
-     * perform this conversion.  So {@code intBitsToFloat} may
-     * not be able to return a {@code float} with a signaling NaN
-     * bit pattern.  Consequently, for some {@code int} values,
-     * {@code floatToRawIntBits(intBitsToFloat(start))} may
-     * <i>not</i> equal {@code start}.  Moreover, which
-     * particular bit patterns represent signaling NaNs is platform
-     * dependent; although all NaN bit patterns, quiet or signaling,
-     * must be in the NaN range identified above.
-     *
-     * @param   bits   an integer.
-     * @return  the {@code float} floating-point value with the same bit
-     *          pattern.
-     */
-    public static native float intBitsToFloat(int bits);
+    * Returns {@code true} if this {@code Posit} value is a
+    * Not-a-Number (NaN), {@code false} otherwise.
+    *
+    * @return  {@code true} if the value represented by this object is
+    *          NaN; {@code false} otherwise.
+    */
+   public boolean isNaN() {
+   	return true;
+   }
 
     /**
      * Adds two {@code float} values together as per the + operator.
@@ -670,40 +384,8 @@ public final class Posit extends Number implements Comparable<Posit> {
     public static float min(float a, float b) {
         return Math.min(a, b);
     }
-	
-    /**
-     * Returns the value of this {@code Float} as a {@code byte} after
-     * a narrowing primitive conversion.
-     *
-     * @return  the {@code float} value represented by this object
-     *          converted to type {@code byte}
-     * @jls 5.1.3 Narrowing Primitive Conversions
-     */
-    public byte byteValue() {
-        return 0b0;
-    }
-
-    /**
-     * Returns the value of this {@code Float} as a {@code short}
-     * after a narrowing primitive conversion.
-     *
-     * @return  the {@code float} value represented by this object
-     *          converted to type {@code short}
-     * @jls 5.1.3 Narrowing Primitive Conversions
-     * @since JDK1.1
-     */
-    public short shortValue() {
-        return (short)0;
-    }
 
 	// Comparable interface
-	@Override
-	public int compareTo(Posit arg0) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-    // Object methods
     /**
      * Compares two {@code Float} objects numerically.  There are
      * two ways in which comparisons performed by this method differ
@@ -736,11 +418,11 @@ public final class Posit extends Number implements Comparable<Posit> {
      * @since   1.2
      * @see Comparable#compareTo(Object)
      */
-    public int compareTo(Float anotherFloat) {
-    	return 0;
-        // return Float.compare(value, anotherFloat.value);
+    public int compareTo(Posit anotherPosit) {
+        return Posit.compare(this, anotherPosit);
     }
 
+    // Object methods
    /**
      * Compares the two specified {@code float} values. The sign
      * of the integer value returned is the same as that of the
@@ -759,7 +441,7 @@ public final class Posit extends Number implements Comparable<Posit> {
      *          {@code f2}.
      * @since 1.4
      */
-    public static int compare(float f1, float f2) {
+    public static int compare(Posit p1, Posit p2) {
     	return 0;
     }
     
@@ -775,18 +457,6 @@ public final class Posit extends Number implements Comparable<Posit> {
     @Override
     public int hashCode() {
         return 0;
-    }
-
-    /**
-     * Returns a hash code for a {@code float} value; compatible with
-     * {@code Float.hashCode()}.
-     *
-     * @param value the value to hash
-     * @return a hash code value for a {@code float} value.
-     * @since 1.8
-     */
-    public static int hashCode(float value) {
-        return floatToIntBits(value);
     }
 
     /**
@@ -832,19 +502,6 @@ public final class Posit extends Number implements Comparable<Posit> {
     	return true;
     }
 
-    /**
-     * Returns a string representation of this {@code Float} object.
-     * The primitive {@code float} value represented by this object
-     * is converted to a {@code String} exactly as if by the method
-     * {@code toString} of one argument.
-     *
-     * @return  a {@code String} representation of this object.
-     * @see java.lang.Float#toString(float)
-     */
-    public String toString() {
-    	return "Posit";
-    }
- 
 	/**
      * Returns a string representation of the {@code float}
      * argument. All characters mentioned below are ASCII characters.
@@ -911,8 +568,128 @@ public final class Posit extends Number implements Comparable<Posit> {
      * @param   f   the float to be converted.
      * @return a string representation of the argument.
      */
-    public static String toString(float f) {
+    public String toString() {
     	return "Posit:";
+    }
+
+    /** Sets internal representation to the given String
+     * 
+     * @param   s  a string of the format ("0","1")*. 
+     * 			If the string has whitespace, it is trimmed.
+     * 			If the string starts with "0b" it is trimmed.
+     * @throws  NumberFormatException  if the string does not contain a
+     *               parsable binary number.
+     */
+    public void parseBinary( String s ) {
+    	if ( null == s )
+    		throw new NullPointerException();
+    	s = s.trim();
+    	if ( s.startsWith( "0b" )) {
+    		s = s.substring(2);
+    	}
+    	// Check
+    	for ( int i = 0; i < s.length(); i++  ) {
+    		if (-1 == "01".indexOf( s.charAt(i) ) ) {
+    			throw new NumberFormatException( "Invalid binary character '" + s.charAt (i) + "' at position " + i );
+    		}
+    	}    
+    	this.bitSet = new BitSet( s.length() );
+    	this.bitSetSize = s.length();
+    	for ( int i = 0; i < s.length(); i++  ) {
+    		if ( s.charAt(i) == '1' ) {
+    			bitSet.set(i);
+    		} else {
+    			bitSet.clear(i);
+    		}
+    	}
+    }
+
+    /*
+    * Gives the internal representation of the Posit as a
+    * String of zero and one characters
+    * <p>
+    * If the Posit bit length is zero, an empty String is returned.
+    *
+    * @return a string representation of the object.
+    */
+    public String toBinaryString() {
+       StringBuilder sb = new StringBuilder();
+	   // System.out.println( "   bitSet=" + bitSet + ", bitSet.length=" + bitSet.length() + ", bitSet.size=" + bitSet.size() + ", bitSetSize=" + this.bitSetSize ); 
+       if ( null != bitSet ) {
+    	   // Size is the number of bits in the bit set. Length is the highest "1"
+    	   for ( int i = 0; i < this.bitSetSize; i++ ) {
+    		   sb.append( bitSet.get(i) ? "1" : "0");
+    	   }
+       }
+   	   return sb.toString();
+    }
+
+    /**
+     * Returns the number of bits in this Posit.
+     * @return number of bits in this Posit
+     */
+    public int getBitSize() {
+    	return this.bitSetSize;
+    }
+    
+    /**
+     * Returns whether the sign bit is set or not.
+     * If the bit size is 0, returns false
+     * @return if this Posit is positive (has the sign bit set)
+     */
+    public boolean isPositive() {
+    	if ( getBitSize() > 0 ) {
+    		return bitSet.get(0);
+    	}
+    	return false;
+    }
+    
+    /**
+     * Returns the regime bits of this Posit as a String of "0" and "1"
+     * If the bit size is less than 2, returns empty Sting.
+     * @return if this Posit is positive (has the sign bit set
+     */
+    public String getRegime() {
+    	StringBuilder sb = new StringBuilder();
+    	String first = null;
+    	for( int i = 1; i < getBitSize(); i++ ) {
+    		String bit = bitSet.get(i) ? "1" : "0";
+    		if ( null == first )
+     		   first = bit;
+    		sb.append( bit );
+    		if ( !bit.equals( first ))
+    			break;
+    	}
+    	return sb.toString();
+    }
+    
+    /**
+     * Returns the regime value K.
+     * <p>
+     * Let m be the number of identical bits starting the regime;
+     * if the bits are 0, then k = −m; if they are 1, then k = m− 1.
+     * 
+     * If the bit size is less than 2, returns empty Sting.
+     * @return if this Posit is positive (has the sign bit set
+     */
+    public int getRegimeK() {
+    	String regime = getRegime();
+    	int k = 0;
+    	String first = null;
+    	if ( null != regime && regime.length() > 0 ) {
+    		for( int i = 0; i < regime.length(); i++ ) {
+        		String bit = regime.substring( i, i+1);
+        		if ( null == first )
+         		   first = bit;
+        		if ( !bit.equals( first ))
+        			break;
+        		if ( "0".equals(first)) 
+        			k--;
+        		if ( "1".equals(first) && i != 0) 
+        			k++;
+    		}    		
+    	}
+    	return k;
     }
     
     // Runtime
@@ -920,12 +697,12 @@ public final class Posit extends Number implements Comparable<Posit> {
 		LOGGER.debug("Hello");
 		System.out.println("Posit");
 		// Parse command line options
-		parseGatherOptions(args);
+		parseOptions(args);
 		LOGGER.debug("Bye");
 	}
 
 	/** Command line options for this application. */
-	public static void parseGatherOptions(String[] args) throws ParseException, IOException {
+	public static void parseOptions(String[] args) throws ParseException, IOException {
 		// Parse the command line arguments
 		Options options = new Options();
 		// Use dash with shortcut (-h) or -- with name (--help).
