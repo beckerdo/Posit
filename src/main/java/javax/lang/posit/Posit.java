@@ -645,9 +645,9 @@ public final class Posit extends Number implements Comparable<Posit> {
     }
     
     /**
-     * Returns the regime bits of this Posit as a String of "0" and "1"
-     * If the bit size is less than 2, returns empty Sting.
-     * @return if this Posit is positive (has the sign bit set
+     * Returns the regime bits of this Posit as a String of "0" and "1".
+     * If the bit size is less than 2, returns empty String.
+     * @return a string of "0" and "1" representing the regime
      */
     public String getRegime() {
     	StringBuilder sb = new StringBuilder();
@@ -670,7 +670,7 @@ public final class Posit extends Number implements Comparable<Posit> {
      * if the bits are 0, then k = −m; if they are 1, then k = m− 1.
      * 
      * If the bit size is less than 2, returns empty Sting.
-     * @return if this Posit is positive (has the sign bit set
+     * @return a value representing the K of the regime bits
      */
     public int getRegimeK() {
     	String regime = getRegime();
@@ -691,30 +691,49 @@ public final class Posit extends Number implements Comparable<Posit> {
     	}
     	return k;
     }
+
+    /**
+     * Returns the exponent bits of this Posit as a String of "0" and "1".
+     * If the regime fills the bit size, the exponent may be empty string.
+     * @return a string of "0" and "1" representing the exponent 
+     */
+    public String getExponent() {
+        StringBuilder sb = new StringBuilder();
+        String first = null;
+        for( int i = 1; i < getBitSize(); i++ ) {
+            // TODO Fix this. Copied code.
+            String bit = bitSet.get(i) ? "1" : "0";
+            if ( null == first )
+               first = bit;
+            sb.append( bit );
+            if ( !bit.equals( first ))
+                break;
+        }
+        return sb.toString();
+    }
+    
     
     // Utility
     public static String twosCompliment(String bin) {
-        String twos = "", ones = "";
+        String ones = "";
 
         for (int i = 0; i < bin.length(); i++) {
             ones += flip(bin.charAt(i));
         }
-        StringBuilder builder = new StringBuilder(ones);
+        StringBuilder twos = new StringBuilder(ones);
         boolean b = false;
         for (int i = ones.length() - 1; i > 0; i--) {
             if (ones.charAt(i) == '1') {
-                builder.setCharAt(i, '0');
+                twos.setCharAt(i, '0');
             } else {
-                builder.setCharAt(i, '1');
+                twos.setCharAt(i, '1');
                 b = true;
                 break;
             }
         }
         if (!b)
-            builder.append("1", 0, 7);
-
-        twos = builder.toString();
-        return twos;
+            twos.append("1", 0, 7);
+        return twos.toString();
     }
 
     // Returns '0' for '1' and '1' for '0'

@@ -28,7 +28,7 @@ public class PositTest {
 
 	@Test
     public void parseStringBinary() {
-		String [] TEST_CASES = { 
+		String [] BINARY_TEST_CASES = { 
 				"", // 0 
 				"0", "1", // 1 
 				"00", "01", "10", "11", // 2 
@@ -63,8 +63,7 @@ public class PositTest {
 				"10", "10", "10", "10", "110", "110", "1110", "1111", // 5
 				"0000", "0001", "001", "001", "01", "01", "01", "01", // 5 
 				"10", "10", "10", "10", "110", "110", "1110", "1111", // 5
-		};
-		
+		};		
 		int [] EXPECTED_REGIME_K = { 
 				0, // 0 
 				0, 0, // 1 
@@ -77,11 +76,35 @@ public class PositTest {
 				-4, -3, -2, -2, -1, -1, -1, -1, // 5 
 				0, 0, 0, 0, 1, 1, 2, 3, // 5
 		};
+        String [] EXPECTED_EXPONENT = { 
+                "", // 0 
+                "0", "1", // 1 
+                "00", "01", "10", "11", // 2 
+                "000", "001", "010", "011", "100", "101", "110", "111", // 3 
+                "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", // 4 
+                "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111", // 4
+                "00000", "00001", "00010", "00011", "00100", "00101", "00110", "00111", // 5 
+                "01000", "01001", "01010", "01011", "01100", "01101", "01110", "01111", // 5
+                "10000", "10001", "10010", "10011", "10100", "10101", "10110", "10111", // 5 
+                "11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
+        };
+        String [] EXPECTED_FRACTION = { 
+                "", // 0 
+                "0", "1", // 1 
+                "00", "01", "10", "11", // 2 
+                "000", "001", "010", "011", "100", "101", "110", "111", // 3 
+                "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", // 4 
+                "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111", // 4
+                "00000", "00001", "00010", "00011", "00100", "00101", "00110", "00111", // 5 
+                "01000", "01001", "01010", "01011", "01100", "01101", "01110", "01111", // 5
+                "10000", "10001", "10010", "10011", "10100", "10101", "10110", "10111", // 5 
+                "11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
+        };
 		
 		// Test that parsing and toString are commutative.
-		for ( int i = 0; i < TEST_CASES.length; i++ ) {
+		for ( int i = 0; i < BINARY_TEST_CASES.length; i++ ) {
 			
-			String expectedString = TEST_CASES[ i ];
+			String expectedString = BINARY_TEST_CASES[ i ];
 			Posit posit = new Posit( expectedString );
 			assertEquals( expectedString.length(), posit.getBitSize() );
 			assertEquals( expectedString, posit.toBinaryString() );
@@ -95,7 +118,14 @@ public class PositTest {
 		
 	}
 
-	/** Spits out information about java.util.BitSet */
+	/** 
+	 * Spits out information about java.util.BitSet
+	 * BitSet is so weird, not reporting its set size, but rather size based on the machine implementation
+	 * or length based on which bits are set.
+	 * Here is an example of BitSet size of 4.
+	 * "BitSet weirdness:  bitSet={1}, bitSet.length=2, bitSet.size=64, bitSetSize=4" 
+	 * 
+	 * */
 	@Test
     public void bitSetInfo() {
 	    int ADDRESS_BITS_PER_WORD = 6;
