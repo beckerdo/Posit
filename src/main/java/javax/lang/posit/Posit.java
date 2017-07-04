@@ -311,25 +311,52 @@ public final class Posit extends Number implements Comparable<Posit> {
     /**
      * Returns {@code true} if this {@code Posit} value is
      * infinitely large in magnitude, {@code false} otherwise.
-     *
+     * <p>
+     * Regardless of bit size, infinity is bit[0] == 1, all others zero. 
+     * <p>
+     * Returns false for uninitialized or bitSize 0.
+     *  
      * @return  {@code true} if the value represented by this object is
      *          positive infinity or negative infinity;
      *          {@code false} otherwise.
      */
     public boolean isInfinite() {
-    	return true;
+		if (null != bitSet) {
+			int length = getBitSize();
+			if  ( length > 0 ) {
+				if ( !bitSet.get( 0 )) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+			for (int i = 1; i < length; i++) {
+				boolean bit = bitSet.get(i);
+				if (bit) {
+					return false;
+				}
+			}
+			return true;
+		}
+    	return false;
     }
 
     /**
      * Returns {@code true} if this {@code Posit} value is
-     * infinitely large in magnitude, {@code false} otherwise.
+     * zero, {@code false} otherwise.
+     * <p>
+     * Regardless of bit size, zero is all bits zero.
+     * <p>
+     * Returns false for uninitialized or bitSize 0. 
      *
      * @return  {@code true} if the value represented by this object is
-     *          positive infinity or negative infinity;
-     *          {@code false} otherwise.
+     *          zero; {@code false} otherwise.
      */
     public boolean isZero() {
-    	return true;
+    	if ( 0 < getBitSize() ) {
+    		return bitSet.isEmpty();
+    	}
+    	return false;
     }
 
     /**
@@ -340,7 +367,7 @@ public final class Posit extends Number implements Comparable<Posit> {
     *          NaN; {@code false} otherwise.
     */
    public boolean isNaN() {
-   	return true;
+      return false;
    }
 
     /**
@@ -690,6 +717,25 @@ public final class Posit extends Number implements Comparable<Posit> {
     		}    		
     	}
     	return k;
+    }
+
+    /**
+     * Returns the useed of this Posit
+     * Useed is 2 ** 2 ** run length of regime.
+     * <ul>
+     * <li>es==0 => 2 
+     * <li>es==1 => 2 * 2 
+     * <li>es==2 => 4 * 4 
+     * <li>es==3 => 16 * 16 
+     * <li>es==4 => 256 * 256 
+     * <li>es==5 => 65536 * 65536 
+     * </ul>
+     * If the bit size is less than 2, returns empty String.
+     * @return a string of "0" and "1" representing the regime
+     */
+    public long getRegimeUseed() {
+    	int regimeLength = getRegime().length();
+    	return (long) Math.pow( 2, Math.pow( 2, regimeLength ));
     }
 
     /**

@@ -8,6 +8,19 @@ import static org.junit.Assert.assertEquals;
 import java.util.BitSet;
 
 public class PositTest {
+	public static final String [] BINARY_TEST_CASES = { 
+			"", // 0 
+			"0", "1", // 1 
+			"00", "01", "10", "11", // 2 
+			"000", "001", "010", "011", "100", "101", "110", "111", // 3 
+			"0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", // 4 
+			"1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111", // 4
+			"00000", "00001", "00010", "00011", "00100", "00101", "00110", "00111", // 5 
+			"01000", "01001", "01010", "01011", "01100", "01101", "01110", "01111", // 5
+			"10000", "10001", "10010", "10011", "10100", "10101", "10110", "10111", // 5 
+			"11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
+	};
+	
 	@Before
     public void setup() {
 	}
@@ -28,19 +41,7 @@ public class PositTest {
 
 	@Test
     public void parseStringBinary() {
-		String [] BINARY_TEST_CASES = { 
-				"", // 0 
-				"0", "1", // 1 
-				"00", "01", "10", "11", // 2 
-				"000", "001", "010", "011", "100", "101", "110", "111", // 3 
-				"0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", // 4 
-				"1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111", // 4
-				"00000", "00001", "00010", "00011", "00100", "00101", "00110", "00111", // 5 
-				"01000", "01001", "01010", "01011", "01100", "01101", "01110", "01111", // 5
-				"10000", "10001", "10010", "10011", "10100", "10101", "10110", "10111", // 5 
-				"11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
-		};
-		boolean [] EXPECTED_POSITIVE = { 
+		final boolean [] EXPECTED_POSITIVE = { 
 				false, // 0
 				false, true, // 1 
 				false, false, true, true, // 2
@@ -52,7 +53,7 @@ public class PositTest {
 				true, true, true, true,  true, true, true, true, // 5
 				true, true, true, true,  true, true, true, true, // 5
 		};		
-		String [] EXPECTED_REGIME = { 
+		final String [] EXPECTED_REGIME = { 
 				"", // 0 
 				"", "", // 1 
 				"0", "1", "0", "1", // 2 
@@ -64,7 +65,7 @@ public class PositTest {
 				"0000", "0001", "001", "001", "01", "01", "01", "01", // 5 
 				"10", "10", "10", "10", "110", "110", "1110", "1111", // 5
 		};		
-		int [] EXPECTED_REGIME_K = { 
+		final int [] EXPECTED_REGIME_K = { 
 				0, // 0 
 				0, 0, // 1 
 				-1, 0, -1, 0, // 2 
@@ -76,7 +77,7 @@ public class PositTest {
 				-4, -3, -2, -2, -1, -1, -1, -1, // 5 
 				0, 0, 0, 0, 1, 1, 2, 3, // 5
 		};
-        String [] EXPECTED_EXPONENT = { 
+        final String [] EXPECTED_EXPONENT = { 
                 "", // 0 
                 "0", "1", // 1 
                 "00", "01", "10", "11", // 2 
@@ -88,7 +89,7 @@ public class PositTest {
                 "10000", "10001", "10010", "10011", "10100", "10101", "10110", "10111", // 5 
                 "11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
         };
-        String [] EXPECTED_FRACTION = { 
+        final String [] EXPECTED_FRACTION = { 
                 "", // 0 
                 "0", "1", // 1 
                 "00", "01", "10", "11", // 2 
@@ -102,8 +103,7 @@ public class PositTest {
         };
 		
 		// Test that parsing and toString are commutative.
-		for ( int i = 0; i < BINARY_TEST_CASES.length; i++ ) {
-			
+		for ( int i = 0; i < BINARY_TEST_CASES.length; i++ ) {			
 			String expectedString = BINARY_TEST_CASES[ i ];
 			Posit posit = new Posit( expectedString );
 			assertEquals( expectedString.length(), posit.getBitSize() );
@@ -114,10 +114,49 @@ public class PositTest {
 			assertEquals( EXPECTED_REGIME[ i ], posit.getRegime());
 			// System.out.println( "i=" + i + ", bits=" + expectedString + ", regime=" + posit.getRegime() + ", k=" + posit.getRegimeK() );
 			assertEquals( EXPECTED_REGIME_K[ i ], posit.getRegimeK());
+			assertEquals( (long) Math.pow( 2, Math.pow( 2, EXPECTED_REGIME[ i ].length())), posit.getRegimeUseed()); // Useed is 2 ** 2 ** es
 		}
 		
 	}
 
+	@Test
+    public void isZeroInfinity() {
+		final boolean [] EXPECTED_IS_ZERO = { 
+				false, // 0 
+				true, false, // 1 
+				true, false, false, false, // 2 
+				true, false, false, false, false, false, false, false, // 3 
+				true, false, false, false, false, false, false, false, // 4 
+				false, false, false, false, false, false, false, false, // 4 
+				true, false, false, false, false, false, false, false, // 5
+				false, false, false, false, false, false, false, false, // 5
+				false, false, false, false, false, false, false, false, // 5
+				false, false, false, false, false, false, false, false, // 5
+		};
+		final boolean [] EXPECTED_IS_INFINITE = { 
+				false, // 0 
+				false, true, // 1 
+				false, false, true, false, // 2 
+				false, false, false, false, true, false, false, false, // 3 
+				false, false, false, false, false, false, false, false, // 4 
+				true, false, false, false, false, false, false, false, // 4 
+				false, false, false, false, false, false, false, false, // 5
+				false, false, false, false, false, false, false, false, // 5
+				true, false, false, false, false, false, false, false, // 5
+				false, false, false, false, false, false, false, false, // 5
+		};
+
+		// Test that parsing and toString are commutative.
+		for ( int i = 0; i < BINARY_TEST_CASES.length; i++ ) {
+			Posit posit = new Posit( BINARY_TEST_CASES[ i ] );
+			// System.out.println( "i=" + i + ", bits=" + BINARY_TEST_CASES[i] + ", isZero=" + posit.isZero() + ", isInfinity=" + posit.isInfinite());
+			assertEquals( EXPECTED_IS_ZERO[ i ], posit.isZero());
+			assertEquals( EXPECTED_IS_INFINITE[ i ], posit.isInfinite());			
+		}
+
+	}
+
+	
 	/** 
 	 * Spits out information about java.util.BitSet
 	 * BitSet is so weird, not reporting its set size, but rather size based on the machine implementation
