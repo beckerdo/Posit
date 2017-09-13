@@ -1,82 +1,32 @@
 package javax.lang.posit;
 
-import java.io.IOException;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import java.util.BitSet;
 
 /**
- * Posit
+ * Posit implementation based on String
  * <p>
- * An implementation of Posit numbers for Java
- * <p>In addition, this class provides several methods for converting a
- * {@code Posit} to a {@code String} and a
- * {@code String} to a {@code Posit}, as well as other
- * constants and methods useful when dealing with a
- * {@code Posit}s.
- * <p>
- * More information from John Gustafson: 
- * <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf">Beating Floating Point</a>
- * <p>
- * Implementation classes of Posit decide which primitive type to use to support
- * size and dynamic range: byte (8 bit), short (16 bit), int (32 bit), long (64 bit),
- * or String (arbitrary bits). 
+ * @see Posit
  * 
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
-public class Posit extends Number implements Comparable<Posit>  {
+public final class PositStringImpl extends Posit  implements Comparable<Posit>  {
 	/** Serialization version */
 	private static final long serialVersionUID = 1L;
-
-	/** LOGGER */
-	public static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(Posit.class);
-
-	// Some constants for posits
+    
     /**
-     * A constant holding infinity of type {@code Posit}.
-     * For Posits, infinity is the special case 1 followed by zeros.
-     * All Posit infinity representations, whether 1 bit, or many,
-     * are considered equal.
+     * internal representation
      */
-    public static final String INFINITY_STR = "∞";
-    public static final Posit INFINITY = new Posit(INFINITY_STR);
+    private BitSet bitSet;
 
-    /**
-     * A constant holding zero of type {@code Posit}.
-     * For Posits, zero is the special case of all zeroes.
-     * All Posit zero representations, whether 1 bit, or many,
-     * are considered equal.
+    
+    /** BitSet has the weirdest size rules.
+     * Size returns the internal representation size.
+     * Length returns the highest 1 set.
+     * Tracking on our own.
      */
-    public static final String ZERO_STR = "0";
-    public static final Posit ZERO = new Posit(ZERO_STR);
+    private int bitSetSize;
 
-    /**
-     * A constant holding a Not-a-Number (NAN) value of type {@code Posit}.
-     */
-    public static final String NAN_STR = "NaN";
-    public static final Posit NAN = new Posit(NAN_STR);
-
-    /** 
-     * Implementation class states the type of primitive used to implement
-     * this Posit.
-     * <p>
-     * May be one of the implementation types: byte, short, int, long, or String.
-     * 
-     */
-	private Class<?> implementationClass;
-	
     // Constructors
-    /**
-     * Constructs a newly allocated {@code Posit} object. 
-     */
-    public Posit() {
-    		this.implementationClass = Posit.class; // marks the default implementation
-    }
-
     /**
      * Constructs a newly allocated {@code Posit} object 
      * with the internal representation given by the String.
@@ -91,8 +41,8 @@ public class Posit extends Number implements Comparable<Posit>  {
      * @throws  NumberFormatException  if the string does not contain a
      *               parsable number.
      */
-    public Posit(String s) throws NumberFormatException {
-		this.implementationClass = Posit.class; // marks the default implementation
+    public PositStringImpl(String s) throws NumberFormatException {
+    		super();
     		parseBinary(s);
     }
 
@@ -358,9 +308,9 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          parsable number.
      */
     public static Posit valueOf(String s) throws NumberFormatException {
-        return new Posit(s);
+        return new PositStringImpl(s);
     }
-    
+
     /** 
      * Sets internal representation to the given String
      * 
@@ -386,6 +336,7 @@ public class Posit extends Number implements Comparable<Posit>  {
    	   return sb.toString();
     }
 
+    
     // Math interface
     /**
      * Returns {@code true} if this {@code Posit} value is
@@ -399,8 +350,26 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          positive infinity or negative infinity;
      *          {@code false} otherwise.
      */
+    @Override
     public boolean isInfinite() {
-    		return false;
+		if (null != bitSet) {
+			int length = getBitSize();
+			if  ( length > 0 ) {
+				if ( !bitSet.get( 0 )) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+			for (int i = 1; i < length; i++) {
+				boolean bit = bitSet.get(i);
+				if (bit) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
     }
 
     /**
@@ -414,37 +383,43 @@ public class Posit extends Number implements Comparable<Posit>  {
      * @return  {@code true} if the value represented by this object is
      *          zero; {@code false} otherwise.
      */
+    @Override
 	public boolean isZero() {
+		if (0 < getBitSize()) {
+			return bitSet.isEmpty();
+		}
 		return false;
 	}
 
-    /**
+   /**
     * Returns {@code true} if this {@code Posit} value is a
     * Not-a-Number (NaN), {@code false} otherwise.
     *
     * @return  {@code true} if the value represented by this object is
     *          NaN; {@code false} otherwise.
     */
+   @Override
    public boolean isNaN() {
       return false;
    }
 
    // TODO Consider +, -, *, /
-    /**
-     * Adds {@code Posit} value to this posit and returns this.
-     *
-     * @param addend the first operand
-     * @return the sum of {@code a} and {@code b}
-     * @jls 4.2.4 Floating-Point Operations
-     * @see java.util.function.BinaryOperator
-     * @since 1.8
-     */
-    public Posit add(Posit addend) {
-        return this;
-    }
+   /**
+    * Adds {@code Posit} value to this posit and returns this.
+    *
+    * @param addend the first operand
+    * @return the sum of {@code a} and {@code b}
+    * @jls 4.2.4 Floating-Point Operations
+    * @see java.util.function.BinaryOperator
+    * @since 1.8
+    */
+   @Override
+   public Posit add(Posit addend) {
+       return this;
+   }
 
-	// Comparable interface
-    /**
+   // Comparable interface
+   /**
      * Compares two {@code Float} objects numerically.  There are
      * two ways in which comparisons performed by this method differ
      * from those performed by the Java language numerical comparison
@@ -476,8 +451,8 @@ public class Posit extends Number implements Comparable<Posit>  {
      * @since   1.2
      * @see Comparable#compareTo(Object)
      */
-    public int compareTo(Posit anotherPosit) {
-        return Posit.compare(this, anotherPosit);
+    public int compareTo(PositStringImpl anotherPosit) {
+        return PositStringImpl.compare(this, anotherPosit);
     }
 
     // Object methods
@@ -499,7 +474,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          {@code f2}.
      * @since 1.4
      */
-    public static int compare(Posit p1, Posit p2) {
+    public static int compare(PositStringImpl p1, PositStringImpl p2) {
     		return 0;
     }
     
@@ -561,7 +536,7 @@ public class Posit extends Number implements Comparable<Posit>  {
     }
 
 	/**
-     * Returns a string representation of the {@code Posit}
+     * Returns a string representation of the {@code float}
      * argument. All characters mentioned below are ASCII characters.
      * <ul>
      * <li>If the argument is NaN, the result is the string
@@ -623,24 +598,27 @@ public class Posit extends Number implements Comparable<Posit>  {
      * <p>To create localized string representations of a floating-point
      * value, use subclasses of {@link java.text.NumberFormat}.
      *
+     * @param   f   the float to be converted.
      * @return a string representation of the argument.
      */
+    @Override
     public String toString() {
     		return "Posit:";
     }
 
     // Posit domain interface
+    @Override
     public Class<?> getImplementation() {
-    		return this.implementationClass;    	
+    		return String.class;    	
     }
-        
+    
     /**
      * Returns the number of bits in this Posit.
      * @return number of bits in this Posit
      */
     public int getBitSize() {
-    		return 0;
-    };
+    		return this.bitSetSize;
+    }
     
     /**
      * Returns whether the sign bit is set or not.
@@ -648,6 +626,9 @@ public class Posit extends Number implements Comparable<Posit>  {
      * @return if this Posit is positive (has the sign bit set)
      */
 	public boolean isPositive() {
+		if (getBitSize() > 0) {
+			return bitSet.get(0);
+		}
 		return false;
 	}
     
@@ -658,6 +639,15 @@ public class Posit extends Number implements Comparable<Posit>  {
      */
 	public String getRegime() {
 		StringBuilder sb = new StringBuilder();
+		String first = null;
+		for (int i = 1; i < getBitSize(); i++) {
+			String bit = bitSet.get(i) ? "1" : "0";
+			if (null == first)
+				first = bit;
+			sb.append(bit);
+			if (!bit.equals(first))
+				break;
+		}
 		return sb.toString();
 	}
     
@@ -716,11 +706,21 @@ public class Posit extends Number implements Comparable<Posit>  {
      */
     public String getExponent() {
         StringBuilder sb = new StringBuilder();
+        String first = null;
+        for( int i = 1; i < getBitSize(); i++ ) {
+            // TODO Fix this. Copied code.
+            String bit = bitSet.get(i) ? "1" : "0";
+            if ( null == first )
+               first = bit;
+            sb.append( bit );
+            if ( !bit.equals( first ))
+                break;
+        }
         return sb.toString();
     }
-        
+    
     // Utility
-    public static String twosComplement(String bin) {
+    public static String twosCompliment(String bin) {
         String ones = "";
 
         for (int i = 0; i < bin.length(); i++) {
@@ -746,36 +746,4 @@ public class Posit extends Number implements Comparable<Posit>  {
     public static char flip(char c) {
         return (c == '0') ? '1' : '0';
     }   
-    
-    // Runtime
-	public static void main(String[] args) throws Exception {
-		LOGGER.info("Posit");
-		// Parse command line options
-		parseOptions(args);
-		LOGGER.debug("Posit bye");
-	}
-
-	/** Command line options for this application. */
-	public static void parseOptions(String[] args) throws ParseException, IOException {
-		// Parse the command line arguments
-		Options options = new Options();
-		// Use dash with shortcut (-h) or -- with name (--help).
-		options.addOption("h", "help", false, "print the command line options");
-		options.addOption("n", "numPatterns", true, "generates this many patterns");
-
-		CommandLineParser cliParser = new DefaultParser();
-		CommandLine line = cliParser.parse(options, args);
-
-		// // Gather command line arguments for execution
-		if (line.hasOption("help")) {
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("java -jar posit.jar <options> javax.lang.posit.Posit",
-					options);
-			System.exit(0);
-		}
-//		if (line.hasOption("numPatterns")) {
-//			numPatterns = Integer.parseInt(line.getOptionValue("numPatterns"));
-//			System.out.println("   numPatterns=" + numPatterns);
-//		}
-	}
 }

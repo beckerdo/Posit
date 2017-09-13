@@ -105,7 +105,7 @@ public class PositTest {
 		// Test that parsing and toString are commutative.
 		for ( int i = 0; i < BINARY_TEST_CASES.length; i++ ) {			
 			String expectedString = BINARY_TEST_CASES[ i ];
-			Posit posit = new Posit( expectedString );
+			Posit posit = new PositStringImpl( expectedString );
 			assertEquals( expectedString.length(), posit.getBitSize() );
 			assertEquals( expectedString, posit.toBinaryString() );
 
@@ -148,7 +148,7 @@ public class PositTest {
 
 		// Test that parsing and toString are commutative.
 		for ( int i = 0; i < BINARY_TEST_CASES.length; i++ ) {
-			Posit posit = new Posit( BINARY_TEST_CASES[ i ] );
+			Posit posit = new PositStringImpl( BINARY_TEST_CASES[ i ] );
 			// System.out.println( "i=" + i + ", bits=" + BINARY_TEST_CASES[i] + ", isZero=" + posit.isZero() + ", isInfinity=" + posit.isInfinite());
 			assertEquals( EXPECTED_IS_ZERO[ i ], posit.isZero());
 			assertEquals( EXPECTED_IS_INFINITE[ i ], posit.isInfinite());			
