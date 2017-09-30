@@ -23,8 +23,25 @@ import org.apache.commons.cli.ParseException;
  * <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf">Beating Floating Point</a>
  * <p>
  * Implementation classes of Posit decide which primitive type to use to support
- * size and dynamic range: byte (8 bit), short (16 bit), int (32 bit), long (64 bit),
- * or String (arbitrary bits). 
+ * size and dynamic range:
+ * <ul> 
+ * <li>byte (8 bit) - most compact, lowest range,
+ * <li>short (16 bit),
+ * <li>int (32 bit),
+ * <li>long (64 bit) - less compact, higher range,
+ * <li>String - arbitrary length, least compact, arbitrary range.
+ * </ul> 
+ * <p>
+ * APIs for this class fall into these groups:
+ * <ul>
+ * <li>Constructors - methods for creating Posits,
+ * <li>Number interface - methods for converting to/from Java Number types,
+ * <li>Conversion - methods for converting to/from other types such as String,
+ * <li>Math - value testing, arithmetic operations,
+ * <li>Object methods - Java hash, equals, toString, compare,
+ * <li>Posit domain - methods such as regime, useed, exponent, size, implementation
+ * <li>Utility - twosComplement, etc.
+ * </ul>
  * 
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
