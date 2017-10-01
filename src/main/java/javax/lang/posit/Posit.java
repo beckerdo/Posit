@@ -8,6 +8,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Posit
@@ -45,12 +47,12 @@ import org.apache.commons.cli.ParseException;
  * 
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
-public class Posit extends Number implements Comparable<Posit>  {
+public abstract class Posit extends Number implements Comparable<Posit>  {
 	/** Serialization version */
 	private static final long serialVersionUID = 1L;
 
 	/** LOGGER */
-	public static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(Posit.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(Posit.class);
 
 	// Some constants for posits
     /**
@@ -60,7 +62,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      * are considered equal.
      */
     public static final String INFINITY_STR = "∞";
-    public static final Posit INFINITY = new Posit(INFINITY_STR);
+    // public static final Posit INFINITY = new Posit(INFINITY_STR);
 
     /**
      * A constant holding zero of type {@code Posit}.
@@ -69,48 +71,30 @@ public class Posit extends Number implements Comparable<Posit>  {
      * are considered equal.
      */
     public static final String ZERO_STR = "0";
-    public static final Posit ZERO = new Posit(ZERO_STR);
+    // public static final Posit ZERO = new Posit(ZERO_STR);
 
     /**
      * A constant holding a Not-a-Number (NAN) value of type {@code Posit}.
      */
     public static final String NAN_STR = "NaN";
-    public static final Posit NAN = new Posit(NAN_STR);
+    // public static final Posit NAN = new Posit(NAN_STR);
 
-    /** 
-     * Implementation class states the type of primitive used to implement
-     * this Posit.
-     * <p>
-     * May be one of the implementation types: byte, short, int, long, or String.
-     * 
-     */
-	private Class<?> implementationClass;
-	
     // Constructors
     /**
      * Constructs a newly allocated {@code Posit} object. 
      */
-    public Posit() {
-    		this.implementationClass = Posit.class; // marks the default implementation
+    protected Posit() {
     }
 
     /**
      * Constructs a newly allocated {@code Posit} object 
-     * with the internal representation given by the String.
-     * The length of the String is the number of bits in
-     * the Posit.
-     * The first character is the sign bit.
-     * The next N characters are the regime bits.
-     * The next S characters are the exponent bits, if any.
-     * The next F characters are the fraction bits, if any.
+     * with the internal representation given by the instance.
      *
      * @param   s  a string of the format ("0","1")*
      * @throws  NumberFormatException  if the string does not contain a
      *               parsable number.
      */
-    public Posit(String s) throws NumberFormatException {
-		this.implementationClass = Posit.class; // marks the default implementation
-    		parseBinary(s);
+    protected Posit(Object instance) throws NumberFormatException {
     }
 
 	// Number interface
@@ -123,10 +107,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          converted to type {@code byte}
      * @jls 5.1.3 Narrowing Primitive Conversions
      */
-	public byte byteValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public abstract byte byteValue();
 
 	@Override
     /**
@@ -137,10 +118,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          converted to type {@code short}
      * @jls 5.1.3 Narrowing Primitive Conversions
      */
-	public short shortValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public abstract short shortValue();
 
 	@Override
     /**
@@ -151,10 +129,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          converted to type {@code int}
      * @jls 5.1.3 Narrowing Primitive Conversions
      */
-	public int intValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public abstract int intValue();
 
 	@Override
     /**
@@ -165,10 +140,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          converted to type {@code long}
      * @jls 5.1.3 Narrowing Primitive Conversions
      */
-	public long longValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public abstract long longValue();
 
 	@Override
     /**
@@ -179,10 +151,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          converted to type {@code float}
      * @jls 5.1.3 Narrowing Primitive Conversions
      */
-	public float floatValue() {
-		// TODO Auto-generated method stub
-		return 0.0f;
-	}
+	public abstract float floatValue();
 
 	@Override
     /**
@@ -193,23 +162,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          converted to type {@code double}
      * @jls 5.1.3 Narrowing Primitive Conversions
      */
-	public double doubleValue() {
-		// TODO Auto-generated method stub
-		return 0.0;
-	}
-
-    /**
-     * Returns value of this {@code Posit} as a {@code String} after a
-     * conversion.
-     *
-     * @return  the {@code Posit} value represented by this object
-     *          converted to type {@code String}
-     * @jls 5.1.3 Narrowing Primitive Conversions
-     */
-	public String stringValue() {
-		// TODO Auto-generated method stub
-		return "0";
-	}
+	public abstract double doubleValue();
 
 	// Conversion
     /**
@@ -375,7 +328,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          parsable number.
      */
     public static Posit valueOf(String s) throws NumberFormatException {
-        return new Posit(s);
+        return new PositStringImpl(s);
     }
     
     /** 
@@ -387,7 +340,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      * @throws  NumberFormatException  if the string does not contain a
      *               parsable binary number.
      */
-    public void parseBinary( String s ) {
+    public void parsePosit( String s ) {
     }
 
     /*
@@ -417,7 +370,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      *          {@code false} otherwise.
      */
     public boolean isInfinite() {
-    		return false;
+    	return false;
     }
 
     /**
@@ -443,24 +396,12 @@ public class Posit extends Number implements Comparable<Posit>  {
     *          NaN; {@code false} otherwise.
     */
    public boolean isNaN() {
-      return false;
+	   return false;
    }
 
-   // TODO Consider +, -, *, /
-    /**
-     * Adds {@code Posit} value to this posit and returns this.
-     *
-     * @param addend the first operand
-     * @return the sum of {@code a} and {@code b}
-     * @jls 4.2.4 Floating-Point Operations
-     * @see java.util.function.BinaryOperator
-     * @since 1.8
-     */
-    public Posit add(Posit addend) {
-        return this;
-    }
+   // Math Consider +, -, *, /
 
-	// Comparable interface
+   // Comparable interface
     /**
      * Compares two {@code Float} objects numerically.  There are
      * two ways in which comparisons performed by this method differ
@@ -517,7 +458,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      * @since 1.4
      */
     public static int compare(Posit p1, Posit p2) {
-    		return 0;
+    	return 0;
     }
     
     /**
@@ -574,7 +515,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      * @see java.lang.Float#floatToIntBits(float)
      */
     public boolean equals(Object obj) {
-    		return true;
+    	return true;
     }
 
 	/**
@@ -643,40 +584,35 @@ public class Posit extends Number implements Comparable<Posit>  {
      * @return a string representation of the argument.
      */
     public String toString() {
-    		return "Posit:";
+    	return "Posit";
     }
 
     // Posit domain interface
-    public Class<?> getImplementation() {
-    		return this.implementationClass;    	
-    }
+    /** Returns the implementation class of this Posit
+     * 
+     * @return Class of this implementation
+     */
+    public abstract Class<?> getImplementation();
         
     /**
      * Returns the number of bits in this Posit.
      * @return number of bits in this Posit
      */
-    public int getBitSize() {
-    		return 0;
-    };
+    public abstract int getBitSize();
     
     /**
      * Returns whether the sign bit is set or not.
      * If the bit size is 0, returns false
      * @return if this Posit is positive (has the sign bit set)
      */
-	public boolean isPositive() {
-		return false;
-	}
+	public abstract boolean isPositive();
     
     /**
      * Returns the regime bits of this Posit as a String of "0" and "1".
      * If the bit size is less than 2, returns empty String.
      * @return a string of "0" and "1" representing the regime
      */
-	public String getRegime() {
-		StringBuilder sb = new StringBuilder();
-		return sb.toString();
-	}
+	public abstract String getRegime();
     
     /**
      * Returns the regime value K.
@@ -687,25 +623,7 @@ public class Posit extends Number implements Comparable<Posit>  {
      * If the bit size is less than 2, returns empty Sting.
      * @return a value representing the K of the regime bits
      */
-	public int getRegimeK() {
-		String regime = getRegime();
-		int k = 0;
-		String first = null;
-		if (null != regime && regime.length() > 0) {
-			for (int i = 0; i < regime.length(); i++) {
-				String bit = regime.substring(i, i + 1);
-				if (null == first)
-					first = bit;
-				if (!bit.equals(first))
-					break;
-				if ("0".equals(first))
-					k--;
-				if ("1".equals(first) && i != 0)
-					k++;
-			}
-		}
-		return k;
-	}
+	public abstract int getRegimeK();
 
     /**
      * Returns the useed of this Posit
@@ -721,20 +639,14 @@ public class Posit extends Number implements Comparable<Posit>  {
      * If the bit size is less than 2, returns empty String.
      * @return a string of "0" and "1" representing the regime
      */
-	public long getRegimeUseed() {
-		int regimeLength = getRegime().length();
-		return (long) Math.pow(2, Math.pow(2, regimeLength));
-	}
+	public abstract long getRegimeUseed();
 
     /**
      * Returns the exponent bits of this Posit as a String of "0" and "1".
      * If the regime fills the bit size, the exponent may be empty string.
      * @return a string of "0" and "1" representing the exponent 
      */
-    public String getExponent() {
-        StringBuilder sb = new StringBuilder();
-        return sb.toString();
-    }
+    public abstract String getExponent();
         
     // Utility
     public static String twosComplement(String bin) {
