@@ -2,12 +2,79 @@ package javax.lang.posit;
 
 import org.junit.Test;
 import org.junit.Before;
-
 import static org.junit.Assert.assertEquals;
 
 import java.util.BitSet;
 
+/**
+ * General test of this class.
+ * <p>
+ * Tests in this class should work with all implementations of Posits.
+ * More specific tests may be in specific test implementations. 
+ *
+ * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ */
 public class PositTest {
+	public static void testNull(final Posit p) {
+		// Number interface
+		assertEquals(0, p.byteValue());
+		assertEquals(0, p.shortValue());
+		assertEquals(0, p.intValue());
+		assertEquals(0, p.longValue());
+		assertEquals(0, p.floatValue(), 0.0001);
+		assertEquals(0, p.doubleValue(), 0.0001);
+		assertEquals("", p.stringValue());
+		// Conversion interface
+		p.parse(null);
+		assertEquals("", p.toString());
+		p.parse("");
+		assertEquals("", p.toString());
+		// Math interface
+		assertEquals(Boolean.FALSE, p.isInfinite());
+		assertEquals(Boolean.FALSE, p.isZero());
+		assertEquals(Boolean.FALSE, p.isNaN());
+		// Object interface
+		Posit p2 = new PositStringImpl( null );
+		assertEquals( 0, p.compareTo( p2 ));
+		assertEquals( 0, Posit.compare(p,p2));
+		assertEquals( 0, p.hashCode());
+		assertEquals( Boolean.TRUE, p.equals( p2 ));
+		assertEquals( "", p.toString());
+		// Posit domain interface
+		assertEquals(String.class, p.getImplementation());
+		assertEquals(0, p.getBitSize());
+		assertEquals(Boolean.FALSE, p.isPositive());
+		assertEquals("", p.getRegime());
+		assertEquals(0, p.getRegimeK());
+		assertEquals(2, p.getUseed());
+		assertEquals("", p.getExponent());
+	}
+	
+	@Test
+	public void testNull() {
+		Posit p = new PositStringImpl( null );
+		testNull( p );
+	}
+
+	@Test
+	public void testNullString() {
+		Posit p = new PositStringImpl( (String) null );
+		testNull( p );
+	}
+
+	@Test
+	public void testLength0() {
+		Posit p = new PositStringImpl( "" );
+		testNull( p );
+	}
+
+	@Test
+	public void testLength1() {
+		Posit p0 = new PositStringImpl( "0" );
+		Posit p1 = new PositStringImpl( "1" );
+	}
+	
+
 	public static final String [] BINARY_TEST_CASES = { 
 			"", // 0 
 			"0", "1", // 1 
@@ -43,15 +110,15 @@ public class PositTest {
     public void parseStringBinary() {
 		final boolean [] EXPECTED_POSITIVE = { 
 				false, // 0
-				false, true, // 1 
-				false, false, true, true, // 2
-				false, false, false, false, true, true, true, true, // 3
+				true, false, // 1 
+				true, true, false, false, // 2
+				true, true, true, true, false, false, false, false, // 3
+				true, true, true, true, true, true, true, true, // 4 
 				false, false, false, false, false, false, false, false, // 4
-				true, true, true, true,  true, true, true, true, // 4
+				true, true, true, true, true, true, true, true, // 5 
+				true, true, true, true, true, true, true, true, // 5 
 				false, false, false, false, false, false, false, false, // 5
 				false, false, false, false, false, false, false, false, // 5
-				true, true, true, true,  true, true, true, true, // 5
-				true, true, true, true,  true, true, true, true, // 5
 		};		
 		final String [] EXPECTED_REGIME = { 
 				"", // 0 
@@ -107,14 +174,15 @@ public class PositTest {
 			String expectedString = BINARY_TEST_CASES[ i ];
 			Posit posit = new PositStringImpl( expectedString );
 			assertEquals( expectedString.length(), posit.getBitSize() );
-			assertEquals( expectedString, posit.toBinaryString() );
+			assertEquals( expectedString, posit.toString() );
 
 			// test domain info
-			assertEquals( EXPECTED_POSITIVE[ i ], posit.isPositive());
-			assertEquals( EXPECTED_REGIME[ i ], posit.getRegime());
+			// System.out.println( "Working test case " + i + " \"" + posit + "\"");
+			assertEquals( "Positive test on " + posit, EXPECTED_POSITIVE[ i ], posit.isPositive());
+			assertEquals( "Regime test on " + posit, EXPECTED_REGIME[ i ], posit.getRegime());
 			// System.out.println( "i=" + i + ", bits=" + expectedString + ", regime=" + posit.getRegime() + ", k=" + posit.getRegimeK() );
-			assertEquals( EXPECTED_REGIME_K[ i ], posit.getRegimeK());
-			assertEquals( (long) Math.pow( 2, Math.pow( 2, EXPECTED_REGIME[ i ].length())), posit.getRegimeUseed()); // Useed is 2 ** 2 ** es
+			assertEquals( "Regime K test on " + posit, EXPECTED_REGIME_K[ i ], posit.getRegimeK());
+			assertEquals( (long) Math.pow( 2, Math.pow( 2, EXPECTED_REGIME[ i ].length())), posit.getUseed()); // Useed is 2 ** 2 ** es
 		}
 		
 	}
@@ -155,30 +223,30 @@ public class PositTest {
 		}
 
 	}
-
 	
 	/** 
 	 * Spits out information about java.util.BitSet
 	 * BitSet is so weird, not reporting its set size, but rather size based on the machine implementation
 	 * or length based on which bits are set.
 	 * Here is an example of BitSet size of 4.
-	 * "BitSet weirdness:  bitSet={1}, bitSet.length=2, bitSet.size=64, bitSetSize=4" 
-	 * 
-	 * */
+	 * "BitSet weirdness:  bitSet={1}, bitSet.length=2, bitSet.size=64, bitSetSize=4"
+	 * <p>
+	 * This test is a legacy artifact from when the first implementation was based on BitSet. 
+	 */
 	@Test
     public void bitSetInfo() {
 	    int ADDRESS_BITS_PER_WORD = 6;
 	    int BITS_PER_WORD = 1 << ADDRESS_BITS_PER_WORD;
 	    int BIT_INDEX_MASK = BITS_PER_WORD - 1;
-	    System.out.println( "BitSet info: ADDRESS_BITS_PER_WORD=6,BITS_PER_WORD="+ BITS_PER_WORD + ",BIT_INDEX_MASK=0b" + Integer.toBinaryString(BIT_INDEX_MASK));
+	    // System.out.println( "BitSet info: ADDRESS_BITS_PER_WORD=6,BITS_PER_WORD="+ BITS_PER_WORD + ",BIT_INDEX_MASK=0b" + Integer.toBinaryString(BIT_INDEX_MASK));
 
 	    int SIZE = 4;
 	    BitSet bitSet = new BitSet(SIZE);
 	    bitSet.set( 1 );
-		System.out.println( "BitSet weirdness:  bitSet=" + bitSet + ", bitSet.length=" + bitSet.length() + ", bitSet.size=" + bitSet.size() + ", bitSetSize=" + SIZE ); 
+		// System.out.println( "BitSet weirdness:  bitSet=" + bitSet + ", bitSet.length=" + bitSet.length() + ", bitSet.size=" + bitSet.size() + ", bitSetSize=" + SIZE ); 
 	    
-	    boolean OUTPUT = false;
-	    if (OUTPUT) {
+	    final boolean VERBOSE_OUTPUT = false;
+	    if (VERBOSE_OUTPUT) {
 		for (int length = 0; length < 32; length++) {
 			bitSet = new BitSet(length);
 			for ( int odds = 0; odds < length; odds++) {
@@ -203,5 +271,4 @@ public class PositTest {
 		}		
 	    }
 	}
-
 }
