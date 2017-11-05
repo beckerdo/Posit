@@ -133,38 +133,48 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#isInfinite()
 	 */
 	public boolean isInfinite() {
+		return isInfinite( internal );
+	}
+
+	/** Checks if a string of binary 0 and 1 characters represents infinity. */
+	public static boolean isInfinite( String instance ) {
 		// '1' followed by zero or more '0' ("1+0*") 
-		if ( internal.length() < 1) {
+		if ( null == instance || instance.length() < 1) {
 			return false;
 		}
-		if(  '1' != internal.charAt(0) ) {
+		if(  '1' != instance.charAt(0) ) {
 			return false;
 		}
-		for ( int i= 1; i < internal.length(); i++ ) {
-			if ( '0' != internal.charAt(i) ) {
+		for ( int i= 1; i < instance.length(); i++ ) {
+			if ( '0' != instance.charAt(i) ) {
 				return false;
 			}			
 		}
-		return true;
+		return true;		
 	}
-
+	
 	@Override
 	/**
 	 * @see Posit#isZero()
 	 */
 	public boolean isZero() {
+		return isZero( internal );
+	}
+
+	/** Checks if a string of binary 0 and 1 characters represents infinity. */
+	public static boolean isZero( String instance ) {
 		// One or more '0' ("0+") 
-		if ( internal.length() < 1) {
+		if ( null == instance || instance.length() < 1) {
 			return false;
 		}
-		for ( int i= 0; i < internal.length(); i++ ) {
-			if ( '0' != internal.charAt(i) ) {
+		for ( int i= 0; i < instance.length(); i++ ) {
+			if ( '0' != instance.charAt(i) ) {
 				return false;
 			}			
 		}
-		return true;
+		return true;		
 	}
-
+	
 	// Comparable interface
 	/**
 	 * @see Posit#compareTo
@@ -231,35 +241,46 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#isPositive()
 	 */
 	public boolean isPositive() {
-		// One or more '0' ("0+") 
-		if ( internal.length() < 1) {
-			return false;
-		}
-		return '0' == internal.charAt(0);
+		return isPositive( internal );
 	}
 
+	/** Checks if a string of binary 0 and 1 characters is positive. */
+	public static boolean isPositive( String instance ) {
+		// One or more '0' ("0+") 
+		if ( instance.length() < 1) {
+			return false;
+		}
+		return '0' == instance.charAt(0);
+		
+	}
+	
 	@Override
 	/**
 	 * @see Posit#getRegime()
 	 */
 	public String getRegime() {
+		return getRegime( internal );
+	}
+	
+	/** Returns the regime portion of a string of binary 0 and 1 characters. */
+	public static String getRegime( String instance ) {
 		// If the bit size is less than 2, returns empty String.
 		// First char of Posit is sign bit.
 		// Regime is first char until terminated by end of string or until opposite char.
 		// Examples "0", "1", "00", "01", "10", "11"
-		if ( internal.length() < 2) {
+		if ( null == instance || instance.length() < 2) {
 			return "";
 		}
-		char first = internal.charAt(1);
+		char first = instance.charAt(1);
 		final StringBuilder sb = new StringBuilder(first);
-		for (int i = 1; i < internal.length(); i++) {
-			final char current = internal.charAt(i);
+		for (int i = 1; i < instance.length(); i++) {
+			final char current = instance.charAt(i);
 			sb.append(current);
 			if ( first != current) {
 				break;
 			}
 		}
-		return sb.toString();
+		return sb.toString();		
 	}
 
 	@Override
@@ -267,14 +288,18 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getRegimeK()
 	 */
 	public int getRegimeK() {
+		return getRegimeK( internal );
+	}
+
+	/** Returns the regime value of a string of binary 0 and 1 characters. */
+	public static int getRegimeK( String regime ) {
 		// Returns the regime value K.
 		// Let m be the number of identical bits starting the regime;
 		// if the bits are 0, then k = −m;
 		// if the bits are 1, then k = m − 1.
 		// Examples (regime = K):
 		// 0000=-4, 0001=-3,001x=-2,01xx=-1,10xx=110x=1,1110=2,1111=3
-		final String regime = getRegime();
-		if ( regime.length() < 1) {
+		if ( null == regime || regime.length() < 1) {
 			return 0;
 		}
 		char first = regime.charAt(0);
@@ -290,7 +315,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 				k++;
 			}
 		}
-		return k;
+		return k;		
 	}
 
 	@Override
@@ -298,21 +323,38 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getUseed()
 	 */
 	public long getUseed() {
-		final int regimeLength = getRegime().length();
-		return (long) Math.pow(2, Math.pow(2, regimeLength));
+		return getUseed( internal );
 	}
 
+	/** Get the useed of a regime (2^2^regimeLength). */
+	public static long getUseed( String regime ) {
+		if ( null != regime ) {
+			final int regimeLength = regime.length();
+			if ( 0 == regimeLength ) {
+				return 2;
+			}
+			return (long) Math.pow(2, Math.pow(2, regimeLength));			
+		}
+		return 0;		
+	}
+	
 	@Override
 	/**
 	 * @see Posit#getExponent()
 	 */
 	public String getExponent() {
+		return getExponent( internal );
+	}
+	
+	/** Return the exponent part of a given string of 0 and 1 characters. */
+	public static String getExponent( String instance ) {
 		// Returns the exponent bits of this Posit as a String of "0" and "1".
 		// If the regime fills the bit size, the exponent may be empty string.
-		if ( internal.length() < 2) {
+		if ( null == instance || instance.length() < 2) {
 			return "";
 		}
-		String regime = getRegime();
-		return internal.substring(regime.length() + 1);
+		String regime = getRegime( instance );
+		return regime.substring(regime.length() + 1);
+		
 	}
 }

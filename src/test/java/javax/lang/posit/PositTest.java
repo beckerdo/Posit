@@ -134,7 +134,7 @@ public class PositTest {
 		};		
 		final int [] EXPECTED_REGIME_K = { 
 				0, // 0 
-				0, 0, // 1 
+				-1, 0, // 1 
 				-1, 0, -1, 0, // 2 
 				-2, -1, 0, 1, -2, -1, 0, 1, // 3 
 				-3, -2, -1, -1, 0, 0, 1, 2, // 4 
@@ -182,7 +182,8 @@ public class PositTest {
 			assertEquals( "Regime test on " + posit, EXPECTED_REGIME[ i ], posit.getRegime());
 			// System.out.println( "i=" + i + ", bits=" + expectedString + ", regime=" + posit.getRegime() + ", k=" + posit.getRegimeK() );
 			assertEquals( "Regime K test on " + posit, EXPECTED_REGIME_K[ i ], posit.getRegimeK());
-			assertEquals( (long) Math.pow( 2, Math.pow( 2, EXPECTED_REGIME[ i ].length())), posit.getUseed()); // Useed is 2 ** 2 ** es
+			assertEquals( "Regime useed test on " + posit,
+					(long) Math.pow( 2, Math.pow( 2, EXPECTED_REGIME[ i ].length())), posit.getUseed()); // Useed is 2 ** 2 ** es
 		}
 		
 	}
