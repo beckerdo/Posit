@@ -1,8 +1,5 @@
 package javax.lang.posit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Bit
  * <p>
@@ -10,17 +7,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
-public abstract class Bit extends Number implements Comparable<Bit> {
-	/** Serialization version */
-	private static final long serialVersionUID = 1L;
-
-	/** LOGGER */
-	public static final Logger LOGGER = LoggerFactory.getLogger(Bit.class);
-
+public final class Bit {
 	// Constructors
-	/**
-	 * Constructs a newly allocated {@code Posit} object.
-	 */
 	protected Bit() {
 	}
 
