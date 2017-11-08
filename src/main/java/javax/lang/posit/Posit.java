@@ -65,8 +65,7 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	}
 
 	/**
-	 * Constructs a newly allocated {@code Posit} object from
-	 * the given input.
+	 * Constructs a newly allocated {@code Posit} object from the given input.
 	 * representation given by the instance.
 	 *
 	 * @param s
@@ -199,17 +198,6 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 		return false;
 	}
 
-	/**
-	 * Returns {@code true} if this {@code Posit} value is a Not-a-Number (NaN),
-	 * {@code false} otherwise.
-	 *
-	 * @return {@code true} if the value represented by this object is NaN;
-	 *         {@code false} otherwise.
-	 */
-	public boolean isNaN() {
-		return false;
-	}
-
 	// Math Consider +, -, *, /
 
 	// Comparable interface
@@ -242,9 +230,9 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 */
 	@Override
 	public boolean equals(final Object obj) {
-		if ( obj instanceof Posit) {
-			Posit posit = (Posit) obj;
-			return this.equals(posit);
+		if (obj instanceof Posit) {
+			final Posit posit = (Posit) obj;
+			return equals(posit);
 		}
 		return false;
 	}
@@ -254,13 +242,13 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 */
 	@Override
 	public String toString() {
-		return this.stringValue();
+		return stringValue();
 	}
 
 	// Posit domain interface
 	/**
-	 * Returns the native implementation class of this Posit.
-	 * For example: String, Byte, Short, Integer, Long, etc..
+	 * Returns the native implementation class of this Posit. For example: String,
+	 * Byte, Short, Integer, Long, etc..
 	 *
 	 * @return Class of this implementation
 	 */
@@ -275,8 +263,10 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 
 	/**
 	 * Returns whether the sign bit is set or not.
-	 * <p>If the bit size is 0, returns false.
-	 * <p>Note that Zero is considered positive, Infinity is not.
+	 * <p>
+	 * If the bit size is 0, returns false.
+	 * <p>
+	 * Note that Zero is considered positive, Infinity is not.
 	 *
 	 * @return if this Posit is positive (has the sign bit set)
 	 */
@@ -284,11 +274,16 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 
 	/**
 	 * Returns the regime bits of this Posit as a String of "0" and "1".
-	 * <p>If the bit size is less than 2, returns empty String.
-	 * <p>First char of Posit is sign bit.
-	 * <p>Regime is first char until terminated by end of string or until opposite char.
-	 * <p>Examples "0", "1", "00", "01", "10", "11"
-	 * 
+	 * <p>
+	 * If the bit size is less than 2, returns empty String.
+	 * <p>
+	 * First char of Posit is sign bit.
+	 * <p>
+	 * Regime is first char until terminated by end of string or until opposite
+	 * char.
+	 * <p>
+	 * Examples "0", "1", "00", "01", "10", "11"
+	 *
 	 * @return a string of "0" and "1" representing the regime
 	 */
 	public abstract String getRegime();
@@ -296,12 +291,11 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	/**
 	 * Returns the regime value K.
 	 * <p>
-	 * Let m be the number of identical bits starting the regime;
-	 * if the bits are 0, then k = −m;
-	 * if the bits are 1, then k = m − 1.
+	 * Let m be the number of identical bits starting the regime; if the bits are 0,
+	 * then k = −m; if the bits are 1, then k = m − 1.
 	 * <p>
-	 * Examples (regime = K):
-	 * 0000=-4, 0001=-3,001x=-2,01xx=-1,10xx=110x=1,1110=2,1111=3
+	 * Examples (regime = K): 0000=-4,
+	 * 0001=-3,001x=-2,01xx=-1,10xx=110x=1,1110=2,1111=3
 	 *
 	 * @return a value representing the K of the regime bits
 	 */
@@ -310,10 +304,8 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	/**
 	 * Returns the useed of this Posit Useed is 2 ** 2 ** run length of regime.
 	 * <p>
-	 * Given es as the size of the exponent, useed = 2^2^es,
-	 * and scale = useed^k
-	 * Examples (es = useed):
-	 * 0=2,1=2^2=4,2=4^2=16,3=16^2=256,4=256^2=65536
+	 * Given es as the size of the exponent, useed = 2^2^es, and scale = useed^k
+	 * Examples (es = useed): 0=2,1=2^2=4,2=4^2=16,3=16^2=256,4=256^2=65536
 	 *
 	 * @return a long representing the Useed.
 	 */

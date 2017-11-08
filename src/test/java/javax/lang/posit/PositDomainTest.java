@@ -10,52 +10,37 @@ import org.junit.Test;
  *
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
-public class PositModelTest {
+public class PositDomainTest {
 	@Before
 	public void setup() {
 	}
 
-	public static void testNull(final Posit p) {
-		assertEquals("", p.toString());
-		p.parse("");
-		assertEquals("", p.toString());
+	public static void testNull(final Object o) {
 		// Math interface
-		assertEquals(Boolean.FALSE, p.isInfinite());
-		assertEquals(Boolean.FALSE, p.isZero());
-		assertEquals(Boolean.FALSE, p.isNaN());
-		// Object interface
-		final Posit p2 = new PositStringImpl(null);
-		assertEquals(0, p.compareTo(p2));
-		assertEquals(0, Posit.compare(p, p2));
-		assertEquals(0, p.hashCode());
-		assertEquals(Boolean.TRUE, p.equals(p2));
-		assertEquals("", p.toString());
+		assertEquals(Boolean.FALSE, PositDomain.isInfinite((String) o));
+		assertEquals(Boolean.FALSE, PositDomain.isZero((String) o));
+		assertEquals(Boolean.FALSE, PositDomain.isPositive((String) o));
+		assertEquals(Boolean.FALSE, PositDomain.isExact((String) o));
 		// Posit domain interface
-		assertEquals(String.class, p.getImplementation());
-		assertEquals(0, p.getBitSize());
-		assertEquals(Boolean.FALSE, p.isPositive());
-		assertEquals("", p.getRegime());
-		assertEquals(0, p.getRegimeK());
-		assertEquals(2, p.getUseed());
-		assertEquals("", p.getExponent());
+		assertEquals("", PositDomain.getRegime((String) o));
+		assertEquals(0, PositDomain.getRegimeK((String) o));
+		assertEquals(2, PositDomain.getUseed((String) o));
+		assertEquals("", PositDomain.getExponent((String) o));
 	}
 
 	@Test
 	public void testNull() {
-		final Posit p = new PositStringImpl(null);
-		testNull(p);
+		testNull(null);
 	}
 
 	@Test
 	public void testNullString() {
-		final Posit p = new PositStringImpl((String) null);
-		testNull(p);
+		testNull((String) null);
 	}
 
 	@Test
 	public void testLength0() {
-		final Posit p = new PositStringImpl("");
-		testNull(p);
+		testNull("");
 	}
 
 	public static final String[] BINARY_TEST_CASES = { "", // 0
@@ -85,18 +70,8 @@ public class PositModelTest {
 	// }
 
 	@Test
-	public void parseStringBinary() {
-		final boolean[] EXPECTED_POSITIVE = { false, // 0
-				true, false, // 1
-				true, true, false, false, // 2
-				true, true, true, true, false, false, false, false, // 3
-				true, true, true, true, true, true, true, true, // 4
-				false, false, false, false, false, false, false, false, // 4
-				true, true, true, true, true, true, true, true, // 5
-				true, true, true, true, true, true, true, true, // 5
-				false, false, false, false, false, false, false, false, // 5
-				false, false, false, false, false, false, false, false, // 5
-		};
+	public void positDomain() {
+
 		final String[] EXPECTED_REGIME = { "", // 0
 				"", "", // 1
 				"0", "1", "0", "1", // 2
@@ -142,22 +117,20 @@ public class PositModelTest {
 				"11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
 		};
 
-		// Test that parsing and toString are commutative.
 		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
-			final String expectedString = BINARY_TEST_CASES[i];
-			final Posit posit = new PositStringImpl(expectedString);
-			assertEquals(expectedString.length(), posit.getBitSize());
-			assertEquals(expectedString, posit.toString());
-
 			// test domain info
-			// System.out.println( "Working test case " + i + " \"" + posit + "\"");
-			assertEquals("Positive test on " + posit, EXPECTED_POSITIVE[i], posit.isPositive());
-			assertEquals("Regime test on " + posit, EXPECTED_REGIME[i], posit.getRegime());
+			assertEquals("Regime test on " + BINARY_TEST_CASES[i], EXPECTED_REGIME[i],
+					PositDomain.getRegime(BINARY_TEST_CASES[i]));
 			// System.out.println( "i=" + i + ", bits=" + expectedString + ", regime=" +
 			// posit.getRegime() + ", k=" + posit.getRegimeK() );
-			assertEquals("Regime K test on " + posit, EXPECTED_REGIME_K[i], posit.getRegimeK());
-			assertEquals("Regime useed test on " + posit, (long) Math.pow(2, Math.pow(2, EXPECTED_REGIME[i].length())),
-					posit.getUseed()); // Useed is 2 ** 2 ** es
+			assertEquals("Regime K test on " + BINARY_TEST_CASES[i], EXPECTED_REGIME_K[i],
+					PositDomain.getRegimeK(BINARY_TEST_CASES[i]));
+			assertEquals("Regime useed test on " + BINARY_TEST_CASES[i],
+					(long) Math.pow(2, Math.pow(2, EXPECTED_REGIME[i].length())),
+					PositDomain.getUseed(BINARY_TEST_CASES[i])); // Useed is 2 ** 2 ** es
+
+			// Need expected exponent
+			// Need excpected fraction
 		}
 
 	}
@@ -189,12 +162,48 @@ public class PositModelTest {
 
 		// Test that parsing and toString are commutative.
 		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
-			final Posit posit = new PositStringImpl(BINARY_TEST_CASES[i]);
 			// System.out.println( "i=" + i + ", bits=" + BINARY_TEST_CASES[i] + ", isZero="
 			// + posit.isZero() + ", isInfinity=" + posit.isInfinite());
-			assertEquals(EXPECTED_IS_ZERO[i], posit.isZero());
-			assertEquals(EXPECTED_IS_INFINITE[i], posit.isInfinite());
+			assertEquals("isZero test on " + BINARY_TEST_CASES[i], EXPECTED_IS_ZERO[i],
+					PositDomain.isZero(BINARY_TEST_CASES[i]));
+			assertEquals("isInfinte test on " + BINARY_TEST_CASES[i], EXPECTED_IS_INFINITE[i],
+					PositDomain.isInfinite(BINARY_TEST_CASES[i]));
 		}
-
 	}
+
+	@Test
+	public void isPositveIsExact() {
+		final boolean[] EXPECTED_POSITIVE = { false, // 0
+				true, false, // 1
+				true, true, false, false, // 2
+				true, true, true, true, false, false, false, false, // 3
+				true, true, true, true, true, true, true, true, // 4
+				false, false, false, false, false, false, false, false, // 4
+				true, true, true, true, true, true, true, true, // 5
+				true, true, true, true, true, true, true, true, // 5
+				false, false, false, false, false, false, false, false, // 5
+				false, false, false, false, false, false, false, false, // 5
+		};
+		final boolean[] EXPECTED_EXACT = { true, // 0
+				true, true, // 1
+				true, true, true, true, // 2
+				true, false, true, false, true, false, true, false, // 3
+				true, false, true, false, true, false, true, false, // 4
+				true, false, true, false, true, false, true, false, // 4
+				true, false, true, false, true, false, true, false, // 5
+				true, false, true, false, true, false, true, false, // 5
+				true, false, true, false, true, false, true, false, // 5
+				true, false, true, false, true, false, true, false, // 5
+		};
+		// Test that parsing and toString are commutative.
+		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
+			// System.out.println( "i=" + i + ", bits=" + BINARY_TEST_CASES[i] + ", isZero="
+			// + posit.isZero() + ", isInfinity=" + posit.isInfinite());
+			assertEquals("isPositive test on " + BINARY_TEST_CASES[i], EXPECTED_POSITIVE[i],
+					PositDomain.isZero(BINARY_TEST_CASES[i]));
+			assertEquals("isExact test on " + BINARY_TEST_CASES[i], EXPECTED_EXACT[i],
+					PositDomain.isExact(BINARY_TEST_CASES[i]));
+		}
+	}
+
 }

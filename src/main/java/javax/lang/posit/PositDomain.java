@@ -10,7 +10,7 @@ package javax.lang.posit;
  *
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
-public final class PositModel {
+public final class PositDomain {
 
 	// Math interface
 	/** Checks if a string of binary 0 and 1 characters represents infinity. */
@@ -51,6 +51,21 @@ public final class PositModel {
 			return false;
 		}
 		return '0' == instance.charAt(0);
+
+	}
+
+	/**
+	 * Checks if a string of binary 0 and 1 characters is exact. Type II unums
+	 * ending in 1 (the ubit) represent the open interval between adjacent exact
+	 * points, the unums for which end in 0.
+	 * <p>
+	 * Posits of length 0, 1, 2, (0,1,∞,-1) are all exact.
+	 */
+	public static boolean isExact(String instance) {
+		if (instance.length() < 3) {
+			return true;
+		}
+		return '0' == instance.charAt(instance.length() - 1);
 
 	}
 

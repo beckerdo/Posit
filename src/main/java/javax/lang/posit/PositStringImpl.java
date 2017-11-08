@@ -133,7 +133,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#isInfinite()
 	 */
 	public boolean isInfinite() {
-		return PositModel.isInfinite(internal);
+		return PositDomain.isInfinite(internal);
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#isZero()
 	 */
 	public boolean isZero() {
-		return PositModel.isZero(internal);
+		return PositDomain.isZero(internal);
 	}
 
 	// Comparable interface
@@ -228,7 +228,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getRegime()
 	 */
 	public String getRegime() {
-		return PositModel.getRegime(internal);
+		return PositDomain.getRegime(internal);
 	}
 
 	@Override
@@ -236,7 +236,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getRegimeK()
 	 */
 	public int getRegimeK() {
-		return PositModel.getRegimeK(internal);
+		return PositDomain.getRegimeK(internal);
 	}
 
 	@Override
@@ -244,7 +244,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getUseed()
 	 */
 	public long getUseed() {
-		return PositModel.getUseed(internal);
+		return PositDomain.getUseed(internal);
 	}
 
 	@Override
@@ -252,7 +252,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getExponent()
 	 */
 	public String getExponent() {
-		return PositModel.getExponent(internal);
+		return PositDomain.getExponent(internal);
 	}
 
 }
