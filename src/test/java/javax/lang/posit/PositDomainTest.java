@@ -20,7 +20,7 @@ public class PositDomainTest {
 		assertEquals(Boolean.FALSE, PositDomain.isInfinite((String) o));
 		assertEquals(Boolean.FALSE, PositDomain.isZero((String) o));
 		assertEquals(Boolean.FALSE, PositDomain.isPositive((String) o));
-		assertEquals(Boolean.FALSE, PositDomain.isExact((String) o));
+		assertEquals(Boolean.TRUE, PositDomain.isExact((String) o));
 		// Posit domain interface
 		assertEquals("", PositDomain.getRegime((String) o));
 		assertEquals(0, PositDomain.getRegimeK((String) o));
@@ -84,7 +84,7 @@ public class PositDomainTest {
 				"10", "10", "10", "10", "110", "110", "1110", "1111", // 5
 		};
 		final int[] EXPECTED_REGIME_K = { 0, // 0
-				-1, 0, // 1
+				0, 0, // 1
 				-1, 0, -1, 0, // 2
 				-2, -1, 0, 1, -2, -1, 0, 1, // 3
 				-3, -2, -1, -1, 0, 0, 1, 2, // 4
@@ -124,10 +124,10 @@ public class PositDomainTest {
 			// System.out.println( "i=" + i + ", bits=" + expectedString + ", regime=" +
 			// posit.getRegime() + ", k=" + posit.getRegimeK() );
 			assertEquals("Regime K test on " + BINARY_TEST_CASES[i], EXPECTED_REGIME_K[i],
-					PositDomain.getRegimeK(BINARY_TEST_CASES[i]));
+					PositDomain.getRegimeK(EXPECTED_REGIME[i]));
 			assertEquals("Regime useed test on " + BINARY_TEST_CASES[i],
 					(long) Math.pow(2, Math.pow(2, EXPECTED_REGIME[i].length())),
-					PositDomain.getUseed(BINARY_TEST_CASES[i])); // Useed is 2 ** 2 ** es
+					PositDomain.getUseed(EXPECTED_REGIME[i])); // Useed is 2 ** 2 ** es
 
 			// Need expected exponent
 			// Need excpected fraction
@@ -197,10 +197,8 @@ public class PositDomainTest {
 		};
 		// Test that parsing and toString are commutative.
 		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
-			// System.out.println( "i=" + i + ", bits=" + BINARY_TEST_CASES[i] + ", isZero="
-			// + posit.isZero() + ", isInfinity=" + posit.isInfinite());
 			assertEquals("isPositive test on " + BINARY_TEST_CASES[i], EXPECTED_POSITIVE[i],
-					PositDomain.isZero(BINARY_TEST_CASES[i]));
+					PositDomain.isPositive(BINARY_TEST_CASES[i]));
 			assertEquals("isExact test on " + BINARY_TEST_CASES[i], EXPECTED_EXACT[i],
 					PositDomain.isExact(BINARY_TEST_CASES[i]));
 		}

@@ -47,7 +47,7 @@ public final class PositDomain {
 	/** Checks if a string of binary 0 and 1 characters is positive. */
 	public static boolean isPositive(String instance) {
 		// One or more '0' ("0+")
-		if (instance.length() < 1) {
+		if (null == instance || instance.length() < 1) {
 			return false;
 		}
 		return '0' == instance.charAt(0);
@@ -62,7 +62,7 @@ public final class PositDomain {
 	 * Posits of length 0, 1, 2, (0,1,∞,-1) are all exact.
 	 */
 	public static boolean isExact(String instance) {
-		if (instance.length() < 3) {
+		if (null == instance || instance.length() < 3) {
 			return true;
 		}
 		return '0' == instance.charAt(instance.length() - 1);
@@ -127,7 +127,7 @@ public final class PositDomain {
 			}
 			return (long) Math.pow(2, Math.pow(2, regimeLength));
 		}
-		return 0;
+		return 2;
 	}
 
 	/** Return the exponent part of a given string of 0 and 1 characters. */
