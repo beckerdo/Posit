@@ -13,7 +13,6 @@ import java.math.BigInteger;
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
 public final class PositDomain {
-
 	// Math interface
 	/** Checks if a string of binary 0 and 1 characters represents infinity. */
 	public static boolean isInfinite(String instance) {

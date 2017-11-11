@@ -21,8 +21,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	/** internal representation */
 	private String internal;
 
-	/** one max es for entire class */
-	private static int staticMaxExponentSize = 2;
+	private byte maxExponentSize = 2;
 	
 	// Constructors
 	/**
@@ -90,8 +89,35 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#doubleValue()
 	 */
 	public double doubleValue() {
-		// TODO Auto-generated method stub
-		return 0.0;
+		// Temp implementation
+		if ( isZero() ) {
+			return 0.0;
+		}
+		if ( isInfinite() ) {
+			return Double.POSITIVE_INFINITY;
+		}
+		BigInteger useed = getUseed();
+		// System.out.println( "Posit \"" + this + "\", useed=" + useed);
+		int k = getRegimeK();
+	    // System.out.println( "Posit \"" + this + "\", regime K=" + k);
+		String exponent = getExponent();
+		int expVal = Integer.parseUnsignedInt(exponent,2);
+		// System.out.println( "Posit \"" + this + "\", expVal=" + expVal);
+		String fraction = getFraction();
+		long fracVal = Long.parseUnsignedLong(fraction,2);
+		// System.out.println( "Posit \"" + this + "\", fracVal=" + expVal);
+		double val = -1.0;
+		if ( isPositive() ) { 
+			val = 1.0;
+		}
+		if (k > 0) 
+			val *= useed.pow(k).doubleValue(); // sign*regime
+		else
+			val /= useed.pow(Math.abs(k)).doubleValue(); // sign*regime
+		val *= BigInteger.valueOf(2).pow(expVal).doubleValue(); // sign*regime*exp
+		double fracDouble = 1.0 + (fracVal/useed.doubleValue()); // sign*regime*exp*fraction
+		val *= fracDouble;
+		return val;
 	}
 
 	@Override
@@ -262,16 +288,16 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	/**
 	 * @see Posit#getMaxExponentSize()
 	 */
-	public int getMaxExponentSize() {
-		return staticMaxExponentSize;
+	public byte getMaxExponentSize() {
+		return this.maxExponentSize;
 	}
 
 	@Override
 	/**
 	 * @see Posit#setMaxExponentSize()
 	 */
-	public void setMaxExponentSize(int maxExponentSize) {
-		staticMaxExponentSize = maxExponentSize;
+	public void setMaxExponentSize(byte maxExponentSize) {
+		this.maxExponentSize = maxExponentSize;
 	}
 
 	@Override
@@ -296,6 +322,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getUseed()
 	 */
 	public BigInteger getUseed() {
+		// System.out.println( "Posit \"" + internal + "\", exponent=\"" + getExponent() + "\"");
 		return PositDomain.getUseed(getExponent().length());
 	}
 }

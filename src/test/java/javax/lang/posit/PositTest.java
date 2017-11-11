@@ -29,8 +29,8 @@ public class PositTest {
 		assertEquals(0, p.shortValue());
 		assertEquals(0, p.intValue());
 		assertEquals(0, p.longValue());
-		assertEquals(0, p.floatValue(), 0.0001);
-		assertEquals(0, p.doubleValue(), 0.0001);
+		assertEquals(0, p.floatValue(), PositDomainTest.COMPARE_PRECISION);
+		assertEquals(0, p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
 		assertEquals("", p.stringValue());
 		// Conversion interface
 		p.parse(null);
@@ -83,10 +83,9 @@ public class PositTest {
 	public void parseStringBinary() {
 		// Test that parsing and toString are commutative.
 		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
-			final String expectedString = BINARY_TEST_CASES[i];
-			final Posit posit = new PositStringImpl(expectedString);
-			assertEquals(expectedString.length(), posit.getBitSize());
-			assertEquals(expectedString, posit.toString());
+			final Posit posit = new PositStringImpl(BINARY_TEST_CASES[i]);
+			assertEquals(BINARY_TEST_CASES[i].length(), posit.getBitSize());
+			assertEquals(BINARY_TEST_CASES[i], posit.toString());
 
 			// test domain info
 			// System.out.println( "Working test case " + i + " \"" + posit + "\"");
@@ -94,9 +93,12 @@ public class PositTest {
 			assertEquals("Regime test on " + posit, EXPECTED_REGIME[i], posit.getRegime());
 			// System.out.println( "i=" + i + ", bits=" + expectedString + ", regime=" +
 			// posit.getRegime() + ", k=" + posit.getRegimeK() );
-			assertEquals("Regime K test on " + posit, EXPECTED_REGIME_K[i], posit.getRegimeK());
-			
-			assertEquals("Regime useed test on " + posit, PositDomainTest.EXPECTED_USEED[ i ],
+			assertEquals("Regime K test element " + i + ", posit=" + posit, EXPECTED_REGIME_K[i], posit.getRegimeK());
+
+			assertEquals("Exponent/fraction test element " + i + ", posit=" + BINARY_TEST_CASES[i], PositDomainTest.EXPECTED_EXPONENT_FRACTION[i],
+					posit.getExponentFraction());
+
+			assertEquals("Useed test element " + i + ", posit=" + posit, PositDomainTest.EXPECTED_USEED[ posit.getExponent().length() ],
 					posit.getUseed()); // Useed is 2 ** 2 ** es
 		}
 
@@ -125,6 +127,21 @@ public class PositTest {
 					posit.isExact());
 		}
 	}
+	
+	@Test
+	public void doubleValue() {
+		final String TEST_CASE = "0000110111011101";
+		final double EXPECTED = Double.parseDouble("3.55393E-6");
+		Posit posit = new PositStringImpl(TEST_CASE);
+		posit.setMaxExponentSize((byte)3);
+		double returned = posit.doubleValue();
+		System.out.println( "Posit=\"" + posit + "\", double=" + returned);
+		
+		assertEquals( "Posit double value testCase=" + TEST_CASE + ", doubleVal=" + returned,
+				EXPECTED, returned, PositDomainTest.COMPARE_PRECISION);
+	}
+
+	
 	/**
 	 * Spits out information about java.util.BitSet BitSet is so weird, not
 	 * reporting its set size, but rather size based on the machine implementation

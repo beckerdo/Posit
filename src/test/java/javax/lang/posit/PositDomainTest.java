@@ -12,7 +12,9 @@ import org.junit.Test;
  *
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
-public class PositDomainTest {
+public class PositDomainTest {	
+	public static final double COMPARE_PRECISION = 0.000001;
+
 	public static final String[] BINARY_TEST_CASES = { 
 			"", // 0
 			"0", "1", // 1

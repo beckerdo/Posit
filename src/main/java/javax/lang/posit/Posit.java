@@ -337,12 +337,12 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 *
 	 * @return maximum number of exponent bits in this Posit
 	 */
-	public abstract int getMaxExponentSize();
+	public abstract byte getMaxExponentSize();
 
 	/**
 	 * Sets the maximum exponent size or em in this Posit.
 	 */
-	public abstract void setMaxExponentSize(int maxExponentSize);
+	public abstract void setMaxExponentSize(byte maxExponentSize);
 
 	/**
 	 * Returns the exponent bits of this Posit as a String of "0" and "1".
