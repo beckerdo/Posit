@@ -1,5 +1,7 @@
 package javax.lang.posit;
 
+import java.math.BigInteger;
+
 /**
  * Posit implementation based on String
  * <p>
@@ -16,11 +18,12 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	/** Serialization version */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * internal representation
-	 */
+	/** internal representation */
 	private String internal;
 
+	/** one max es for entire class */
+	private static int staticMaxExponentSize = 2;
+	
 	// Constructors
 	/**
 	 * @see Posit#()
@@ -213,6 +216,14 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		return isPositive(internal);
 	}
 
+	@Override
+	/**
+	 * @see Posit#isExact()
+	 */
+	public boolean isExact() {
+		return PositDomain.isExact(internal);
+	}
+
 	/** Checks if a string of binary 0 and 1 characters is positive. */
 	public static boolean isPositive(String instance) {
 		// One or more '0' ("0+")
@@ -236,15 +247,31 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getRegimeK()
 	 */
 	public int getRegimeK() {
-		return PositDomain.getRegimeK(internal);
+		return PositDomain.getRegimeK(PositDomain.getRegime(internal));
 	}
 
 	@Override
 	/**
-	 * @see Posit#getUseed()
+	 * @see Posit#getExponentFraction()
 	 */
-	public long getUseed() {
-		return PositDomain.getUseed(internal);
+	public String getExponentFraction() {
+		return PositDomain.getExponentFraction(internal);
+	}
+
+	@Override
+	/**
+	 * @see Posit#getMaxExponentSize()
+	 */
+	public int getMaxExponentSize() {
+		return staticMaxExponentSize;
+	}
+
+	@Override
+	/**
+	 * @see Posit#setMaxExponentSize()
+	 */
+	public void setMaxExponentSize(int maxExponentSize) {
+		staticMaxExponentSize = maxExponentSize;
 	}
 
 	@Override
@@ -252,7 +279,23 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getExponent()
 	 */
 	public String getExponent() {
-		return PositDomain.getExponent(internal);
+		return PositDomain.getExponent(getExponentFraction(),getMaxExponentSize());
 	}
 
+
+	@Override
+	/**
+	 * @see Posit#getFraction()
+	 */
+	public String getFraction() {
+		return PositDomain.getFraction(getExponentFraction(),getMaxExponentSize());
+	}		
+
+	@Override
+	/**
+	 * @see Posit#getUseed()
+	 */
+	public BigInteger getUseed() {
+		return PositDomain.getUseed(getExponent().length());
+	}
 }

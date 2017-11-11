@@ -1,5 +1,7 @@
 package javax.lang.posit;
 
+import java.math.BigInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -273,6 +275,18 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	public abstract boolean isPositive();
 
 	/**
+	 * Returns whether the Posit is an exact number or not.
+	 * Numbers such as 0, ∞, 1, 2, 4, 1/2, 1/4 are exact.
+	 * Other Posits are approximations lying in the interval
+	 * between two exacts 
+	 * <p>
+	 * Posits are exact when the last bit is 0.
+	 *
+	 * @return if this Posit is exact (has the last bit unset)
+	 */
+	public abstract boolean isExact();
+
+	/**
 	 * Returns the regime bits of this Posit as a String of "0" and "1".
 	 * <p>
 	 * If the bit size is less than 2, returns empty String.
@@ -301,22 +315,67 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 */
 	public abstract int getRegimeK();
 
+	/** 
+	 * Return the exponent and fraction part of this Posit after the sign and regime are removed.
+	 *  
+	 * @return the exponent and fraction part of this Posit after the sign and regime are removed.
+	 */
+	public abstract String getExponentFraction();
+
+	/**
+	 * Returns the maximum exponent size or em in this Posit.
+	 * <p>
+	 * Normally any part of the Posit after the sign and the regime
+	 * comprise the exponent and the fraction.
+	 * Both may be absent. However, when present, the
+	 * maximum number of exponent bits is given by this value.
+	 * <p>
+	 * Es or "exponent size" is the actual length of the
+	 * exponent string in a posit instance.
+	 * For example, in a 5 bit posit with em of 2,
+	 * there are posit instances with es = 0, 1, and 2.
+	 *
+	 * @return maximum number of exponent bits in this Posit
+	 */
+	public abstract int getMaxExponentSize();
+
+	/**
+	 * Sets the maximum exponent size or em in this Posit.
+	 */
+	public abstract void setMaxExponentSize(int maxExponentSize);
+
+	/**
+	 * Returns the exponent bits of this Posit as a String of "0" and "1".
+	 * <p>
+	 * If the sign and regime bits fill the bit size, 
+	 * the exponent may be empty string.
+	 * If the exponent and fraction are not zero length,
+	 * es or "exponent size" will be the length of this String.
+	 * 
+	 * @return a string of "0" and "1" representing the exponent
+	 */
+	public abstract String getExponent();
+
+	/**
+	 * Returns the exponent bits of this Posit as a String of "0" and "1".
+	 * <p>
+	 * If the sign and regime bits fill the bit size, 
+	 * the exponent may be empty string.
+	 * If the exponent and fraction are not zero length,
+	 * es or "exponent size" will be the length of this String.
+	 * 
+	 * @return a string of "0" and "1" representing the exponent
+	 */
+	public abstract String getFraction();
+
 	/**
 	 * Returns the useed of this Posit Useed is 2 ** 2 ** run length of regime.
 	 * <p>
 	 * Given es as the size of the exponent, useed = 2^2^es, and scale = useed^k
 	 * Examples (es = useed): 0=2,1=2^2=4,2=4^2=16,3=16^2=256,4=256^2=65536
 	 *
-	 * @return a long representing the Useed.
+	 * @return a BigInteger representing the Useed.
 	 */
-	public abstract long getUseed();
-
-	/**
-	 * Returns the exponent bits of this Posit as a String of "0" and "1".
-	 * <p>
-	 * If the regime fills the bit size, the exponent may be empty string.
-	 *
-	 * @return a string of "0" and "1" representing the exponent
-	 */
-	public abstract String getExponent();
+	public abstract BigInteger getUseed();
+	
 }
