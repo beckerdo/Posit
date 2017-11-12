@@ -22,7 +22,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	private String internal;
 
 	private byte maxExponentSize = 2;
-	
+
 	// Constructors
 	/**
 	 * @see Posit#()
@@ -89,33 +89,37 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#doubleValue()
 	 */
 	public double doubleValue() {
-		// Temp implementation
-		if ( isZero() ) {
+		// Temp implementation Should be compacted, more native.
+		if (null == internal || internal.length() == 0) {
 			return 0.0;
 		}
-		if ( isInfinite() ) {
+		if (isZero()) {
+			return 0.0;
+		}
+		if (isInfinite()) {
 			return Double.POSITIVE_INFINITY;
 		}
-		BigInteger useed = getUseed();
-		// System.out.println( "Posit \"" + this + "\", useed=" + useed);
-		int k = getRegimeK();
-	    // System.out.println( "Posit \"" + this + "\", regime K=" + k);
-		String exponent = getExponent();
-		int expVal = Integer.parseUnsignedInt(exponent,2);
-		// System.out.println( "Posit \"" + this + "\", expVal=" + expVal);
-		String fraction = getFraction();
-		long fracVal = Long.parseUnsignedLong(fraction,2);
+		final BigInteger useed = getUseed();
+		// System.out.println("Posit \"" + this + "\", useed=" + useed);
+		final int k = getRegimeK();
+		// System.out.println("Posit \"" + this + "\", regime K=" + k);
+		final String exponent = getExponent();
+		final int expVal = Integer.parseUnsignedInt(exponent, 2);
+		// System.out.println("Posit \"" + this + "\", expVal=" + expVal);
+		final String fraction = getFraction();
+		final long fracVal = Long.parseUnsignedLong(fraction, 2);
 		// System.out.println( "Posit \"" + this + "\", fracVal=" + expVal);
 		double val = -1.0;
-		if ( isPositive() ) { 
+		if (isPositive()) {
 			val = 1.0;
 		}
-		if (k > 0) 
+		if (k > 0) {
 			val *= useed.pow(k).doubleValue(); // sign*regime
-		else
+		} else {
 			val /= useed.pow(Math.abs(k)).doubleValue(); // sign*regime
+		}
 		val *= BigInteger.valueOf(2).pow(expVal).doubleValue(); // sign*regime*exp
-		double fracDouble = 1.0 + (fracVal/useed.doubleValue()); // sign*regime*exp*fraction
+		final double fracDouble = 1.0 + (fracVal / useed.doubleValue()); // sign*regime*exp*fraction
 		val *= fracDouble;
 		return val;
 	}
@@ -289,7 +293,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getMaxExponentSize()
 	 */
 	public byte getMaxExponentSize() {
-		return this.maxExponentSize;
+		return maxExponentSize;
 	}
 
 	@Override
@@ -305,24 +309,24 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	 * @see Posit#getExponent()
 	 */
 	public String getExponent() {
-		return PositDomain.getExponent(getExponentFraction(),getMaxExponentSize());
+		return PositDomain.getExponent(getExponentFraction(), getMaxExponentSize());
 	}
-
 
 	@Override
 	/**
 	 * @see Posit#getFraction()
 	 */
 	public String getFraction() {
-		return PositDomain.getFraction(getExponentFraction(),getMaxExponentSize());
-	}		
+		return PositDomain.getFraction(getExponentFraction(), getMaxExponentSize());
+	}
 
 	@Override
 	/**
 	 * @see Posit#getUseed()
 	 */
 	public BigInteger getUseed() {
-		// System.out.println( "Posit \"" + internal + "\", exponent=\"" + getExponent() + "\"");
+		// System.out.println( "Posit \"" + internal + "\", exponent=\"" + getExponent()
+		// + "\"");
 		return PositDomain.getUseed(getExponent().length());
 	}
 }
