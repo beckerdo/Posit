@@ -75,8 +75,10 @@ public class PositTest {
 		testNull(p);
 	}
 
-	@Before
-	public void setup() {
+	@Test
+	public void testConstructor() {
+		final Posit p = new PositStringImpl("0000",(byte)0);
+		assertEquals(0,p.getMaxExponentSize());
 	}
 
 	@Test

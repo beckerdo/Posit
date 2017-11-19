@@ -7,6 +7,24 @@ import java.math.BigInteger;
  * <p>
  * Encodes information from Posit papers. Items in this class should be usable
  * by all Posit classes: Posit, PositStringImpl, etc.
+ * <p>
+ * More information from John Gustafson:
+ * <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf">Beating
+ * Floating Point</a> 
+ * <p>
+ * "Suppose we view the bit string for a posit p as a signed integer,
+ * ranging from -2^(n-1) to 2^(n-1)-1.
+ * Let k be the integer represented by the regime bits,
+ * let e be the unsigned integer represented by the exponent bits, if any
+ * let f be the fraction bits, represented by 1.f1...fn, if any
+ * Then
+ * x=0, when p=0
+ * x=±∞, when p=-2^(n-1)
+ * x=sign(p)*useed^k*2^e*f,all other p."
+ * <p>
+ * For example p="0 0001 101 11011101" with es=3<br/>
+ * x=1*256^(-3)*2^(5)*(1+221/256)=477/134217728
+ * ~=3.55393*10^(-6)
  *
  * @see Posit
  *

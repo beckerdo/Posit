@@ -70,12 +70,24 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 * Constructs a newly allocated {@code Posit} object from the given input.
 	 * representation given by the instance.
 	 *
-	 * @param s
-	 *            a string of the format ("0","1")*
+	 * @param s a legal implementation instance
 	 * @throws NumberFormatException
 	 *             if the string does not contain a parsable number.
 	 */
 	protected Posit(final Object instance) throws NumberFormatException {
+		// cannot instantiate abstract Posit
+	}
+
+	/**
+	 * Constructs a newly allocated {@code Posit} object from the given input
+	 * and maximum exponent size, es.
+	 *
+	 * @param s a legal implementation instance
+	 * @param es max exponent size
+	 * @throws NumberFormatException
+	 *             if the string does not contain a parsable number.
+	 */
+	protected Posit(final Object instance,int es) throws NumberFormatException {
 		// cannot instantiate abstract Posit
 	}
 
