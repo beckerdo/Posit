@@ -1,18 +1,18 @@
 package javax.lang.posit;
 
-import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Test;
 import static javax.lang.posit.PositDomainTest.BINARY_TEST_CASES;
-import static javax.lang.posit.PositDomainTest.EXPECTED_REGIME; 
-import static javax.lang.posit.PositDomainTest.EXPECTED_REGIME_K; 
-import static javax.lang.posit.PositDomainTest.EXPECTED_ZERO; 
-import static javax.lang.posit.PositDomainTest.EXPECTED_INFINITE; 
-import static javax.lang.posit.PositDomainTest.EXPECTED_POSITIVE; 
 import static javax.lang.posit.PositDomainTest.EXPECTED_EXACT;
+import static javax.lang.posit.PositDomainTest.EXPECTED_INFINITE;
+import static javax.lang.posit.PositDomainTest.EXPECTED_POSITIVE;
+import static javax.lang.posit.PositDomainTest.EXPECTED_REGIME;
+import static javax.lang.posit.PositDomainTest.EXPECTED_REGIME_K;
+import static javax.lang.posit.PositDomainTest.EXPECTED_ZERO;
+import static org.junit.Assert.assertEquals;
 
 import java.math.BigInteger;
 import java.util.BitSet;
+
+import org.junit.Test;
 
 /**
  * General test of this class.
@@ -77,8 +77,8 @@ public class PositTest {
 
 	@Test
 	public void testConstructor() {
-		final Posit p = new PositStringImpl("0000",(byte)0);
-		assertEquals(0,p.getMaxExponentSize());
+		final Posit p = new PositStringImpl("0000", (byte) 0);
+		assertEquals(0, p.getMaxExponentSize());
 	}
 
 	@Test
@@ -97,11 +97,12 @@ public class PositTest {
 			// posit.getRegime() + ", k=" + posit.getRegimeK() );
 			assertEquals("Regime K test element " + i + ", posit=" + posit, EXPECTED_REGIME_K[i], posit.getRegimeK());
 
-			assertEquals("Exponent/fraction test element " + i + ", posit=" + BINARY_TEST_CASES[i], PositDomainTest.EXPECTED_EXPONENT_FRACTION[i],
-					posit.getExponentFraction());
+			assertEquals("Exponent/fraction test element " + i + ", posit=" + BINARY_TEST_CASES[i],
+					PositDomainTest.EXPECTED_EXPONENT_FRACTION[i], posit.getExponentFraction());
 
-			assertEquals("Useed test element " + i + ", posit=" + posit, PositDomainTest.EXPECTED_USEED[ posit.getExponent().length() ],
-					posit.getUseed()); // Useed is 2 ** 2 ** es
+			assertEquals("Useed test element " + i + ", posit=" + posit,
+					PositDomainTest.EXPECTED_USEED[posit.getExponent().length()], posit.getUseed()); // Useed is 2 ** 2
+																										// ** es
 		}
 
 	}
@@ -123,27 +124,24 @@ public class PositTest {
 		// Test that parsing and toString are commutative.
 		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
 			final Posit posit = new PositStringImpl(BINARY_TEST_CASES[i]);
-			assertEquals("isPositive test on " + BINARY_TEST_CASES[i], EXPECTED_POSITIVE[i],
-					posit.isPositive());
-			assertEquals("isExact test on " + BINARY_TEST_CASES[i], EXPECTED_EXACT[i],
-					posit.isExact());
+			assertEquals("isPositive test on " + BINARY_TEST_CASES[i], EXPECTED_POSITIVE[i], posit.isPositive());
+			assertEquals("isExact test on " + BINARY_TEST_CASES[i], EXPECTED_EXACT[i], posit.isExact());
 		}
 	}
-	
+
 	@Test
 	public void doubleValue() {
 		final String TEST_CASE = "0000110111011101";
 		final double EXPECTED = Double.parseDouble("3.55393E-6");
-		Posit posit = new PositStringImpl(TEST_CASE);
-		posit.setMaxExponentSize((byte)3);
-		double returned = posit.doubleValue();
-		System.out.println( "Posit=\"" + posit + "\", double=" + returned);
-		
-		assertEquals( "Posit double value testCase=" + TEST_CASE + ", doubleVal=" + returned,
-				EXPECTED, returned, PositDomainTest.COMPARE_PRECISION);
+		final Posit posit = new PositStringImpl(TEST_CASE);
+		posit.setMaxExponentSize((byte) 3);
+		final double returned = posit.doubleValue();
+		System.out.println("Posit=\"" + posit + "\", double=" + returned);
+
+		assertEquals("Posit double value testCase=" + TEST_CASE + ", doubleVal=" + returned, EXPECTED, returned,
+				PositDomainTest.COMPARE_PRECISION);
 	}
 
-	
 	/**
 	 * Spits out information about java.util.BitSet BitSet is so weird, not
 	 * reporting its set size, but rather size based on the machine implementation
@@ -197,20 +195,4 @@ public class PositTest {
 			}
 		}
 	}
-
-	// @Test
-	// public void parseString() {
-	// String [] TEST_CASES = { "0", "∞", "NaN", // specials
-	// "0.00390625", "0.0625", "0.25", "1", "4", "16", "256", // positives
-	// "-0.00390625", "-0.0625", "-0.25", "-1", "-4", "-16", "-256", // negatives
-	// };
-	//
-	// // Test that parsing and toString are commutative.
-	// for ( String testString : TEST_CASES ) {
-	// Posit posit = new Posit( testString );
-	// assertEquals( testString, posit.toString() );
-	// }
-	// }
-
-
 }
