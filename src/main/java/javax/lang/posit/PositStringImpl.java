@@ -141,7 +141,8 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		final String fraction = getFraction();
 		if (null != fraction && fraction.length() > 0) {
 			final double fracVal = PositDomain.getFractionVal(fraction, positive);
-			System.out.println("Posit \"" + this + "\", frac=" + fraction + ", fracVal=" + fracVal);
+			// System.out.println("Posit \"" + this + "\", frac=" + fraction + ", fracVal="
+			// + fracVal);
 			val *= 1.0 + (PositDomain.getFractionVal(fraction, positive) / useed.doubleValue()); // sign*regime*exp*frac
 		}
 		return val;

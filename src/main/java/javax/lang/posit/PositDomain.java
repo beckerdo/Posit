@@ -197,6 +197,58 @@ public final class PositDomain {
 		}
 	}
 
+	/** Return string with spaces between the sign,regime,exponent, and fraction. */
+	public static String toSpacedString(String instance, int maxExponent) {
+		if (null == instance || instance.length() < 1) {
+			return "";
+		}
+		if (instance.length() == 1) {
+			return instance;
+		}
+		final char[] chars = instance.toCharArray();
+		final StringBuilder sb = new StringBuilder();
+		sb.append(chars[0]);
+		// Regime is second char until terminated by end of string or opposite char.
+		final char first = instance.charAt(1);
+		int rs = 0;
+		for (int i = 1; i < chars.length; i++) {
+			if (1 == i) {
+				sb.append(' ');
+			}
+			final char current = instance.charAt(i);
+			sb.append(current);
+			rs++;
+			if (first != current) {
+				break;
+			}
+		}
+		// 0123456789
+		// 1001eeeeff
+		final int esMax = instance.length() - rs - 1;
+		int es = 0;
+		if (esMax > 0) {
+			es = Math.min(maxExponent, esMax);
+			for (int i = 1 + rs; i < 1 + rs + es; i++) {
+				if (i == 1 + rs) {
+					sb.append(' ');
+				}
+				sb.append(chars[i]);
+			}
+		}
+		final int fs = instance.length() - es - rs - 1;
+		if (fs > 0) {
+			for (int i = 1 + rs + es; i < instance.length(); i++) {
+				if (i == 1 + rs + es) {
+					sb.append(' ');
+				}
+				sb.append(chars[i]);
+			}
+		}
+
+		return sb.toString();
+
+	}
+
 	// Puny long runs out at es=6, puny double rounds at es=6.
 	// public static final BigInteger [] LOOKUP_2_2_N = new BigInteger [] { };
 	public static final BigInteger[] LOOKUP_2_2_N = new BigInteger[] { new BigInteger("2"), new BigInteger("4"),

@@ -286,6 +286,47 @@ public class PositDomainTest {
 		}
 	}
 
+	public static final String[] EXPECTED_ES1_SPACED_STRING = { "", // 0
+			"0", "1", // 1
+			"0 0", "0 1", "1 0", "1 1", // 2
+			"0 00", "0 01", "0 10", "0 11", "1 00", "1 01", "1 10", "1 11", // 3
+			"0 000", "0 001", "0 01 0", "0 01 1", "0 10 0", "0 10 1", "0 110", "0 111", // 4
+			"1 000", "1 001", "1 01 0", "1 01 1", "1 10 0", "1 10 1", "1 110", "1 111", // 4
+			"0 0000", "0 0001", "0 001 0", "0 001 1", "0 01 0 0", "0 01 0 1", "0 01 1 0", "0 01 1 1", // 5
+			"0 10 0 0", "0 10 0 1", "0 10 1 0", "0 10 1 1", "0 110 0", "0 110 1", "0 1110", "0 1111", // 5
+			"1 0000", "1 0001", "1 001 0", "1 001 1", "1 01 0 0", "1 01 0 1", "1 01 1 0", "1 01 1 1", // 5
+			"1 10 0 0", "1 10 0 1", "1 10 1 0", "1 10 1 1", "1 110 0", "1 110 1", "1 1110", "1 1111", // 5
+	};
+	public static final String[] EXPECTED_ES2_SPACED_STRING = { "", // 0
+			"0", "1", // 1
+			"0 0", "0 1", "1 0", "1 1", // 2
+			"0 00", "0 01", "0 10", "0 11", "1 00", "1 01", "1 10", "1 11", // 3
+			"0 000", "0 001", "0 01 0", "0 01 1", "0 10 0", "0 10 1", "0 110", "0 111", // 4
+			"1 000", "1 001", "1 01 0", "1 01 1", "1 10 0", "1 10 1", "1 110", "1 111", // 4
+			"0 0000", "0 0001", "0 001 0", "0 001 1", "0 01 00", "0 01 01", "0 01 10", "0 01 11", // 5
+			"0 10 00", "0 10 01", "0 10 10", "0 10 11", "0 110 0", "0 110 1", "0 1110", "0 1111", // 5
+			"1 0000", "1 0001", "1 001 0", "1 001 1", "1 01 00", "1 01 01", "1 01 10", "1 01 11", // 5
+			"1 10 00", "1 10 01", "1 10 10", "1 10 11", "1 110 0", "1 110 1", "1 1110", "1 1111", // 5
+	};
+
+	@Test
+	public void toSpacedString() {
+		// Test ES1 spaced string.
+		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
+			assertEquals("toSpacedString ES1 test on " + BINARY_TEST_CASES[i], EXPECTED_ES1_SPACED_STRING[i],
+					PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1));
+			assertEquals("toSpacedString ES1 without stpaces on " + BINARY_TEST_CASES[i], BINARY_TEST_CASES[i],
+					PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1).replaceAll("\\s", ""));
+		}
+		// Test ES2 spaced string.
+		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
+			assertEquals("toSpacedString ES2 test on " + BINARY_TEST_CASES[i], EXPECTED_ES2_SPACED_STRING[i],
+					PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2));
+			assertEquals("toSpacedString ES2 without stpaces on " + BINARY_TEST_CASES[i], BINARY_TEST_CASES[i],
+					PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2).replaceAll("\\s", ""));
+		}
+	}
+
 	@Test
 	public void fourBit() {
 		// Positive es40
