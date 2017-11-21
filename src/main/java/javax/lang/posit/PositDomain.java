@@ -110,7 +110,7 @@ public final class PositDomain {
 		// if the bits are 0, then k = −m;
 		// if the bits are 1, then k = m − 1.
 		// Examples (regime = K):
-		// 0000=-4, 0001=-3,001x=-2,01xx=-1,10xx=110x=1,1110=2,1111=3
+		// 0000=-4, 0001=-3,001x=-2,01xx=-1,10xx=0,110x=1,1110=2,1111=3
 		if (null == regime || regime.length() < 1) {
 			return 0;
 		}
@@ -168,7 +168,7 @@ public final class PositDomain {
 		if (positive) {
 			return Integer.parseUnsignedInt(exponent, 2);
 		} else {
-			return 1.0 / Integer.parseUnsignedInt(Bit.twosComplement(exponent), 2);
+			return Integer.parseUnsignedInt(Bit.twosComplement(exponent), 2);
 		}
 	}
 
