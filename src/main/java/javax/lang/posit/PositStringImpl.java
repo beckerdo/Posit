@@ -9,8 +9,8 @@ import java.math.BigInteger;
  * digit. However, String-based Posits can be arbitrary length and dynamic
  * range.
  * <p>
- * String may represent any Posit binary String, the bit size is
- * determined by the length of the String.
+ * String may represent any Posit binary String, the bit size is determined by
+ * the length of the String.
  *
  * @see Posit
  *
@@ -42,8 +42,8 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	/**
 	 * @see Posit#(Object,byte)
 	 */
-	public PositStringImpl(final String s,int es) throws NumberFormatException {
-		setMaxExponentSize((byte)es);
+	public PositStringImpl(final String s, int es) throws NumberFormatException {
+		setMaxExponentSize((byte) es);
 		parse(s);
 	}
 
@@ -95,20 +95,16 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 
 	@Override
 	/**
-	 * "Suppose we view the bit string for a posit p as a signed integer,
-	 * ranging from -2^(n-1) to 2^(n-1)-1.
-	 * Let k be the integer represented by the regime bits,
-	 * let e be the unsigned integer represented by the exponent bits, if any
-	 * let f be the fraction bits, represented by 1.f1...fn, if any
-	 * Then
-	 * x=0, when p=0
-	 * x=±∞, when p=-2^(n-1)
-	 * x=sign(p)*useed^k*2^e*f,all other p."
+	 * "Suppose we view the bit string for a posit p as a signed integer, ranging
+	 * from -2^(n-1) to 2^(n-1)-1. Let k be the integer represented by the regime
+	 * bits, let e be the unsigned integer represented by the exponent bits, if any
+	 * let f be the fraction bits, represented by 1.f1...fn, if any Then x=0, when
+	 * p=0 x=±∞, when p=-2^(n-1) x=sign(p)*useed^k*2^e*f,all other p."
 	 * <p>
 	 * For example p="0 0001 101 11011101" with es=3<br/>
-	 * x=1*256^(-3)*2^(5)*(1+221/256)=477/134217728
-	 * ~=3.55393*10^(-6)
+	 * x=1*256^(-3)*2^(5)*(1+221/256)=477/134217728 ~=3.55393*10^(-6)
 	 * <p>
+	 *
 	 * @see Posit#doubleValue()
 	 */
 	public double doubleValue() {
@@ -122,32 +118,31 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		if (isInfinite()) {
 			return Double.POSITIVE_INFINITY;
 		}
+		final boolean positive = isPositive();
+		double val = positive ? 1.0 : -1.0;
+		if (isPositive()) {
+			val = 1.0;
+		}
 		final BigInteger useed = getUseed();
 		// System.out.println("Posit \"" + this + "\", useed=" + useed);
 		final int k = getRegimeK();
 		// System.out.println("Posit \"" + this + "\", regime K=" + k);
-		final String exponent = getExponent();
-		int expVal = 0;
-		if (null != exponent && exponent.length() > 0) {
-			expVal = Integer.parseUnsignedInt(exponent, 2);
-		}
-		// System.out.println("Posit \"" + this + "\", expVal=" + expVal);
-		double val = -1.0;
-		if (isPositive()) {
-			val = 1.0;
-		}
 		if (k > 0) {
 			val *= useed.pow(k).doubleValue(); // sign*regime
 		} else {
 			val /= useed.pow(Math.abs(k)).doubleValue(); // sign*regime
 		}
-		val *= BigInteger.valueOf(2).pow(expVal).doubleValue(); // sign*regime*exp
+		final String exponent = getExponent();
+		final double expVal = PositDomain.getExponentVal(exponent, positive);
+		// System.out.println("Posit \"" + this + "\", exp=" + exponent + ", expVal=" +
+		// expVal);
+		// val *= BigInteger.valueOf(2).pow(expVal).doubleValue(); // sign*regime*exp
+		val *= Math.pow(2.0, expVal);// sign*regime*exp
 		final String fraction = getFraction();
-		if ( null != fraction && fraction.length() > 0) {
-			final long fracVal = Long.parseUnsignedLong(fraction, 2);
-			// System.out.println( "Posit \"" + this + "\", fracVal=" + expVal);
-			final double fracDouble = 1.0 + (fracVal / useed.doubleValue()); // sign*regime*exp*fraction
-			val *= fracDouble;
+		if (null != fraction && fraction.length() > 0) {
+			final double fracVal = PositDomain.getFractionVal(fraction, positive);
+			System.out.println("Posit \"" + this + "\", frac=" + fraction + ", fracVal=" + fracVal);
+			val *= 1.0 + (PositDomain.getFractionVal(fraction, positive) / useed.doubleValue()); // sign*regime*exp*frac
 		}
 		return val;
 	}
