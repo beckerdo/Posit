@@ -10,7 +10,8 @@ import org.junit.Test;
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
 public class BitTest {
-	public static final String[] BINARY_TEST_CASES = { null, "", // 0
+	public static final String[] BINARY_TEST_CASES = { 
+			null, "", // 0
 			"0", "1", // 1
 			"00", "01", "10", "11", // 2
 			"00000", "00001", "00010", "00011", "00100", "00101", "00110", "00111", // 5
@@ -19,7 +20,8 @@ public class BitTest {
 			"11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
 	};
 
-	public static final String[] EXPECTED = { null, "", // 0
+	public static final String[] EXPECTED = { 
+			null, "", // 0
 			"0", "1", // 1
 			"00", "11", "10", "01", // 2
 			"00000", "11111", "11110", "11101", "11100", "11011", "11010", "11001", // 5

@@ -184,11 +184,11 @@ public final class PositDomain {
 	}
 
 	/** Return the value of a given fraction of 0 and 1 characters. */
-	public static double getFractionVal(String fraction, boolean positive) {
+	public static long getFractionVal(String fraction, boolean positive) {
 		// Returns the exponent bits of this Posit as a String of "0" and "1".
 		// If the regime fills the bit size, the exponent may be empty string.
 		if (null == fraction || fraction.length() < 1) {
-			return 0.0;
+			return 0;
 		}
 		if (positive) {
 			return Long.parseUnsignedLong(fraction, 2);
@@ -230,7 +230,7 @@ public final class PositDomain {
 			es = Math.min(maxExponent, esMax);
 			for (int i = 1 + rs; i < 1 + rs + es; i++) {
 				if (i == 1 + rs) {
-					sb.append(' ');
+					sb.append(" e");
 				}
 				sb.append(chars[i]);
 			}
@@ -239,7 +239,7 @@ public final class PositDomain {
 		if (fs > 0) {
 			for (int i = 1 + rs + es; i < instance.length(); i++) {
 				if (i == 1 + rs + es) {
-					sb.append(' ');
+					sb.append(" f");
 				}
 				sb.append(chars[i]);
 			}

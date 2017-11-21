@@ -118,28 +118,31 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		if (isInfinite()) {
 			return Double.POSITIVE_INFINITY;
 		}
+		String spaced = PositDomain.toSpacedString(internal, maxExponentSize);
 		final boolean positive = isPositive();
 		double val = positive ? 1.0 : -1.0;
 		final BigInteger useed = getUseed();
-		// System.out.println("Posit \"" + this + "\", useed=" + useed);
 		final int k = getRegimeK();
-		System.out.println("Posit=\"" + PositDomain.toSpacedString(internal, maxExponentSize) + "\", useed="
-				+ useed.intValue() + ", k=" + k);
+		double useedK = 1.0; 
 		if (k >= 0) {
-			val *= useed.pow(k).doubleValue(); // sign*regime
+			useedK = useed.pow(k).doubleValue();
+			val *= useedK; // sign*regime
 		} else {
-			val /= useed.pow(Math.abs(k)).doubleValue(); // sign*regime
+			useedK= useed.pow(Math.abs(k)).doubleValue();
+			val /= useedK;  // sign*regime
 		}
+		// System.out.println("Posit=\"" + spaced + "\", useed=" + useed.intValue() + ", k=" + Math.abs(k)  + ", useed^k=" + useedK);
 		final String exponent = getExponent();
 		final double expVal = PositDomain.getExponentVal(exponent, positive);
-		System.out.println("Posit \"" + this + "\", exp=" + exponent + ", expVal=" + expVal);
+		// System.out.println( "Posit=\"" + spaced + "\", exp=" + exponent + ", expVal=" + expVal + ", 2^e=" + Math.pow(2.0, expVal));
 		val *= Math.pow(2.0, expVal);// sign*regime*exp
 		final String fraction = getFraction();
 		if (null != fraction && fraction.length() > 0) {
-			final double fracVal = PositDomain.getFractionVal(fraction, positive);
-			// System.out.println("Posit \"" + this + "\", frac=" + fraction + ", fracVal="
-			// + fracVal);
-			val *= 1.0 + (PositDomain.getFractionVal(fraction, positive) / useed.doubleValue()); // sign*regime*exp*frac
+			final long fracNumerator = PositDomain.getFractionVal(fraction, positive);
+			final double fracMultiplier = 1.0 + ((double) fracNumerator / useed.doubleValue()); 
+			val *= fracMultiplier; // sign*regime*exp*frac
+			System.out.println("Posit \"" + spaced + "\", frac=" + fraction + ",fracNum=" + fracNumerator + 
+					",fracMult=" +	fracMultiplier + ",val=" + val);
 		}
 		return val;
 	}
