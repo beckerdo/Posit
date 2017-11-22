@@ -27,29 +27,6 @@ public class PositDomainTest {
 			"11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
 	};
 
-	public static final double[] EXPECTED_FOURBIT_ES0 = {
-			// "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", // 4
-			// "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111", // 4
-			0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 4.0, Double.POSITIVE_INFINITY, -4.0, -2.0, -1.5, -1.0, -0.75, -0.5,
-			-0.25, };
-	public static final double[] EXPECTED_FOURBIT_ES1 = { 0.0, 0.0625, 0.25, 0.5, 1.0, 2.0, 4.0, 16.0,
-			Double.POSITIVE_INFINITY, -16.0, -4.0, -2.0, -1.0, -0.5, -0.25, -0.0625, };
-	public static final double[] EXPECTED_FOURBIT_ES2 = { 0.0, 0.00390625, 0.0625, 0.25, 1.0, 4.0, 16.0, 256.0,
-			Double.POSITIVE_INFINITY, -256.0, -16.0, -4.0, -1.0, -0.25, -0.0625, -0.00390625, };
-
-	/** 0, 1, ±∞,-1 plus or minus two */
-	public static final int[] TEST_CASES_6BIT = { 62, 63, 0, 1, 2, 14, 15, 16, 17, 18, 30, 31, 32, 33, 34, 46, 47, 48,
-			49, 50 };
-	public static final double[] EXPECTED_SIXBIT_ES0 = { -0.125, -0.0625, 0.0, 0.0625, 0.125, 0.875, 0.9375, 1.0, 1.125,
-			1.25, 8.0, 16.0, Double.POSITIVE_INFINITY, -16.0, -8.0, -1.25, -1.125, -1.0, -0.9375, -0.875, };
-	public static final double[] EXPECTED_SIXBIT_ES1 = { -0.015625, -0.00390625, 0.0, 0.00390625, 0.015625, 0.75, 0.875,
-			1.0, 1.25, 1.5, 64.0, 256.0, Double.POSITIVE_INFINITY, -256.0, -64.0, -1.5, -1.25, -1.0, -0.875, -0.75,
-
-	};
-	public static final double[] EXPECTED_SIXBIT_ES2 = { -0.000244140625, -1.52587890625e-5, 0.0, 1.52587890625e-5,
-			0.000244140625, 0.5, 0.75, 1.0, 1.5, 2.0, 4096.0, 65536.0, Double.POSITIVE_INFINITY, -65536.0, -4096.0,
-			-2.0, -1.5, -1.0, -0.75, -0.5, };
-
 	/** 0, 1, ±∞,-1 plus or minus two */
 	public static final int[] TEST_CASES_8BIT = { 254, 255, 0, 1, 2, 62, 63, 64, 65, 66, 126, 127, 128, 129, 130, 190,
 			191, 192, 193, 194 };
@@ -327,23 +304,33 @@ public class PositDomainTest {
 		}
 	}
 
+	public static final double[] EXPECTED_FOURBIT_ES0 = {
+			// "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", // 4
+			// "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111", // 4
+			0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 4.0, Double.POSITIVE_INFINITY, -4.0, -2.0, -1.5, -1.0, -0.75, -0.5,
+			-0.25, };
+	public static final double[] EXPECTED_FOURBIT_ES1 = { 0.0, 0.0625, 0.25, 0.5, 1.0, 2.0, 4.0, 16.0,
+			Double.POSITIVE_INFINITY, -16.0, -4.0, -2.0, -1.0, -0.5, -0.25, -0.0625, };
+	public static final double[] EXPECTED_FOURBIT_ES2 = { 0.0, 0.00390625, 0.0625, 0.25, 1.0, 4.0, 16.0, 256.0,
+			Double.POSITIVE_INFINITY, -256.0, -16.0, -4.0, -1.0, -0.25, -0.0625, -0.00390625, };
+
 	@Test
 	public void fourBit() {
 		// Positive es40
 		for (int i = 0; i < 8; i++) {
 			final String instance = String.format("%4s", Integer.toBinaryString(i)).replace(" ", "0");
 			final Posit p = new PositStringImpl(instance, 0);
-			System.out.println("posit=" + PositDomain.toSpacedString(instance, 0) + 
-				", double=" + p.doubleValue());
-			// assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+			System.out.println("posit=" + PositDomain.toSpacedString(instance, 0) + ", double=" + p.doubleValue());
+			// assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),
+			// PositDomainTest.COMPARE_PRECISION);
 		}
 		// Negative es40
 		for (int i = 8; i < EXPECTED_FOURBIT_ES0.length; i++) {
 			final String instance = String.format("%4s", Integer.toBinaryString(i)).replace(" ", "0");
 			final Posit p = new PositStringImpl(instance, 0);
-			System.out.println("posit=" + PositDomain.toSpacedString(instance, 0) +
-				", double=" + p.doubleValue());
-			// assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+			System.out.println("posit=" + PositDomain.toSpacedString(instance, 0) + ", double=" + p.doubleValue());
+			// assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),
+			// PositDomainTest.COMPARE_PRECISION);
 		}
 	}
 
@@ -353,17 +340,77 @@ public class PositDomainTest {
 		for (int i = 0; i < 8; i++) {
 			final String instance = String.format("%4s", Integer.toBinaryString(i)).replace(" ", "0");
 			final Posit p = new PositStringImpl(instance, 1);
-			System.out.println("posit=" + PositDomain.toSpacedString(instance, 1) + 
-				", double=" + p.doubleValue());
-			// assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+			System.out.println("posit=" + PositDomain.toSpacedString(instance, 1) + ", double=" + p.doubleValue());
+			// assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),
+			// PositDomainTest.COMPARE_PRECISION);
 		}
 		// Negative es41
-		for (int i = 8; i < EXPECTED_FOURBIT_ES0.length; i++) {
+		for (int i = 8; i < EXPECTED_FOURBIT_ES1.length; i++) {
 			final String instance = String.format("%4s", Integer.toBinaryString(i)).replace(" ", "0");
 			final Posit p = new PositStringImpl(instance, 1);
-			System.out.println("posit=" + PositDomain.toSpacedString(instance, 1) +
-				", double=" + p.doubleValue());
-			// assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+			System.out.println("posit=" + PositDomain.toSpacedString(instance, 1) + ", double=" + p.doubleValue());
+			// assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),
+			// PositDomainTest.COMPARE_PRECISION);
+		}
+	}
+
+	@Test
+	public void fourBitES2() {
+		// Positive es41
+		for (int i = 0; i < EXPECTED_FOURBIT_ES2.length; i++) {
+			final String instance = String.format("%4s", Integer.toBinaryString(i)).replace(" ", "0");
+			final Posit p = new PositStringImpl(instance, 2);
+			System.out.println("testcase=" + i + ", posit=" + PositDomain.toSpacedString(instance, 2) + ", expected="
+					+ EXPECTED_FOURBIT_ES2[i] + ", double=" + p.doubleValue());
+			// assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),
+			// PositDomainTest.COMPARE_PRECISION);
+		}
+	}
+
+	// public static final String[] BINARY_TEST_CASES = { "", // 0
+	// "00000", "00001", "00010", "00011", "00100", "00101", "00110", "00111", // 5
+	// "01000", "01001", "01010", "01011", "01100", "01101", "01110", "01111", // 5
+	// "10000", "10001", "10010", "10011", "10100", "10101", "10110", "10111", // 5
+	// "11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
+	// };
+	public static final double[] EXPECTED_FIVEBIT_ES2 = { 0.0, 1.0 / 4096.0, 1.0 / 256.0, 1.0 / 64.0, 1.0 / 16.0,
+			1.0 / 8.0, 1.0 / 4.0, 1.0 / 2.0, 1.0, 2.0, 4.0, 8.0, 16.0, 64.0, 256.0, 4096.0, Double.POSITIVE_INFINITY,
+			-4096.0, -256.0, -64.0, -16.0, -8.0, -4.0, -2.0, -1.0, -1.0 / 2.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0,
+			-1.0 / 64.0, -1.0 / 256.0, -1.0 / 4096.0 };
+
+	@Test
+	public void fiveBitES2() {
+		// es62
+		for (int i = 0; i < 32; i++) {
+			final String instance = String.format("%5s", Integer.toBinaryString(i)).replace(" ", "0");
+			final Posit p = new PositStringImpl(instance, 2);
+			System.out.println("testcase=" + i + ", posit=" + PositDomain.toSpacedString(instance, 2) + ", expected="
+					+ EXPECTED_FIVEBIT_ES2[i] + ", double=" + p.doubleValue());
+			// assertEquals(EXPECTED_FIVEBIT_ES2[i], p.doubleValue(),
+			// PositDomainTest.COMPARE_PRECISION);
+		}
+	}
+
+	/** 0, 1, ±∞,-1 plus or minus two */
+	public static final int[] TEST_CASES_6BIT = { 62, 63, 0, 1, 2, 14, 15, 16, 17, 18, 30, 31, 32, 33, 34, 46, 47, 48,
+			49, 50 };
+	public static final double[] EXPECTED_SIXBIT_ES0 = { -0.125, -0.0625, 0.0, 0.0625, 0.125, 0.875, 0.9375, 1.0, 1.125,
+			1.25, 8.0, 16.0, Double.POSITIVE_INFINITY, -16.0, -8.0, -1.25, -1.125, -1.0, -0.9375, -0.875, };
+	public static final double[] EXPECTED_SIXBIT_ES1 = { -0.015625, -0.00390625, 0.0, 0.00390625, 0.015625, 0.75, 0.875,
+			1.0, 1.25, 1.5, 64.0, 256.0, Double.POSITIVE_INFINITY, -256.0, -64.0, -1.5, -1.25, -1.0, -0.875, -0.75, };
+	public static final double[] EXPECTED_SIXBIT_ES2 = { -0.000244140625, -1.52587890625e-5, 0.0, 1.52587890625e-5,
+			0.000244140625, 0.5, 0.75, 1.0, 1.5, 2.0, 4096.0, 65536.0, Double.POSITIVE_INFINITY, -65536.0, -4096.0,
+			-2.0, -1.5, -1.0, -0.75, -0.5, };
+
+	@Test
+	public void sixBitES2() {
+		// es62
+		for (int i = 0; i < TEST_CASES_6BIT.length; i++) {
+			final String instance = String.format("%6s", Integer.toBinaryString(TEST_CASES_6BIT[i])).replace(" ", "0");
+			final Posit p = new PositStringImpl(instance, 2);
+			System.out.println("testcase=" + TEST_CASES_6BIT[i] + ", posit=" + PositDomain.toSpacedString(instance, 2)
+					+ ", expected=" + EXPECTED_SIXBIT_ES2[i] + ", double=" + p.doubleValue());
+			assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
 		}
 	}
 

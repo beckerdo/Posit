@@ -118,31 +118,36 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		if (isInfinite()) {
 			return Double.POSITIVE_INFINITY;
 		}
-		String spaced = PositDomain.toSpacedString(internal, maxExponentSize);
+		final String spaced = PositDomain.toSpacedString(internal, maxExponentSize);
 		final boolean positive = isPositive();
 		double val = positive ? 1.0 : -1.0;
 		final BigInteger useed = getUseed();
 		final int k = getRegimeK();
-		double useedK = 1.0; 
+		double useedK = 1.0;
 		if (k >= 0) {
 			useedK = useed.pow(k).doubleValue();
 			val *= useedK; // sign*regime
 		} else {
-			useedK= useed.pow(Math.abs(k)).doubleValue();
-			val /= useedK;  // sign*regime
+			useedK = useed.pow(Math.abs(k)).doubleValue();
+			val /= useedK; // sign*regime
 		}
-		// System.out.println("Posit=\"" + spaced + "\", useed=" + useed.intValue() + ", k=" + Math.abs(k)  + ", useed^k=" + useedK);
+		// System.out.println("Posit=\"" + spaced + "\", useed=" + useed.intValue() + ",
+		// k=" + Math.abs(k) + ", useed^k=" + useedK);
 		final String exponent = getExponent();
-		final double expVal = PositDomain.getExponentVal(exponent, positive);
-		// System.out.println( "Posit=\"" + spaced + "\", exp=" + exponent + ", expVal=" + expVal + ", 2^e=" + Math.pow(2.0, expVal));
-		val *= Math.pow(2.0, expVal);// sign*regime*exp
+		if (null != exponent && exponent.length() > 0) {
+			final double expVal = PositDomain.getExponentVal(exponent, positive);
+			// System.out.println( "Posit=\"" + spaced + "\", exp=" + exponent + ", expVal="
+			// + expVal + ", 2^e=" + Math.pow(2.0, expVal));
+			final double twoe = Math.pow(2.0, expVal);
+			val *= twoe;// sign*regime*exp
+		}
 		final String fraction = getFraction();
 		if (null != fraction && fraction.length() > 0) {
 			final long fracNumerator = PositDomain.getFractionVal(fraction, positive);
-			final double fracMultiplier = 1.0 + ((double) fracNumerator / useed.doubleValue()); 
+			final double fracMultiplier = 1.0 + (fracNumerator / useed.doubleValue());
 			val *= fracMultiplier; // sign*regime*exp*frac
-			System.out.println("Posit \"" + spaced + "\", frac=" + fraction + ",fracNum=" + fracNumerator + 
-					",fracMult=" +	fracMultiplier + ",val=" + val);
+			System.out.println("Posit \"" + spaced + "\", frac=" + fraction + ",fracNum=" + fracNumerator + ",fracMult="
+					+ fracMultiplier + ",val=" + val);
 		}
 		return val;
 	}
@@ -356,6 +361,15 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	public BigInteger getUseed() {
 		// System.out.println( "Posit \"" + internal + "\", exponent=\"" + getExponent()
 		// + "\"");
-		return PositDomain.getUseed(getExponent().length());
+		// final String exponent = getExponent();
+		// if (null == exponent || exponent.length() < 1) {
+		// return BIGINT_2;
+		// }
+		// if (isPositive()) {
+		// return PositDomain.getUseed(Integer.parseInt(exponent, 2));
+		// }
+		// return PositDomain.getUseed(Integer.parseInt(Bit.twosComplement(exponent),
+		// 2));
+		return PositDomain.getUseed(getMaxExponentSize());
 	}
 }

@@ -26,6 +26,9 @@ import java.math.BigInteger;
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
 public final class PositDomain {
+	/** Lots of exponents evaluate to this. */
+	public static final BigInteger BIGINT_2 = new BigInteger("2");
+
 	// Math interface
 	/** Checks if a string of binary 0 and 1 characters represents infinity. */
 	public static boolean isInfinite(String instance) {
@@ -251,7 +254,7 @@ public final class PositDomain {
 
 	// Puny long runs out at es=6, puny double rounds at es=6.
 	// public static final BigInteger [] LOOKUP_2_2_N = new BigInteger [] { };
-	public static final BigInteger[] LOOKUP_2_2_N = new BigInteger[] { new BigInteger("2"), new BigInteger("4"),
+	public static final BigInteger[] LOOKUP_2_2_N = new BigInteger[] { BIGINT_2, new BigInteger("4"),
 			new BigInteger("16"), new BigInteger("256"), new BigInteger("65536"), new BigInteger("4294967296"),
 			new BigInteger("18446744073709551616"), new BigInteger("340282366920938463463374607431768211456"),
 			new BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639936") };
