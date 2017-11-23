@@ -147,6 +147,7 @@ public class PositDomainTest {
 					PositDomain.getRegime(BINARY_TEST_CASES[i]));
 			// System.out.println( "i=" + i + ", bits=" + expectedString + ", regime=" +
 			// posit.getRegime() + ", k=" + posit.getRegimeK() );
+			boolean isPos = PositDomain.isPositive(BINARY_TEST_CASES[i]);
 			assertEquals("Regime K test on " + BINARY_TEST_CASES[i], EXPECTED_REGIME_K[i],
 					PositDomain.getRegimeK(EXPECTED_REGIME[i]));
 
@@ -267,23 +268,23 @@ public class PositDomainTest {
 			"0", "1", // 1
 			"0 0", "0 1", "1 0", "1 1", // 2
 			"0 00", "0 01", "0 10", "0 11", "1 00", "1 01", "1 10", "1 11", // 3
-			"0 000", "0 001", "0 01 0", "0 01 1", "0 10 0", "0 10 1", "0 110", "0 111", // 4
-			"1 000", "1 001", "1 01 0", "1 01 1", "1 10 0", "1 10 1", "1 110", "1 111", // 4
-			"0 0000", "0 0001", "0 001 0", "0 001 1", "0 01 0 0", "0 01 0 1", "0 01 1 0", "0 01 1 1", // 5
-			"0 10 0 0", "0 10 0 1", "0 10 1 0", "0 10 1 1", "0 110 0", "0 110 1", "0 1110", "0 1111", // 5
-			"1 0000", "1 0001", "1 001 0", "1 001 1", "1 01 0 0", "1 01 0 1", "1 01 1 0", "1 01 1 1", // 5
-			"1 10 0 0", "1 10 0 1", "1 10 1 0", "1 10 1 1", "1 110 0", "1 110 1", "1 1110", "1 1111", // 5
+			"0 000", "0 001", "0 01 e0", "0 01 e1", "0 10 e0", "0 10 e1", "0 110", "0 111", // 4
+			"1 000", "1 001", "1 01 e0", "1 01 e1", "1 10 e0", "1 10 e1", "1 110", "1 111", // 4
+			"0 0000", "0 0001", "0 001 e0", "0 001 e1", "0 01 e0 f0", "0 01 e0 f1", "0 01 e1 f0", "0 01 e1 f1", // 5
+			"0 10 e0 f0", "0 10 e0 f1", "0 10 e1 f0", "0 10 e1 f1", "0 110 e0", "0 110 e1", "0 1110", "0 1111", // 5
+			"1 0000", "1 0001", "1 001 e0", "1 001 e1", "1 01 e0 f0", "1 01 e0 f1", "1 01 e1 f0", "1 01 e1 f1", // 5
+			"1 10 e0 f0", "1 10 e0 f1", "1 10 e1 f0", "1 10 e1 f1", "1 110 e0", "1 110 e1", "1 1110", "1 1111", // 5
 	};
 	public static final String[] EXPECTED_ES2_SPACED_STRING = { "", // 0
 			"0", "1", // 1
 			"0 0", "0 1", "1 0", "1 1", // 2
 			"0 00", "0 01", "0 10", "0 11", "1 00", "1 01", "1 10", "1 11", // 3
-			"0 000", "0 001", "0 01 0", "0 01 1", "0 10 0", "0 10 1", "0 110", "0 111", // 4
-			"1 000", "1 001", "1 01 0", "1 01 1", "1 10 0", "1 10 1", "1 110", "1 111", // 4
-			"0 0000", "0 0001", "0 001 0", "0 001 1", "0 01 00", "0 01 01", "0 01 10", "0 01 11", // 5
-			"0 10 00", "0 10 01", "0 10 10", "0 10 11", "0 110 0", "0 110 1", "0 1110", "0 1111", // 5
-			"1 0000", "1 0001", "1 001 0", "1 001 1", "1 01 00", "1 01 01", "1 01 10", "1 01 11", // 5
-			"1 10 00", "1 10 01", "1 10 10", "1 10 11", "1 110 0", "1 110 1", "1 1110", "1 1111", // 5
+			"0 000", "0 001", "0 01 e0", "0 01 e1", "0 10 e0", "0 10 e1", "0 110", "0 111", // 4
+			"1 000", "1 001", "1 01 e0", "1 01 e1", "1 10 e0", "1 10 e1", "1 110", "1 111", // 4
+			"0 0000", "0 0001", "0 001 e0", "0 001 e1", "0 01 e00", "0 01 e01", "0 01 e10", "0 01 e11", // 5
+			"0 10 e00", "0 10 e01", "0 10 e10", "0 10 e11", "0 110 e0", "0 110 e1", "0 1110", "0 1111", // 5
+			"1 0000", "1 0001", "1 001 e0", "1 001 e1", "1 01 e00", "1 01 e01", "1 01 e10", "1 01 e11", // 5
+			"1 10 e00", "1 10 e01", "1 10 e10", "1 10 e11", "1 110 e0", "1 110 e1", "1 1110", "1 1111", // 5
 	};
 
 	@Test
@@ -292,15 +293,15 @@ public class PositDomainTest {
 		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
 			assertEquals("toSpacedString ES1 test on " + BINARY_TEST_CASES[i], EXPECTED_ES1_SPACED_STRING[i],
 					PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1));
-			assertEquals("toSpacedString ES1 without stpaces on " + BINARY_TEST_CASES[i], BINARY_TEST_CASES[i],
-					PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1).replaceAll("\\s", ""));
+			assertEquals("toSpacedString ES1 without spaces on " + BINARY_TEST_CASES[i], BINARY_TEST_CASES[i],
+					PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1).replaceAll("[\\sef]", ""));
 		}
 		// Test ES2 spaced string.
 		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
 			assertEquals("toSpacedString ES2 test on " + BINARY_TEST_CASES[i], EXPECTED_ES2_SPACED_STRING[i],
 					PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2));
 			assertEquals("toSpacedString ES2 without stpaces on " + BINARY_TEST_CASES[i], BINARY_TEST_CASES[i],
-					PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2).replaceAll("\\s", ""));
+					PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2).replaceAll("[ef\\s]", ""));
 		}
 	}
 
@@ -356,15 +357,22 @@ public class PositDomainTest {
 
 	@Test
 	public void fourBitES2() {
+		int oosCount = 0;
 		// Positive es41
 		for (int i = 0; i < EXPECTED_FOURBIT_ES2.length; i++) {
 			final String instance = String.format("%4s", Integer.toBinaryString(i)).replace(" ", "0");
 			final Posit p = new PositStringImpl(instance, 2);
-			System.out.println("testcase=" + i + ", posit=" + PositDomain.toSpacedString(instance, 2) + ", expected="
-					+ EXPECTED_FOURBIT_ES2[i] + ", double=" + p.doubleValue());
-			// assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),
-			// PositDomainTest.COMPARE_PRECISION);
+			String outOfSpec = "";
+			if (!equals( p.doubleValue(), EXPECTED_FOURBIT_ES2[i], COMPARE_PRECISION) ) {
+				outOfSpec = "***";
+				oosCount++;
+			}
+			System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + 
+					",exp=" + EXPECTED_FOURBIT_ES2[i] + outOfSpec );
+//			assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),
+//					PositDomainTest.COMPARE_PRECISION);
 		}
+		System.out.println( "Out of spec count=" + oosCount);
 	}
 
 	// public static final String[] BINARY_TEST_CASES = { "", // 0
@@ -380,15 +388,23 @@ public class PositDomainTest {
 
 	@Test
 	public void fiveBitES2() {
+		int oosCount = 0;
 		// es62
 		for (int i = 0; i < 32; i++) {
 			final String instance = String.format("%5s", Integer.toBinaryString(i)).replace(" ", "0");
 			final Posit p = new PositStringImpl(instance, 2);
-			System.out.println("testcase=" + i + ", posit=" + PositDomain.toSpacedString(instance, 2) + ", expected="
-					+ EXPECTED_FIVEBIT_ES2[i] + ", double=" + p.doubleValue());
+			
+			String outOfSpec = "";
+			if (!equals( p.doubleValue(), EXPECTED_FIVEBIT_ES2[i], COMPARE_PRECISION) ) {
+				outOfSpec = "***";
+				oosCount++;
+			}
+			System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + 
+					",exp=" + EXPECTED_FIVEBIT_ES2[i] + outOfSpec );
 			// assertEquals(EXPECTED_FIVEBIT_ES2[i], p.doubleValue(),
 			// PositDomainTest.COMPARE_PRECISION);
 		}
+		System.out.println( "Out of spec count=" + oosCount);
 	}
 
 	/** 0, 1, ±∞,-1 plus or minus two */
@@ -404,16 +420,36 @@ public class PositDomainTest {
 
 	@Test
 	public void sixBitES2() {
+		int oosCount = 0;
 		// es62
 		for (int i = 0; i < TEST_CASES_6BIT.length; i++) {
 			final String instance = String.format("%6s", Integer.toBinaryString(TEST_CASES_6BIT[i])).replace(" ", "0");
 			final Posit p = new PositStringImpl(instance, 2);
-			System.out.println("testcase=" + TEST_CASES_6BIT[i] + ", posit=" + PositDomain.toSpacedString(instance, 2)
-					+ ", expected=" + EXPECTED_SIXBIT_ES2[i] + ", double=" + p.doubleValue());
-			assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+			String outOfSpec = "";
+			if (!equals( p.doubleValue(), EXPECTED_SIXBIT_ES2[i], COMPARE_PRECISION) ) {
+				outOfSpec = "***";
+				oosCount++;
+			}
+			System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + 
+					",exp=" + EXPECTED_SIXBIT_ES2[i] + outOfSpec );
+			// assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
 		}
+		System.out.println( "Out of spec count=" + oosCount);
 	}
 
+	/** Returns true if the difference between doubles is less than epsilon. Comparison with loose precision. */
+	public static boolean equals( final double a, final double b, final double epsilon) {
+		// Test for infinity, NAN, etc.
+		if ( a == b ) {
+			return true;
+		}
+		final double difference = a - b;
+		if (Math.abs(difference) < epsilon) {
+			return true;
+		}
+		return false;		
+	}
+	
 	// Scalar product a.b = sum a1b1+a2b2+...+anbn
 	// [1,3,-5].[4,-2,-2] = 1.4 + 3.-2 + (-5.-1)=3
 	//

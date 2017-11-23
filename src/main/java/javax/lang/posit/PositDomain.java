@@ -86,7 +86,8 @@ public final class PositDomain {
 
 	}
 
-	/** Returns the regime portion of a string of binary 0 and 1 characters. */
+	/** Returns the regime portion of a string of binary 0 and 1 characters. 
+	 * The String will be twos complemented for negative instances. */
 	public static String getRegime(String instance) {
 		// If the bit size is less than 2, returns empty String.
 		// First char of Posit is sign bit.
@@ -94,6 +95,10 @@ public final class PositDomain {
 		if (null == instance || instance.length() < 2) {
 			return "";
 		}
+		boolean positive = isPositive( instance );
+		if ( !positive ) {
+			   instance = Bit.twosComplement(instance);
+			}
 		final char first = instance.charAt(1);
 		final StringBuilder sb = new StringBuilder(first);
 		for (int i = 1; i < instance.length(); i++) {
@@ -136,7 +141,7 @@ public final class PositDomain {
 	/**
 	 * Return the exponent and fraction part of a Posit after the sign and regime
 	 * are removed.
-	 */
+	 * The String will be twos complemented for negative instances. */
 	public static String getExponentFraction(String instance) {
 		// Returns the exponentFraction bits of this Posit as a String of "0" and "1".
 		// If the regime fills the bit size, the exponentFraction may be empty string.
@@ -200,6 +205,29 @@ public final class PositDomain {
 		}
 	}
 
+	// Puny long runs out at es=6, puny double rounds at es=6.
+	// public static final BigInteger [] LOOKUP_2_2_N = new BigInteger [] { };
+	public static final BigInteger[] LOOKUP_2_2_N = new BigInteger[] { BIGINT_2, new BigInteger("4"),
+			new BigInteger("16"), new BigInteger("256"), new BigInteger("65536"), new BigInteger("4294967296"),
+			new BigInteger("18446744073709551616"), new BigInteger("340282366920938463463374607431768211456"),
+			new BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639936") };
+
+	/** Get the useed of a given exponent size (2^2^exponentSize). */
+	public static BigInteger getUseed(int es) {
+		if (es < 0) {
+			return BigInteger.ZERO;
+		}
+		if (es < LOOKUP_2_2_N.length) {
+			return LOOKUP_2_2_N[es];
+		}
+		BigInteger previous = BigInteger.valueOf(2);
+		for (int i = 0; i < es; i++) {
+			previous = previous.pow(2);
+		}
+		// System.out.println( "Es is " + es + ", returning " + previous);
+		return previous;
+	}
+
 	/** Return string with spaces between the sign,regime,exponent, and fraction. */
 	public static String toSpacedString(String instance, int maxExponent) {
 		if (null == instance || instance.length() < 1) {
@@ -247,31 +275,70 @@ public final class PositDomain {
 				sb.append(chars[i]);
 			}
 		}
-
 		return sb.toString();
-
 	}
 
-	// Puny long runs out at es=6, puny double rounds at es=6.
-	// public static final BigInteger [] LOOKUP_2_2_N = new BigInteger [] { };
-	public static final BigInteger[] LOOKUP_2_2_N = new BigInteger[] { BIGINT_2, new BigInteger("4"),
-			new BigInteger("16"), new BigInteger("256"), new BigInteger("65536"), new BigInteger("4294967296"),
-			new BigInteger("18446744073709551616"), new BigInteger("340282366920938463463374607431768211456"),
-			new BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639936") };
-
-	/** Get the useed of a given exponent size (2^2^exponentSize). */
-	public static BigInteger getUseed(int es) {
-		if (es < 0) {
-			return BigInteger.ZERO;
+	/** Returns a very detailed view of the number. Exercises most APIs. */
+	public static String toDetailsString(String instance, int maxExponent) {
+		BigInteger useed = getUseed(maxExponent);
+		if (null == instance ) { 
+			return "null l0, es" + maxExponent + "useed=" + useed.toString();
 		}
-		if (es < LOOKUP_2_2_N.length) {
-			return LOOKUP_2_2_N[es];
+		if (instance.length() < 1) {
+			return "\"\" l0, es" + maxExponent + "useed=" + useed.toString();
 		}
-		BigInteger previous = BigInteger.valueOf(2);
-		for (int i = 0; i < es; i++) {
-			previous = previous.pow(2);
+		if (instance.length() == 1) {			
+			return "\"" + instance + "\" l1 es" + maxExponent + "useed=" + useed.toString();
 		}
-		// System.out.println( "Es is " + es + ", returning " + previous);
-		return previous;
+		String spacedString = toSpacedString(instance, maxExponent);
+		StringBuilder sb = new StringBuilder();
+		sb.append("\"" + spacedString + "\" l" + instance.length() + " es" + maxExponent + " useed" + useed.toString());
+		if ( isZero( instance ) ) {
+			sb.append( ",val=0.0");
+			return sb.toString();
+		}
+		if ( isInfinite( instance ) ) {
+			sb.append( ",val=" + Double.POSITIVE_INFINITY);
+			return sb.toString();
+		}
+		
+		final boolean positive = isPositive(instance);
+		double val = positive ? 1.0 : -1.0;
+		final String regime = getRegime( instance );
+		if ( null != regime && regime.length() > 0 ) {
+			int k = getRegimeK( regime);
+			double useedK = 1.0;
+			if (k >= 0) {
+				useedK = useed.pow(k).doubleValue();
+				val *= useedK;
+			} else {
+				useedK = useed.pow(Math.abs(k)).doubleValue();
+				val /= useedK;
+				useedK = 1.0 / useedK;
+			}
+			sb.append( ",r=\"" + regime + "\" k=" + k + " useed^k=" + useedK + " val=" + val);
+		} else {
+			sb.append( ",r=\"\"");
+		}
+		final String expFrac = getExponentFraction(instance);
+		final String exponent = getExponent(expFrac,maxExponent);
+		if (null != exponent && exponent.length() > 0) {
+			final double expVal = PositDomain.getExponentVal(exponent, positive);
+			final double twoe = Math.pow(2.0, expVal);
+			val *= twoe;// sign*regime*exp
+			sb.append( ",e=\"" + exponent + "\" e=" + expVal + " 2^e=" + twoe + " val=" + val);
+		} else {
+			sb.append( ",e=\"\"");
+		}
+		final String fraction = getFraction(expFrac,maxExponent);
+		if (null != fraction && fraction.length() > 0) {
+			final long fracNumerator = PositDomain.getFractionVal(fraction, positive);
+			final double fracMultiplier = 1.0 + (fracNumerator / useed.doubleValue());
+			val *= fracMultiplier; // sign*regime*exp*frac
+			sb.append( ",f=\"" + fraction + "\" fn=" + fracNumerator + " fm=" + fracMultiplier + " val=" + val);
+		} else {
+			sb.append( ",f=\"\"");
+		}		
+		return sb.toString();
 	}
 }

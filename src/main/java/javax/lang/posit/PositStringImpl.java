@@ -131,13 +131,9 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 			useedK = useed.pow(Math.abs(k)).doubleValue();
 			val /= useedK; // sign*regime
 		}
-		// System.out.println("Posit=\"" + spaced + "\", useed=" + useed.intValue() + ",
-		// k=" + Math.abs(k) + ", useed^k=" + useedK);
 		final String exponent = getExponent();
 		if (null != exponent && exponent.length() > 0) {
 			final double expVal = PositDomain.getExponentVal(exponent, positive);
-			// System.out.println( "Posit=\"" + spaced + "\", exp=" + exponent + ", expVal="
-			// + expVal + ", 2^e=" + Math.pow(2.0, expVal));
 			final double twoe = Math.pow(2.0, expVal);
 			val *= twoe;// sign*regime*exp
 		}
@@ -146,8 +142,6 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 			final long fracNumerator = PositDomain.getFractionVal(fraction, positive);
 			final double fracMultiplier = 1.0 + (fracNumerator / useed.doubleValue());
 			val *= fracMultiplier; // sign*regime*exp*frac
-			System.out.println("Posit \"" + spaced + "\", frac=" + fraction + ",fracNum=" + fracNumerator + ",fracMult="
-					+ fracMultiplier + ",val=" + val);
 		}
 		return val;
 	}
@@ -307,11 +301,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	public int getRegimeK() {
 		final boolean positive = isPositive();
 		final String regime = PositDomain.getRegime(internal);
-		if (positive) {
-			return PositDomain.getRegimeK(regime);
-		} else {
-			return PositDomain.getRegimeK(Bit.twosComplement(regime));
-		}
+		return PositDomain.getRegimeK(regime);
 	}
 
 	@Override
