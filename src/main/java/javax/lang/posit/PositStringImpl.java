@@ -139,8 +139,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		}
 		final String fraction = getFraction();
 		if (null != fraction && fraction.length() > 0) {
-			final long fracNumerator = PositDomain.getFractionVal(fraction, positive);
-			final double fracMultiplier = 1.0 + (fracNumerator / useed.doubleValue());
+			double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
 			val *= fracMultiplier; // sign*regime*exp*frac
 		}
 		return val;
@@ -312,13 +311,13 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		return PositDomain.getExponentFraction(internal);
 	}
 
-	@Override
-	/**
-	 * @see Posit#getMaxExponentSize()
-	 */
-	public byte getMaxExponentSize() {
-		return maxExponentSize;
-	}
+    @Override
+    /**
+     * @see Posit#getMaxExponentSize()
+     */
+    public byte getMaxExponentSize() {
+        return maxExponentSize;
+    }
 
 	@Override
 	/**
@@ -343,6 +342,18 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 	public String getFraction() {
 		return PositDomain.getFraction(getExponentFraction(), getMaxExponentSize());
 	}
+
+    @Override
+    /**
+     * @see Posit#getFractionMultiplier()
+     */
+    public double getFractionMultiplier() {        
+        int fs = getBitSize() - 3 - getMaxExponentSize();
+        if (fs < 1) {
+            return 0;
+        }
+        return fs;
+    }
 
 	@Override
 	/**

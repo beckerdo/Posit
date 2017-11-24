@@ -191,20 +191,43 @@ public final class PositDomain {
 		return exponentFraction.substring(max);
 	}
 
-	/** Return the value of a given fraction of 0 and 1 characters. */
-	public static long getFractionVal(String fraction, boolean positive) {
-		// Returns the exponent bits of this Posit as a String of "0" and "1".
-		// If the regime fills the bit size, the exponent may be empty string.
-		if (null == fraction || fraction.length() < 1) {
-			return 0;
-		}
-		if (positive) {
-			return Long.parseUnsignedLong(fraction, 2);
-		} else {
-			return Long.parseUnsignedLong(Bit.twosComplement(fraction), 2);
-		}
-	}
+    /** Return the value of a given fraction of 0 and 1 characters. */
+    public static long getFractionVal(String fraction, boolean positive) {
+        // Returns the exponent bits of this Posit as a String of "0" and "1".
+        // If the regime fills the bit size, the exponent may be empty string.
+        if (null == fraction || fraction.length() < 1) {
+            return 0;
+        }
+        if (positive) {
+            return Long.parseUnsignedLong(fraction, 2);
+        } else {
+            return Long.parseUnsignedLong(Bit.twosComplement(fraction), 2);
+        }
+    }
 
+    /** Return the fraction multiplier of 0 and 1 characters. */
+    public static double getFractionMultiplier(String fraction) {
+        if (null == fraction || fraction.length() < 1) {
+            return 1.0;
+        }
+        double fnumerator = Long.parseUnsignedLong(fraction, 2);
+        double fdenominator = powerN( 2, fraction.length());
+        double fmultiplier = 1.0 + fnumerator/fdenominator;
+        return fmultiplier;
+    }
+
+    /** Return base^exp. Only 0..MAX_LONG exps are supported. */
+    public static long powerN( long base, long exp ) {
+        if(exp < 1) return 1; // no fractions here
+        long result = base;
+
+        while(exp > 1) {
+            result*=base;
+            exp--;
+        }
+        return result;
+    }
+    
 	// Puny long runs out at es=6, puny double rounds at es=6.
 	// public static final BigInteger [] LOOKUP_2_2_N = new BigInteger [] { };
 	public static final BigInteger[] LOOKUP_2_2_N = new BigInteger[] { BIGINT_2, new BigInteger("4"),
@@ -282,17 +305,17 @@ public final class PositDomain {
 	public static String toDetailsString(String instance, int maxExponent) {
 		BigInteger useed = getUseed(maxExponent);
 		if (null == instance ) { 
-			return "null l0, es" + maxExponent + "useed=" + useed.toString();
+			return "null es" + maxExponent + "useed=" + useed.toString();
 		}
 		if (instance.length() < 1) {
-			return "\"\" l0, es" + maxExponent + "useed=" + useed.toString();
+			return "\"\" es" + maxExponent + "useed=" + useed.toString();
 		}
 		if (instance.length() == 1) {			
-			return "\"" + instance + "\" l1 es" + maxExponent + "useed=" + useed.toString();
+			return "\"" + instance + "\" es" + maxExponent + "useed=" + useed.toString();
 		}
 		String spacedString = toSpacedString(instance, maxExponent);
 		StringBuilder sb = new StringBuilder();
-		sb.append("\"" + spacedString + "\" l" + instance.length() + " es" + maxExponent + " useed" + useed.toString());
+		sb.append("\"" + spacedString + "\" es" + maxExponent + " useed" + useed.toString());
 		if ( isZero( instance ) ) {
 			sb.append( ",val=0.0");
 			return sb.toString();
@@ -316,9 +339,9 @@ public final class PositDomain {
 				val /= useedK;
 				useedK = 1.0 / useedK;
 			}
-			sb.append( ",r=\"" + regime + "\" k=" + k + " useed^k=" + useedK + " val=" + val);
+			sb.append( ", r=\"" + regime + "\" k=" + k + " useed^k=" + useedK + " val=" + val);
 		} else {
-			sb.append( ",r=\"\"");
+			sb.append( ", r=\"\"");
 		}
 		final String expFrac = getExponentFraction(instance);
 		final String exponent = getExponent(expFrac,maxExponent);
@@ -326,19 +349,21 @@ public final class PositDomain {
 			final double expVal = PositDomain.getExponentVal(exponent, positive);
 			final double twoe = Math.pow(2.0, expVal);
 			val *= twoe;// sign*regime*exp
-			sb.append( ",e=\"" + exponent + "\" e=" + expVal + " 2^e=" + twoe + " val=" + val);
+			sb.append( ", e=\"" + exponent + "\" e=" + expVal + " 2^e=" + twoe + " val=" + val);
 		} else {
-			sb.append( ",e=\"\"");
+			sb.append( ", e=\"\"");
 		}
 		final String fraction = getFraction(expFrac,maxExponent);
 		if (null != fraction && fraction.length() > 0) {
-			final long fracNumerator = PositDomain.getFractionVal(fraction, positive);
-			final double fracMultiplier = 1.0 + (fracNumerator / useed.doubleValue());
+			final double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
 			val *= fracMultiplier; // sign*regime*exp*frac
-			sb.append( ",f=\"" + fraction + "\" fn=" + fracNumerator + " fm=" + fracMultiplier + " val=" + val);
+			sb.append( ", f=\"" + fraction + "\" fm " + fracMultiplier + " val=" + val);
 		} else {
-			sb.append( ",f=\"\"");
+			sb.append( ", f=\"\"");
 		}		
+		if ( 0.0 != val ) {
+		    sb.append( ",1/val=" + 1.0/val);
+		}
 		return sb.toString();
 	}
 }

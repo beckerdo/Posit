@@ -33,5 +33,4 @@ public final class Bit {
 	public static char invert(char c) {
 		return (c == '0') ? '1' : '0';
 	}
-
 }

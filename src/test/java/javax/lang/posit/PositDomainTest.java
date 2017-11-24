@@ -412,30 +412,176 @@ public class PositDomainTest {
 			49, 50 };
 	public static final double[] EXPECTED_SIXBIT_ES0 = { -0.125, -0.0625, 0.0, 0.0625, 0.125, 0.875, 0.9375, 1.0, 1.125,
 			1.25, 8.0, 16.0, Double.POSITIVE_INFINITY, -16.0, -8.0, -1.25, -1.125, -1.0, -0.9375, -0.875, };
-	public static final double[] EXPECTED_SIXBIT_ES1 = { -0.015625, -0.00390625, 0.0, 0.00390625, 0.015625, 0.75, 0.875,
-			1.0, 1.25, 1.5, 64.0, 256.0, Double.POSITIVE_INFINITY, -256.0, -64.0, -1.5, -1.25, -1.0, -0.875, -0.75, };
-	public static final double[] EXPECTED_SIXBIT_ES2 = { -0.000244140625, -1.52587890625e-5, 0.0, 1.52587890625e-5,
-			0.000244140625, 0.5, 0.75, 1.0, 1.5, 2.0, 4096.0, 65536.0, Double.POSITIVE_INFINITY, -65536.0, -4096.0,
-			-2.0, -1.5, -1.0, -0.75, -0.5, };
-
-	@Test
-	public void sixBitES2() {
-		int oosCount = 0;
-		// es62
-		for (int i = 0; i < TEST_CASES_6BIT.length; i++) {
-			final String instance = String.format("%6s", Integer.toBinaryString(TEST_CASES_6BIT[i])).replace(" ", "0");
-			final Posit p = new PositStringImpl(instance, 2);
-			String outOfSpec = "";
-			if (!equals( p.doubleValue(), EXPECTED_SIXBIT_ES2[i], COMPARE_PRECISION) ) {
-				outOfSpec = "***";
-				oosCount++;
-			}
-			System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + 
-					",exp=" + EXPECTED_SIXBIT_ES2[i] + outOfSpec );
-			// assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
-		}
-		System.out.println( "Out of spec count=" + oosCount);
-	}
+	public static final double[] EXPECTED_SIXBIT_ES1 = { 
+	        0.0, // "0 00000", 0
+	        1.0 /  256.0, // "0 00001", 1
+	        1.0 / 64.0, // "0 0001 0", 2
+	        1.0 / 32.0, // "0 0001 1", 3
+	        1.0 / 16.0, // "0 001 00", 4
+	        1.0 / 12.0, // "0 001 01", 5
+	        1.0 / 8.0, // "0 001 10", 6
+	        1.0 / 6.0, // "0 001 11", 7
+	        1.0 / 4.0, // "0 01 0 00", 8
+	        1.0 / 3.5, // "0 01 0 01", 9
+	        1.0 / 3.0, // "0 01 0 10", 10
+	        1.0 / 2.5, // "0 01 0 11", 11
+	        1.0 / 2.0, // "0 01 1 00", 12
+	        1.0 / 1.75, // "0 01 1 01", 13
+	        1.0 / 1.5, // "0 01 1 10", 14
+	        1.0 / 1,25, // "0 01 1 11", 15
+	        1.0, // "0 10 0 00", 16
+	        1.25, // "0 10 0 01", 17
+	        1.5, // "0 10 0 10", 18
+	        1.75, // "0 10 0 11", 19
+	        2.0, // "0 10 1 00", 20
+	        2.5, // "0 10 1 01", 21
+	        3.0, // "0 10 1 10", 22
+	        3.5, // "0 10 1 11", 23
+	        4.0, // "0 110 00", 24
+	        6.0, // "0 110 01", 25
+	        8.0, // "0 110 10", 26
+	        12.0, // "0 110 11", 27
+	        16.0, // "0 1110 0", 28
+	        32.0, // "0 1110 1", 29
+	        64.0, // "0 11110", 30
+	        256.0, // "0 11111", 31
+	        Double.POSITIVE_INFINITY, // "1 00000", 32
+	        -256.0, // "1 00001", 33
+	        -64.0, // "1 0001 0", 34
+	        -32.0, // "1 0001 1", 35
+	        -16.0, // "1 001 00", 36
+	        -12.0, // "1 001 01", 37
+	        -8.0, // "1 001 10", 38
+	        -6.0, // "1 001 11", 39
+	        -4.0, // "1 01 0 00", 40
+	        -3.5, // "1 01 0 01", 41
+	        -3.0, // "1 01 0 10", 42
+	        -2.5, // "1 01 0 11", 43
+	        -2.0, // "1 01 1 00", 44
+	        -1.75, // "1 01 1 01", 45
+	        -1.5, // "1 01 1 10", 46
+	        -1.25, // "1 01 1 11", 47
+	        -1.0, // "1 10 0 00", 48
+	        -1.0 / 1.25, // "1 10 0 01", 49
+	        -1.0 / 1.5, // "1 10 0 10", 50
+	        -1.0 / 1.75, // "1 10 0 11", 51
+	        -1.0 / 2.0, // "1 10 1 00", 52
+	        -1.0 / 2.5, // "1 10 1 01", 53
+	        -1.0 / 3.0, // "1 10 1 10", 54
+	        -1.0 / 3.5, // "1 10 1 11", 55
+	        -1.0 / 3.0, // "1 110 00", 56
+	        -1.0 / 4.0, // "1 110 01", 57
+	        -1.0 / 6.0, // "1 110 10", 58
+	        -1.0 / 8.0, // "1 110 11", 59
+	        -1.0 / 16.0, // "1 1110 0", 60
+	        -1.0 / 32.0, // "1 1110 1", 61
+	        -1.0 / 64.0, // "1 11110", 62
+	        -1.0 / 256.0, // "1 11111", 63
+	};
+    public static final double[] EXPECTED_SIXBIT_ES2 = { 
+            0.0, // "0 00000", 0
+            1.0 / 65536.0, // "0 00001", 1
+            1.0 / 4096.0, // "0 0001 0", 2
+            1.0 / 1024.0, // "0 0001 1", 3
+            1.0 / 256.0, // "0 001 00", 4
+            1.0/ 128.0, // "0 001 01", 5
+            1.0 / 64.0, // "0 001 10", 6
+            1.0 / 32.0, // "0 001 11", 7
+            1.0 / 16.0, // "0 01 000", 8
+            1.0 / 12.0, // "0 01 001", 9
+            1.0 / 8.0, // "0 01 010", 10
+            1.0 / 6.0, // "0 01 011", 11
+            1.0 / 4.0, // "0 01 100", 12
+            1.0 / 3.0, // "0 01 101", 13
+            1.0 / 2.0, // "0 01 110", 14
+            1.0 / 1.5, // "0 01 111", 15
+            1.0, // "0 10 000", 16
+            1.5, // "0 10 001", 17
+            2.0, // "0 10 010", 18
+            3.0, // "0 10 011", 19
+            4.0, // "0 10 100", 20
+            6.0, // "0 10 101", 21
+            8.0, // "0 10 110", 22
+            12.0, // "0 10 111", 23
+            16.0, // "0 110 00", 24
+            32.0, // "0 110 01", 25
+            64.0, // "0 110 10", 26
+            128.0, // "0 110 11", 27
+            256.0, // "0 1110 0", 28
+            1024.0, // "0 1110 1", 29
+            4096.0, // "0 11110", 30
+            65536.0, // "0 11111", 31
+            Double.POSITIVE_INFINITY, // "1 00000", 32
+            -65536.0, // "1 00001", 33
+            -4096.0, // "1 0001 0", 34
+            -1024.0, // "1 0001 1", 35
+            -256.0, // "1 001 00", 36
+            -128.0, // "1 001 01", 37
+            -64.0, // "1 001 10", 38
+            -32.0, // "1 001 11", 39
+            -16.0, // "1 01 000", 40
+            -12.0, // "1 01 001", 41
+            -8.0, // "1 01 010", 42
+            -6.0, // "1 01 011", 43
+            -4.0, // "1 01 100", 44
+            -3.0, // "1 01 101", 45
+            -2.0, // "1 01 110", 46
+            -1.5, // "1 01 111", 47
+            -1.0, // "1 10 000", 48
+            -1.0 / 1.5, // "1 10 001", 49
+            -1.0 / 2.0, // "1 10 010", 50
+            -1.0 / 3.0, // "1 10 011", 51
+            -1.0 / 4.0, // "1 10 100", 52
+            -1.0 / 6.0, // "1 10 101", 53
+            -1.0 / 8.0, // "1 10 110", 54
+            -1.0 / 12.0, // "1 10 111", 55
+            -1.0 / 16.0, // "1 110 00", 56
+            -1.0 / 32.0, // "1 110 01", 57
+            -1.0 / 64.0, // "1 110 10", 58
+            -1.0 / 128.0, // "1 110 11", 59
+            -1.0 / 256.0, // "1 1110 0", 60
+            -1.0 / 1024.0, // "1 1110 1", 61
+            -1.0 / 4096.0, // "1 11110", 62
+            -1.0 / 65536.0, // "1 11111", 63    
+    };
+	
+    @Test
+    public void sixBitES1() {
+        int oosCount = 0;
+        // es62
+        for (int i = 0; i < EXPECTED_SIXBIT_ES1.length; i++) {
+            final String instance = String.format("%6s", Integer.toBinaryString(i)).replace(" ", "0");
+            final Posit p = new PositStringImpl(instance, 2);
+            String outOfSpec = "";
+            if (!equals( p.doubleValue(), EXPECTED_SIXBIT_ES1[i], COMPARE_PRECISION) ) {
+                outOfSpec = "***";
+                oosCount++;
+            }
+            System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + 
+                    ",exp=" + EXPECTED_SIXBIT_ES1[i] + outOfSpec );
+            // assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+        }
+        System.out.println( "Out of spec count=" + oosCount);
+    }
+    
+    @Test
+    public void sixBitES2() {
+        int oosCount = 0;
+        // es62
+        for (int i = 0; i < EXPECTED_SIXBIT_ES2.length; i++) {
+            final String instance = String.format("%6s", Integer.toBinaryString(i)).replace(" ", "0");
+            final Posit p = new PositStringImpl(instance, 2);
+            String outOfSpec = "";
+            if (!equals( p.doubleValue(), EXPECTED_SIXBIT_ES2[i], COMPARE_PRECISION) ) {
+                outOfSpec = "***";
+                oosCount++;
+            }
+            System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + 
+                    ",exp=" + EXPECTED_SIXBIT_ES2[i] + outOfSpec );
+            // assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+        }
+        System.out.println( "Out of spec count=" + oosCount);
+    }
 
 	/** Returns true if the difference between doubles is less than epsilon. Comparison with loose precision. */
 	public static boolean equals( final double a, final double b, final double epsilon) {

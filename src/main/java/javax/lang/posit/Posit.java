@@ -326,29 +326,29 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 */
 	public abstract int getRegimeK();
 
-	/**
-	 * Return the exponent and fraction part of this Posit after the sign and regime
-	 * are removed.
-	 * 
-	 * @return the exponent and fraction part of this Posit after the sign and
-	 *         regime are removed.
-	 */
-	public abstract String getExponentFraction();
+    /**
+     * Return the exponent and fraction part of this Posit after the sign and regime
+     * are removed.
+     * 
+     * @return the exponent and fraction part of this Posit after the sign and
+     *         regime are removed.
+     */
+    public abstract String getExponentFraction();
 
-	/**
-	 * Returns the maximum exponent size or em in this Posit.
-	 * <p>
-	 * Normally any part of the Posit after the sign and the regime comprise the
-	 * exponent and the fraction. Both may be absent. However, when present, the
-	 * maximum number of exponent bits is given by this value.
-	 * <p>
-	 * Es or "exponent size" is the actual length of the exponent string in a posit
-	 * instance. For example, in a 5 bit posit with em of 2, there are posit
-	 * instances with es = 0, 1, and 2.
-	 *
-	 * @return maximum number of exponent bits in this Posit
-	 */
-	public abstract byte getMaxExponentSize();
+    /**
+     * Returns the maximum exponent size or em in this Posit.
+     * <p>
+     * Normally any part of the Posit after the sign and the regime comprise the
+     * exponent and the fraction. Both may be absent. However, when present, the
+     * maximum number of exponent bits is given by this value.
+     * <p>
+     * Es or "exponent size" is the actual length of the exponent string in a posit
+     * instance. For example, in a 5 bit posit with em of 2, there are posit
+     * instances with es = 0, 1, and 2.
+     *
+     * @return maximum number of exponent bits in this Posit
+     */
+    public abstract byte getMaxExponentSize();
 
 	/**
 	 * Sets the maximum exponent size or em in this Posit.
@@ -376,6 +376,22 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 * @return a string of "0" and "1" representing the exponent
 	 */
 	public abstract String getFraction();
+
+    /**
+     * Returns the fraction to scale the Posit value.
+     * <p>
+     * In general, fractional bits of a posit are used to scale the value.
+     * If a fraction is given as f0..fn fraction bits, the multiplier
+     * is 1.0 + val( fn ) / 2^n
+     * <p>
+     * For example, a one bit fraction (n=1) will have multipliers
+     * fm(0,1)=1.0,1.5.
+     * A two bit fraction (n=2) will have multipliers of
+     * fm(00,01,10,11)=1.0,1.25,1.5,1.75
+     *
+     * @return the fraction scaling multiplier
+     */
+    public abstract double getFractionMultiplier();
 
 	/**
 	 * Returns the useed of this Posit Useed is 2 ** 2 ** run length of regime.
