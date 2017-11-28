@@ -118,7 +118,6 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		if (isInfinite()) {
 			return Double.POSITIVE_INFINITY;
 		}
-		final String spaced = PositDomain.toSpacedString(internal, maxExponentSize);
 		final boolean positive = isPositive();
 		double val = positive ? 1.0 : -1.0;
 		final BigInteger useed = getUseed();
@@ -139,7 +138,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		}
 		final String fraction = getFraction();
 		if (null != fraction && fraction.length() > 0) {
-			double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
+			final double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
 			val *= fracMultiplier; // sign*regime*exp*frac
 		}
 		return val;
@@ -311,13 +310,13 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		return PositDomain.getExponentFraction(internal);
 	}
 
-    @Override
-    /**
-     * @see Posit#getMaxExponentSize()
-     */
-    public byte getMaxExponentSize() {
-        return maxExponentSize;
-    }
+	@Override
+	/**
+	 * @see Posit#getMaxExponentSize()
+	 */
+	public byte getMaxExponentSize() {
+		return maxExponentSize;
+	}
 
 	@Override
 	/**
@@ -343,17 +342,17 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 		return PositDomain.getFraction(getExponentFraction(), getMaxExponentSize());
 	}
 
-    @Override
-    /**
-     * @see Posit#getFractionMultiplier()
-     */
-    public double getFractionMultiplier() {        
-        int fs = getBitSize() - 3 - getMaxExponentSize();
-        if (fs < 1) {
-            return 0;
-        }
-        return fs;
-    }
+	@Override
+	/**
+	 * @see Posit#getFractionMultiplier()
+	 */
+	public double getFractionMultiplier() {
+		final int fs = getBitSize() - 3 - getMaxExponentSize();
+		if (fs < 1) {
+			return 0;
+		}
+		return fs;
+	}
 
 	@Override
 	/**
