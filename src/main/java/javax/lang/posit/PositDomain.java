@@ -86,8 +86,10 @@ public final class PositDomain {
 
 	}
 
-	/** Returns the regime portion of a string of binary 0 and 1 characters. 
-	 * The String will be twos complemented for negative instances. */
+	/**
+	 * Returns the regime portion of a string of binary 0 and 1 characters. The
+	 * String will be twos complemented for negative instances.
+	 */
 	public static String getRegime(String instance) {
 		// If the bit size is less than 2, returns empty String.
 		// First char of Posit is sign bit.
@@ -95,10 +97,10 @@ public final class PositDomain {
 		if (null == instance || instance.length() < 2) {
 			return "";
 		}
-		boolean positive = isPositive( instance );
-		if ( !positive ) {
-			   instance = Bit.twosComplement(instance);
-			}
+		final boolean positive = isPositive(instance);
+		if (!positive) {
+			instance = Bit.twosComplement(instance);
+		}
 		final char first = instance.charAt(1);
 		final StringBuilder sb = new StringBuilder(first);
 		for (int i = 1; i < instance.length(); i++) {
@@ -140,8 +142,8 @@ public final class PositDomain {
 
 	/**
 	 * Return the exponent and fraction part of a Posit after the sign and regime
-	 * are removed.
-	 * The String will be twos complemented for negative instances. */
+	 * are removed. The String will be twos complemented for negative instances.
+	 */
 	public static String getExponentFraction(String instance) {
 		// Returns the exponentFraction bits of this Posit as a String of "0" and "1".
 		// If the regime fills the bit size, the exponentFraction may be empty string.
@@ -191,43 +193,45 @@ public final class PositDomain {
 		return exponentFraction.substring(max);
 	}
 
-    /** Return the value of a given fraction of 0 and 1 characters. */
-    public static long getFractionVal(String fraction, boolean positive) {
-        // Returns the exponent bits of this Posit as a String of "0" and "1".
-        // If the regime fills the bit size, the exponent may be empty string.
-        if (null == fraction || fraction.length() < 1) {
-            return 0;
-        }
-        if (positive) {
-            return Long.parseUnsignedLong(fraction, 2);
-        } else {
-            return Long.parseUnsignedLong(Bit.twosComplement(fraction), 2);
-        }
-    }
+	/** Return the value of a given fraction of 0 and 1 characters. */
+	public static long getFractionVal(String fraction, boolean positive) {
+		// Returns the exponent bits of this Posit as a String of "0" and "1".
+		// If the regime fills the bit size, the exponent may be empty string.
+		if (null == fraction || fraction.length() < 1) {
+			return 0;
+		}
+		if (positive) {
+			return Long.parseUnsignedLong(fraction, 2);
+		} else {
+			return Long.parseUnsignedLong(Bit.twosComplement(fraction), 2);
+		}
+	}
 
-    /** Return the fraction multiplier of 0 and 1 characters. */
-    public static double getFractionMultiplier(String fraction) {
-        if (null == fraction || fraction.length() < 1) {
-            return 1.0;
-        }
-        double fnumerator = Long.parseUnsignedLong(fraction, 2);
-        double fdenominator = powerN( 2, fraction.length());
-        double fmultiplier = 1.0 + fnumerator/fdenominator;
-        return fmultiplier;
-    }
+	/** Return the fraction multiplier of 0 and 1 characters. */
+	public static double getFractionMultiplier(String fraction) {
+		if (null == fraction || fraction.length() < 1) {
+			return 1.0;
+		}
+		final double fnumerator = Long.parseUnsignedLong(fraction, 2);
+		final double fdenominator = powerN(2, fraction.length());
+		final double fmultiplier = 1.0 + fnumerator / fdenominator;
+		return fmultiplier;
+	}
 
-    /** Return base^exp. Only 0..MAX_LONG exps are supported. */
-    public static long powerN( long base, long exp ) {
-        if(exp < 1) return 1; // no fractions here
-        long result = base;
+	/** Return base^exp. Only 0..MAX_LONG exps are supported. */
+	public static long powerN(long base, long exp) {
+		if (exp < 1) {
+			return 1; // no fractions here
+		}
+		long result = base;
 
-        while(exp > 1) {
-            result*=base;
-            exp--;
-        }
-        return result;
-    }
-    
+		while (exp > 1) {
+			result *= base;
+			exp--;
+		}
+		return result;
+	}
+
 	// Puny long runs out at es=6, puny double rounds at es=6.
 	// public static final BigInteger [] LOOKUP_2_2_N = new BigInteger [] { };
 	public static final BigInteger[] LOOKUP_2_2_N = new BigInteger[] { BIGINT_2, new BigInteger("4"),
@@ -252,24 +256,28 @@ public final class PositDomain {
 	}
 
 	/** Return string with spaces between the sign,regime,exponent, and fraction. */
-	public static String toSpacedString(String instance, int maxExponent) {
+	public static String toSpacedString(String instance, int maxExponent, boolean flipNegative) {
 		if (null == instance || instance.length() < 1) {
 			return "";
 		}
 		if (instance.length() == 1) {
 			return instance;
 		}
-		final char[] chars = instance.toCharArray();
 		final StringBuilder sb = new StringBuilder();
-		sb.append(chars[0]);
+		sb.append(instance.charAt(0));
+		String remaining = instance.substring(1);
+		if (flipNegative && !isPositive(instance)) {
+			remaining = Bit.twosComplement(remaining);
+		}
+
 		// Regime is second char until terminated by end of string or opposite char.
-		final char first = instance.charAt(1);
+		final char first = remaining.charAt(0);
 		int rs = 0;
-		for (int i = 1; i < chars.length; i++) {
-			if (1 == i) {
+		for (int i = 0; i < remaining.length(); i++) {
+			if (0 == i) {
 				sb.append(' ');
 			}
-			final char current = instance.charAt(i);
+			final char current = remaining.charAt(i);
 			sb.append(current);
 			rs++;
 			if (first != current) {
@@ -278,24 +286,24 @@ public final class PositDomain {
 		}
 		// 0123456789
 		// 1001eeeeff
-		final int esMax = instance.length() - rs - 1;
+		final int esMax = remaining.length() - rs;
 		int es = 0;
 		if (esMax > 0) {
 			es = Math.min(maxExponent, esMax);
-			for (int i = 1 + rs; i < 1 + rs + es; i++) {
-				if (i == 1 + rs) {
+			for (int i = rs; i < rs + es; i++) {
+				if (i == rs) {
 					sb.append(" e");
 				}
-				sb.append(chars[i]);
+				sb.append(remaining.charAt(i));
 			}
 		}
-		final int fs = instance.length() - es - rs - 1;
+		final int fs = remaining.length() - es - rs;
 		if (fs > 0) {
-			for (int i = 1 + rs + es; i < instance.length(); i++) {
-				if (i == 1 + rs + es) {
+			for (int i = rs + es; i < remaining.length(); i++) {
+				if (i == rs + es) {
 					sb.append(" f");
 				}
-				sb.append(chars[i]);
+				sb.append(remaining.charAt(i));
 			}
 		}
 		return sb.toString();
@@ -303,33 +311,33 @@ public final class PositDomain {
 
 	/** Returns a very detailed view of the number. Exercises most APIs. */
 	public static String toDetailsString(String instance, int maxExponent) {
-		BigInteger useed = getUseed(maxExponent);
-		if (null == instance ) { 
+		final BigInteger useed = getUseed(maxExponent);
+		if (null == instance) {
 			return "null es" + maxExponent + "useed=" + useed.toString();
 		}
 		if (instance.length() < 1) {
 			return "\"\" es" + maxExponent + "useed=" + useed.toString();
 		}
-		if (instance.length() == 1) {			
+		if (instance.length() == 1) {
 			return "\"" + instance + "\" es" + maxExponent + "useed=" + useed.toString();
 		}
-		String spacedString = toSpacedString(instance, maxExponent);
-		StringBuilder sb = new StringBuilder();
+		final String spacedString = toSpacedString(instance, maxExponent, true);
+		final StringBuilder sb = new StringBuilder();
 		sb.append("\"" + spacedString + "\" es" + maxExponent + " useed" + useed.toString());
-		if ( isZero( instance ) ) {
-			sb.append( ",val=0.0");
+		if (isZero(instance)) {
+			sb.append(",val=0.0");
 			return sb.toString();
 		}
-		if ( isInfinite( instance ) ) {
-			sb.append( ",val=" + Double.POSITIVE_INFINITY);
+		if (isInfinite(instance)) {
+			sb.append(",val=" + Double.POSITIVE_INFINITY);
 			return sb.toString();
 		}
-		
+
 		final boolean positive = isPositive(instance);
 		double val = positive ? 1.0 : -1.0;
-		final String regime = getRegime( instance );
-		if ( null != regime && regime.length() > 0 ) {
-			int k = getRegimeK( regime);
+		final String regime = getRegime(instance);
+		if (null != regime && regime.length() > 0) {
+			final int k = getRegimeK(regime);
 			double useedK = 1.0;
 			if (k >= 0) {
 				useedK = useed.pow(k).doubleValue();
@@ -339,30 +347,30 @@ public final class PositDomain {
 				val /= useedK;
 				useedK = 1.0 / useedK;
 			}
-			sb.append( ", r=\"" + regime + "\" k=" + k + " useed^k=" + useedK + " val=" + val);
+			sb.append(", r=\"" + regime + "\" k=" + k + " useed^k=" + useedK + " val=" + val);
 		} else {
-			sb.append( ", r=\"\"");
+			sb.append(", r=\"\"");
 		}
 		final String expFrac = getExponentFraction(instance);
-		final String exponent = getExponent(expFrac,maxExponent);
+		final String exponent = getExponent(expFrac, maxExponent);
 		if (null != exponent && exponent.length() > 0) {
 			final double expVal = PositDomain.getExponentVal(exponent, positive);
 			final double twoe = Math.pow(2.0, expVal);
 			val *= twoe;// sign*regime*exp
-			sb.append( ", e=\"" + exponent + "\" e=" + expVal + " 2^e=" + twoe + " val=" + val);
+			sb.append(", e=\"" + exponent + "\" e=" + expVal + " 2^e=" + twoe + " val=" + val);
 		} else {
-			sb.append( ", e=\"\"");
+			sb.append(", e=\"\"");
 		}
-		final String fraction = getFraction(expFrac,maxExponent);
+		final String fraction = getFraction(expFrac, maxExponent);
 		if (null != fraction && fraction.length() > 0) {
 			final double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
 			val *= fracMultiplier; // sign*regime*exp*frac
-			sb.append( ", f=\"" + fraction + "\" fm " + fracMultiplier + " val=" + val);
+			sb.append(", f=\"" + fraction + "\" fm " + fracMultiplier + " val=" + val);
 		} else {
-			sb.append( ", f=\"\"");
-		}		
-		if ( 0.0 != val ) {
-		    sb.append( ",1/val=" + 1.0/val);
+			sb.append(", f=\"\"");
+		}
+		if (0.0 != val) {
+			sb.append(",1/val=" + 1.0 / val);
 		}
 		return sb.toString();
 	}
