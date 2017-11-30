@@ -72,9 +72,9 @@ public final class PositDomain {
 	}
 
 	/**
-	 * Checks if a string of binary 0 and 1 characters is exact. Type II unums
-	 * ending in 1 (the ubit) represent the open interval between adjacent exact
-	 * points, the unums for which end in 0.
+	 * Checks if a string of binary 0 and 1 characters is exact.
+	 * <p>
+	 * A posit will be exact if the fraction is 0.
 	 * <p>
 	 * Posits of length 0, 1, 2, (0,1,∞,-1) are all exact.
 	 */
@@ -253,6 +253,54 @@ public final class PositDomain {
 		}
 		// System.out.println( "Es is " + es + ", returning " + previous);
 		return previous;
+	}
+
+	/**
+	 * Returns an array consisting of sign, regime, exponent, and fraction.
+	 * Components are not interpreted, simply grouped.
+	 *
+	 * @param instance
+	 * @param maxExponent
+	 * @param flipNegative
+	 * @return
+	 */
+	public static String[] getComponents(String instance, int maxExponent, boolean flipNegative) {
+		if (null == instance || instance.length() < 1) {
+			return new String[] { "", "", "", "" };
+		}
+		if (instance.length() == 1) {
+			return new String[] { instance, "", "", "" };
+		}
+		final String[] components = new String[] { instance.substring(0, 1), null, null, null };
+
+		String remaining = instance.substring(1);
+		if (flipNegative && !isPositive(instance)) {
+			remaining = Bit.twosComplement(remaining);
+		}
+
+		// Regime is second char until terminated by end of string or opposite char.
+		final char first = remaining.charAt(0);
+		int rs = 0;
+		for (int i = 0; i < remaining.length(); i++) {
+			final char current = remaining.charAt(i);
+			rs++;
+			if (first != current) {
+				break;
+			}
+		}
+		components[1] = remaining.substring(0, rs);
+
+		// 0123456789
+		// 1001eeeeff
+		final int esMax = remaining.length() - rs;
+		final int es = Math.min(maxExponent, esMax);
+		components[2] = remaining.substring(rs, rs + es);
+
+		final int fs = remaining.length() - es - rs;
+		if (fs > 0) {
+			components[3] = remaining.substring(rs + es);
+		}
+		return components;
 	}
 
 	/** Return string with spaces between the sign,regime,exponent, and fraction. */
