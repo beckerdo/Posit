@@ -85,6 +85,54 @@ public final class PositDomain {
     }
 
     /**
+     * Returns an array consisting of sign, regime, exponent, and fraction. Components are not interpreted, simply
+     * grouped. You can use the PositEnum values to get the fields in this tuple.
+     *
+     * @param instance
+     * @param maxExponent
+     * @param flipNegative
+     * @return
+     */
+    public static String[] getComponents(String instance, int maxExponent, boolean flipNegative) {
+        if (null == instance || instance.length() < 1) {
+            return new String[]{"","","",""};
+        }
+        if (instance.length() == 1) {
+            return new String[]{instance,"","",""};
+        }
+        final String[] components = new String[]{instance.substring(0, 1),"","",""};
+
+        String remaining = instance.substring(1);
+        if (flipNegative && !isPositive(instance)) {
+            remaining = Bit.twosComplement(remaining);
+        }
+
+        // Regime is second char until terminated by end of string or opposite char.
+        final char first = remaining.charAt(0);
+        int rs = 0;
+        for (int i = 0; i < remaining.length(); i++) {
+            final char current = remaining.charAt(i);
+            rs++;
+            if (first != current) {
+                break;
+            }
+        }
+        components[1] = remaining.substring(0, rs);
+
+        // 0123456789
+        // 1001eeeeff
+        final int esMax = remaining.length() - rs;
+        final int es = Math.min(maxExponent, esMax);
+        components[2] = remaining.substring(rs, rs + es);
+
+        final int fs = remaining.length() - es - rs;
+        if (fs > 0) {
+            components[3] = remaining.substring(rs + es);
+        }
+        return components;
+    }
+
+    /**
      * Returns the regime portion of a string of binary 0 and 1 characters. The String will be twos complemented for
      * negative instances.
      */
@@ -167,17 +215,13 @@ public final class PositDomain {
     }
 
     /** Return the value of an exponent string of 0 and 1 characters. */
-    public static double getExponentVal(String exponent, boolean positive) {
+    public static double getExponentVal(String exponent) {
         // Returns the exponent bits of this Posit as a String of "0" and "1".
         // If the regime fills the bit size, the exponent may be empty string.
         if (null == exponent || exponent.length() < 1) {
             return 0.0;
         }
-        if (positive) {
-            return Integer.parseUnsignedInt(exponent, 2);
-        } else {
-            return Integer.parseUnsignedInt(Bit.twosComplement(exponent), 2);
-        }
+        return Integer.parseUnsignedInt(exponent, 2);
     }
 
     /** Return the fraction part of a given string of 0 and 1 characters. */
@@ -253,54 +297,6 @@ public final class PositDomain {
         return previous;
     }
 
-    /**
-     * Returns an array consisting of sign, regime, exponent, and fraction. Components are not interpreted, simply
-     * grouped.
-     *
-     * @param instance
-     * @param maxExponent
-     * @param flipNegative
-     * @return
-     */
-    public static String[] getComponents(String instance, int maxExponent, boolean flipNegative) {
-        if (null == instance || instance.length() < 1) {
-            return new String[]{"","","",""};
-        }
-        if (instance.length() == 1) {
-            return new String[]{instance,"","",""};
-        }
-        final String[] components = new String[]{instance.substring(0, 1),"","",""};
-
-        String remaining = instance.substring(1);
-        if (flipNegative && !isPositive(instance)) {
-            remaining = Bit.twosComplement(remaining);
-        }
-
-        // Regime is second char until terminated by end of string or opposite char.
-        final char first = remaining.charAt(0);
-        int rs = 0;
-        for (int i = 0; i < remaining.length(); i++) {
-            final char current = remaining.charAt(i);
-            rs++;
-            if (first != current) {
-                break;
-            }
-        }
-        components[1] = remaining.substring(0, rs);
-
-        // 0123456789
-        // 1001eeeeff
-        final int esMax = remaining.length() - rs;
-        final int es = Math.min(maxExponent, esMax);
-        components[2] = remaining.substring(rs, rs + es);
-
-        final int fs = remaining.length() - es - rs;
-        if (fs > 0) {
-            components[3] = remaining.substring(rs + es);
-        }
-        return components;
-    }
-
     /** Return string with spaces between the sign,regime,exponent, and fraction. */
     public static String toSpacedString(String instance, int maxExponent, boolean flipNegative) {
         if (null == instance || instance.length() < 1) {
@@ -369,7 +365,7 @@ public final class PositDomain {
         final String expFrac = getExponentFraction(instance);
         final String exponent = getExponent(expFrac, maxExponent);
         if (null != exponent && exponent.length() > 0) {
-            final double expVal = PositDomain.getExponentVal(exponent, positive);
+            final double expVal = PositDomain.getExponentVal(exponent);
             final double twoe = Math.pow(2.0, expVal);
             val *= twoe;// sign*regime*exp
             sb.append(", e=\"" + exponent + "\" e=" + expVal + " 2^e=" + twoe + " val=" + val);
