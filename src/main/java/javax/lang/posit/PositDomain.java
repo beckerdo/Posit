@@ -271,7 +271,7 @@ public final class PositDomain {
 		if (instance.length() == 1) {
 			return new String[] { instance, "", "", "" };
 		}
-		final String[] components = new String[] { instance.substring(0, 1), null, null, null };
+		final String[] components = new String[] { instance.substring(0, 1), "", "", "" };
 
 		String remaining = instance.substring(1);
 		if (flipNegative && !isPositive(instance)) {
