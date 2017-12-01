@@ -276,10 +276,9 @@ public class PositDomainTest {
 		}
 	}
 
-	public static final String[][] EXPECTED_ES1_COMPONENTS = { new String[] { "", "", "", "" }, // 0
-			new String[] { "0", "", "", "" }, new String[] { "1", "", "", "" }, // 1
-			new String[] { "0", "0", "", "" }, new String[] { "0", "1", "", "" }, new String[] { "1", "0", "", "" },
-			new String[] { "1", "1", "", "" }, }; // 2
+	public static final String[][] EXPECTED_ES1_COMPONENTS = { { "", "", "", "" }, // 0
+			{ "0", "", "", "" }, { "1", "", "", "" }, // 1
+			{ "0", "0", "", "" }, { "0", "1", "", "" }, { "1", "0", "", "" }, { "1", "1", "", "" }, }; // 2
 	// "0 00", "0 01", "0 10", "0 11", "1 00", "1 01", "1 10", "1 11", // 3
 	// "0 000", "0 001", "0 01 e0", "0 01 e1", "0 10 e0", "0 10 e1", "0 110", "0
 	// 111", // 4
