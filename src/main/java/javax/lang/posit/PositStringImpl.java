@@ -118,7 +118,8 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
         final boolean positive = isPositive();
         double val = positive ? 1.0 : -1.0;
         final BigInteger useed = getUseed();
-        final int k = getRegimeK();
+        final String [] components = PositDomain.getComponents(internal, getMaxExponentSize(), true);
+        final int k = PositDomain.getRegimeK(components[PositEnum.REGIME.v()]);
         double useedK = 1.0;
         if (k >= 0) {
             useedK = useed.pow(k).doubleValue();
@@ -127,13 +128,13 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
             useedK = useed.pow(Math.abs(k)).doubleValue();
             val /= useedK; // sign*regime
         }
-        final String exponent = getExponent();
+        final String exponent = components[PositEnum.EXPONENT.v()];
         if (null != exponent && exponent.length() > 0) {
             final double expVal = PositDomain.getExponentVal(exponent);
             final double twoe = Math.pow(2.0, expVal);
             val *= twoe;// sign*regime*exp
         }
-        final String fraction = getFraction();
+        final String fraction = components[PositEnum.FRACTION.v()];
         if (null != fraction && fraction.length() > 0) {
             final double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
             val *= fracMultiplier; // sign*regime*exp*frac
@@ -300,14 +301,6 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 
     @Override
     /**
-     * @see Posit#getExponentFraction()
-     */
-    public String getExponentFraction() {
-        return PositDomain.getExponentFraction(internal);
-    }
-
-    @Override
-    /**
      * @see Posit#getMaxExponentSize()
      */
     public byte getMaxExponentSize() {
@@ -327,7 +320,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
      * @see Posit#getExponent()
      */
     public String getExponent() {
-        return PositDomain.getExponent(getExponentFraction(), getMaxExponentSize());
+        return PositDomain.getExponent(internal, getMaxExponentSize());
     }
 
     @Override
@@ -335,7 +328,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
      * @see Posit#getFraction()
      */
     public String getFraction() {
-        return PositDomain.getFraction(getExponentFraction(), getMaxExponentSize());
+        return PositDomain.getFraction(internal, getMaxExponentSize());
     }
 
     @Override

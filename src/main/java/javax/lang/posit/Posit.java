@@ -327,15 +327,6 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	public abstract int getRegimeK();
 
     /**
-     * Return the exponent and fraction part of this Posit after the sign and regime
-     * are removed.
-     * 
-     * @return the exponent and fraction part of this Posit after the sign and
-     *         regime are removed.
-     */
-    public abstract String getExponentFraction();
-
-    /**
      * Returns the maximum exponent size or em in this Posit.
      * <p>
      * Normally any part of the Posit after the sign and the regime comprise the

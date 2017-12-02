@@ -15,7 +15,8 @@ import org.junit.Test;
 public class PositDomainTest {
     public static final double COMPARE_PRECISION = 0.00000001;
 
-    public static final String[] BINARY_TEST_CASES = {"", // 0
+    public static final String[] BINARY_TEST_CASES = {
+            "", // 0
             "0","1", // 1
             "00","01","10","11", // 2
             "000","001","010","011","100","101","110","111", // 3
@@ -26,19 +27,6 @@ public class PositDomainTest {
             "10000","10001","10010","10011","10100","10101","10110","10111", // 5
             "11000","11001","11010","11011","11100","11101","11110","11111", // 5
     };
-
-    /** 0, 1, ±∞,-1 plus or minus two */
-    public static final int[] TEST_CASES_8BIT = {254,255,0,1,2,62,63,64,65,66,126,127,128,129,130,190,
-            191,192,193,194};
-    public static final double[] EXPECTED_EIGHTBIT_ES0 = {-0.03125,-0.015625,0.0,0.015625,0.03125,0.96875,
-            0.984375,1.0,1.03125,1.0625,32.0,64.0,Double.POSITIVE_INFINITY,-64.0,-32.0,-1.0625,-1.03125,-1.0,
-            -0.984375,-0.96875,};
-    public static final double[] EXPECTED_EIGHTBIT_ES1 = {-0.0009765625,-0.000244140625,0.0,0.000244140625,
-            0.0009765625,0.9375,0.96875,1.0,1.0625,1.125,1024.0,4096.0,Double.POSITIVE_INFINITY,-4096.0,
-            -1024.0,-1.125,-1.0625,-1.0,-0.96875,-0.9375,};
-    public static final double[] EXPECTED_EIGHTBIT_ES2 = {-9.5367431640625e-7,-5.960464477539063e-8,0.0,
-            5.960464477539063e-8,9.5367431640625e-7,0.875,0.9375,1.0,1.125,1.25,1.048576e6,1.6777216e7,
-            Double.POSITIVE_INFINITY,-1.6777216e7,-1.048576e6,-1.25,-1.125,-1.0,-0.9375,-0.875,};
 
     @Before
     public void setup() {
@@ -94,18 +82,7 @@ public class PositDomainTest {
             -4,3,2,1,1,0,0,0, // 5
             0,-1,-1,-1,-1,-2,-2,-3, // 5
     };
-    public static final String[] BINARY_TEST_CASES1 = {"", // 0
-            "0","1", // 1
-            "00","01","10","11", // 2
-            "000","001","010","011","100","101","110","111", // 3
-            "0000","0001","0010","0011","0100","0101","0110","0111", // 4
-            "1000","1001","1010","1011","1100","1101","1110","1111", // 4
-            "00000","00001","00010","00011","00100","00101","00110","00111", // 5
-            "01000","01001","01010","01011","01100","01101","01110","01111", // 5
-            "10000","10001","10010","10011","10100","10101","10110","10111", // 5
-            "11000","11001","11010","11011","11100","11101","11110","11111", // 5
-    };
-    public static final String[] EXPECTED_EXPONENT_FRACTION = {"", // 0
+    public static final String[] EXPECTED_FRACTION_ES0 = {"", // 0
             "","", // 1
             "","","","", // 2
             "","","","","","","","", // 3
@@ -116,11 +93,6 @@ public class PositDomainTest {
             "","","","1","0","11","10","01", // 5
             "00","11","10","01","00","1","0","", // 5
     };
-    // "00000", "00001", "00010", "00011", "00100", "00101", "00110", "00111", // 5
-    // "01000", "01001", "01010", "01011", "01100", "01101", "01110", "01111", // 5
-    // "10000", "10001", "10010", "10011", "10100", "10101", "10110", "10111", // 5
-    // "11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
-
     public static final String[] EXPECTED_EXPONENT_ES1 = {"", // 0
             "","", // 1
             "","","","", // 2
@@ -140,12 +112,34 @@ public class PositDomainTest {
             "","","","","","","","", // 4
             "","","","","0","1","0","1", // 5
             "0","1","0","1","","","","", // 5
-            "","","","","1","0","1","0", // 5
-            "1","0","1","0","","","","", // 5
+            "","","","","","1","0","1", // 5
+            "0","1","0","1","0","","","", // 5
+    };
+    public static final String[] EXPECTED_EXPONENT_ES2 = {"", // 0
+            "","", // 1
+            "","","","", // 2
+            "","","","","","","","", // 3
+            "","","0","1","0","1","","", // 4
+            "","","","1","0","1","0","", // 4
+            "","","0","1","00","01","10","11", // 5
+            "00","01","10","11","0","1","","", // 5
+            "","","","1","0","11","10","01", // 5
+            "00","11","10","01","00","1","0","", // 5
+    };
+    public static final String[] EXPECTED_FRACTION_ES2 = {"", // 0
+            "","", // 1
+            "","","","", // 2
+            "","","","","","","","", // 3
+            "","","","","","","","", // 4
+            "","","","","","","","", // 4
+            "","","","","","","","", // 5
+            "","","","","","","","", // 5
+            "","","","","","","","", // 5
+            "","","","","","","","", // 5
     };
 
     @Test
-    public void positDomain() {
+    public void positComponents() {
         for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
             // test domain info
             assertEquals("Regime test on " + BINARY_TEST_CASES[i], EXPECTED_REGIME[i],
@@ -155,33 +149,29 @@ public class PositDomainTest {
             assertEquals("Regime K test on " + BINARY_TEST_CASES[i], EXPECTED_REGIME_K[i],
                     PositDomain.getRegimeK(EXPECTED_REGIME[i]));
 
-            assertEquals("Exponent/fraction test on " + BINARY_TEST_CASES[i], EXPECTED_EXPONENT_FRACTION[i],
-                    PositDomain.getExponentFraction(BINARY_TEST_CASES[i]));
-
             // Expected exponent, es=0
             assertEquals("Exponent test es=0 on " + BINARY_TEST_CASES[i], "",
-                    PositDomain.getExponent(PositDomain.getExponentFraction(BINARY_TEST_CASES[i]), 0));
+                    PositDomain.getExponent(BINARY_TEST_CASES[i], 0));
             // Expected fraction, es=0
-            assertEquals("Fraction test es=0 on " + BINARY_TEST_CASES[i], EXPECTED_EXPONENT_FRACTION[i],
-                    PositDomain.getFraction(PositDomain.getExponentFraction(BINARY_TEST_CASES[i]), 0));
+            assertEquals("Fraction test es=0 on " + BINARY_TEST_CASES[i], EXPECTED_FRACTION_ES0[i],
+                    PositDomain.getFraction(BINARY_TEST_CASES[i], 0));
             // Expected exponent, es=1
             assertEquals("Exponent test es=1 on " + BINARY_TEST_CASES[i], EXPECTED_EXPONENT_ES1[i],
-                    PositDomain.getExponent(PositDomain.getExponentFraction(BINARY_TEST_CASES[i]), 1));
+                    PositDomain.getExponent(BINARY_TEST_CASES[i], 1));
             // Expected fraction, es=1
             assertEquals("Fraction test es=1 on " + BINARY_TEST_CASES[i], EXPECTED_FRACTION_ES1[i],
-                    PositDomain.getFraction(PositDomain.getExponentFraction(BINARY_TEST_CASES[i]), 1));
+                    PositDomain.getFraction(BINARY_TEST_CASES[i], 1));
             // Expected exponent, es=2
-            assertEquals("Exponent test es=2 on " + BINARY_TEST_CASES[i], EXPECTED_EXPONENT_FRACTION[i],
-                    PositDomain.getExponent(PositDomain.getExponentFraction(BINARY_TEST_CASES[i]), 2));
+            assertEquals("Exponent test es=2 on " + BINARY_TEST_CASES[i], EXPECTED_EXPONENT_ES2[i],
+                    PositDomain.getExponent(BINARY_TEST_CASES[i], 2));
             // Expected fraction, es=2
-            assertEquals("Fraction test es=2 on " + BINARY_TEST_CASES[i], "",
-                    PositDomain.getFraction(PositDomain.getExponentFraction(BINARY_TEST_CASES[i]), 2));
+            assertEquals("Fraction test es=2 on " + BINARY_TEST_CASES[i], EXPECTED_FRACTION_ES2[i],
+                    PositDomain.getFraction(BINARY_TEST_CASES[i], 2));
         }
     }
 
     @Test
-    public void positSpecific() {
-
+    public void positDetailsString() {
         final String instance = "10100";
         final int i = Integer.parseInt(instance, 2);
         System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1));
@@ -519,12 +509,6 @@ public class PositDomainTest {
         System.out.println("Out of spec count=" + oosCount);
     }
 
-    // public static final String[] BINARY_TEST_CASES = { "", // 0
-    // "00000", "00001", "00010", "00011", "00100", "00101", "00110", "00111", // 5
-    // "01000", "01001", "01010", "01011", "01100", "01101", "01110", "01111", // 5
-    // "10000", "10001", "10010", "10011", "10100", "10101", "10110", "10111", // 5
-    // "11000", "11001", "11010", "11011", "11100", "11101", "11110", "11111", // 5
-    // };
     public static final double[] EXPECTED_FIVEBIT_ES2 = {0.0,1.0 / 4096.0,1.0 / 256.0,1.0 / 64.0,1.0 / 16.0,
             1.0 / 8.0,1.0 / 4.0,1.0 / 2.0,1.0,2.0,4.0,8.0,16.0,64.0,256.0,4096.0,Double.POSITIVE_INFINITY,
             -4096.0,-256.0,-64.0,-16.0,-8.0,-4.0,-2.0,-1.0,-1.0 / 2.0,-1.0 / 4.0,-1.0 / 8.0,-1.0 / 16.0,
@@ -741,6 +725,19 @@ public class PositDomainTest {
         }
         return false;
     }
+
+    /** 0, 1, ±∞,-1 plus or minus two */
+    public static final int[] TEST_CASES_8BIT = {254,255,0,1,2,62,63,64,65,66,126,127,128,129,130,190,
+            191,192,193,194};
+    public static final double[] EXPECTED_EIGHTBIT_ES0 = {-0.03125,-0.015625,0.0,0.015625,0.03125,0.96875,
+            0.984375,1.0,1.03125,1.0625,32.0,64.0,Double.POSITIVE_INFINITY,-64.0,-32.0,-1.0625,-1.03125,-1.0,
+            -0.984375,-0.96875,};
+    public static final double[] EXPECTED_EIGHTBIT_ES1 = {-0.0009765625,-0.000244140625,0.0,0.000244140625,
+            0.0009765625,0.9375,0.96875,1.0,1.0625,1.125,1024.0,4096.0,Double.POSITIVE_INFINITY,-4096.0,
+            -1024.0,-1.125,-1.0625,-1.0,-0.96875,-0.9375,};
+    public static final double[] EXPECTED_EIGHTBIT_ES2 = {-9.5367431640625e-7,-5.960464477539063e-8,0.0,
+            5.960464477539063e-8,9.5367431640625e-7,0.875,0.9375,1.0,1.125,1.25,1.048576e6,1.6777216e7,
+            Double.POSITIVE_INFINITY,-1.6777216e7,-1.048576e6,-1.25,-1.125,-1.0,-0.9375,-0.875,};
 
     // Scalar product a.b = sum a1b1+a2b2+...+anbn
     // [1,3,-5].[4,-2,-2] = 1.4 + 3.-2 + (-5.-1)=3

@@ -53,7 +53,7 @@ public class PositTest {
 		assertEquals(Boolean.FALSE, p.isPositive());
 		assertEquals("", p.getRegime());
 		assertEquals(0, p.getRegimeK());
-		assertEquals(new BigInteger("2"), p.getUseed());
+		assertEquals(new BigInteger("16"), p.getUseed());
 		assertEquals("", p.getExponent());
 	}
 
@@ -97,14 +97,10 @@ public class PositTest {
 			// posit.getRegime() + ", k=" + posit.getRegimeK() );
 			assertEquals("Regime K test element " + i + ", posit=" + posit, EXPECTED_REGIME_K[i], posit.getRegimeK());
 
-			assertEquals("Exponent/fraction test element " + i + ", posit=" + BINARY_TEST_CASES[i],
-					PositDomainTest.EXPECTED_EXPONENT_FRACTION[i], posit.getExponentFraction());
-
+            // Useed is 2 ^ 2 ^ es
 			assertEquals("Useed test element " + i + ", posit=" + posit,
-					PositDomainTest.EXPECTED_USEED[posit.getExponent().length()], posit.getUseed()); // Useed is 2 ** 2
-																										// ** es
+					PositDomainTest.EXPECTED_USEED[posit.getExponent().length()], posit.getUseed()); 
 		}
-
 	}
 
 	@Test
