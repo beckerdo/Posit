@@ -1,318 +1,371 @@
 package javax.lang.posit;
 
+import java.math.BigInteger;
+
+
 /**
  * Posit implementation based on String
  * <p>
- * String-based Posits are not compact. One character represents one binary
- * digit. However, String-based Posits can be arbitrary length and dynamic
- * range.
+ * String-based Posits are not compact. One character represents one binary digit. However, String-based Posits can be
+ * arbitrary length and dynamic range.
  * <p>
- * 
- * @see Posit
+ * String may represent any Posit binary String, the bit size is determined by the length of the String.
  *
+ * @see Posit
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
 public final class PositStringImpl extends Posit implements Comparable<Posit> {
-	/** Serialization version */
-	private static final long serialVersionUID = 1L;
+    /** Serialization version */
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * internal representation
-	 */
-	private String internal;
+    /** internal representation */
+    private String internal;
+    private byte maxExponentSize = 2;
 
-	// Constructors
-	/**
-	 * @see Posit#()
-	 */
-	public PositStringImpl() {
-		parse("");
-	}
+    // Constructors
+    /**
+     * @see Posit#()
+     */
+    public PositStringImpl() {
+        parse("");
+    }
 
-	/**
-	 * @see Posit#(String)
-	 */
-	public PositStringImpl(final String s) throws NumberFormatException {
-		parse(s);
-	}
+    /**
+     * @see Posit#(Object)
+     */
+    public PositStringImpl(final String s) throws NumberFormatException {
+        parse(s);
+    }
 
-	// Number interface
-	@Override
-	/**
-	 * @see Posit#byteValue()
-	 */
-	public byte byteValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    /**
+     * @see Posit#(Object,byte)
+     */
+    public PositStringImpl(final String s, int es) throws NumberFormatException {
+        setMaxExponentSize((byte) es);
+        parse(s);
+    }
 
-	@Override
-	/**
-	 * @see Posit#shortValue()
-	 */
-	public short shortValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    // Number interface
+    @Override
+    /**
+     * @see Posit#byteValue()
+     */
+    public byte byteValue() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	@Override
-	/**
-	 * @see Posit#intValue()
-	 */
-	public int intValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    /**
+     * @see Posit#shortValue()
+     */
+    public short shortValue() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	@Override
-	/**
-	 * @see Posit#longValue()
-	 */
-	public long longValue() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    /**
+     * @see Posit#intValue()
+     */
+    public int intValue() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	@Override
-	/**
-	 * @see Posit#floatValue()
-	 */
-	public float floatValue() {
-		// TODO Auto-generated method stub
-		return 0.0f;
-	}
+    @Override
+    /**
+     * @see Posit#longValue()
+     */
+    public long longValue() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	@Override
-	/**
-	 * @see Posit#doubleValue()
-	 */
-	public double doubleValue() {
-		// TODO Auto-generated method stub
-		return 0.0;
-	}
+    @Override
+    /**
+     * @see Posit#floatValue()
+     */
+    public float floatValue() {
+        // TODO Auto-generated method stub
+        return 0.0f;
+    }
 
-	@Override
-	/**
-	 * @see Posit#stringValue()
-	 */
-	public String stringValue() {
-		return internal;
-	}
-	
-	// Conversion
-	/**
-	 * Sets internal representation to the given String
-	 * 
-	 * @param s
-	 *            a string of the format ("0","1")*. If the string has whitespace,
-	 *            it is trimmed. If the string starts with "0b" it is trimmed.
-	 * @throws NumberFormatException
-	 *             if the string does not contain a parsable binary number.
-	 */
-	@Override
-	public void parse(final String s) throws NumberFormatException {
-		if ( null == s) {
-			internal = "";
-			return;
-		}
-		String local = s.trim();
-		if ( local.startsWith("0b")) {
-			local = local.substring(2);
-		}
-		for ( int i= 0; i < local.length(); i++ ) {
-			if ( '0' != local.charAt(i) && '1' != local.charAt(i) ) {
-				throw new NumberFormatException("illegal character in \"" + local + "\"" );				
-			}			
-		}
-		internal = local;		
-	}
+    @Override
+    /**
+     * "Suppose we view the bit string for a posit p as a signed integer, ranging from -2^(n-1) to 2^(n-1)-1. Let k be
+     * the integer represented by the regime bits, let e be the unsigned integer represented by the exponent bits, if
+     * any let f be the fraction bits, represented by 1.f1...fn, if any Then x=0, when p=0 x=±∞, when p=-2^(n-1)
+     * x=sign(p)*useed^k*2^e*f,all other p."
+     * <p>
+     * For example p="0 0001 101 11011101" with es=3<br/>
+     * x=1*256^(-3)*2^(5)*(1+221/256)=477/134217728 ~=3.55393*10^(-6)
+     * <p>
+     *
+     * @see Posit#doubleValue()
+     */
+    public double doubleValue() {
+        // Temp implementation Should be compacted, more native.
+        if (null == internal || internal.length() == 0) {
+            return 0.0;
+        }
+        if (isZero()) {
+            return 0.0;
+        }
+        if (isInfinite()) {
+            return Double.POSITIVE_INFINITY;
+        }
+        final boolean positive = isPositive();
+        double val = positive ? 1.0 : -1.0;
+        final BigInteger useed = getUseed();
+        final int k = getRegimeK();
+        double useedK = 1.0;
+        if (k >= 0) {
+            useedK = useed.pow(k).doubleValue();
+            val *= useedK; // sign*regime
+        } else {
+            useedK = useed.pow(Math.abs(k)).doubleValue();
+            val /= useedK; // sign*regime
+        }
+        final String exponent = getExponent();
+        if (null != exponent && exponent.length() > 0) {
+            final double expVal = PositDomain.getExponentVal(exponent);
+            final double twoe = Math.pow(2.0, expVal);
+            val *= twoe;// sign*regime*exp
+        }
+        final String fraction = getFraction();
+        if (null != fraction && fraction.length() > 0) {
+            final double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
+            val *= fracMultiplier; // sign*regime*exp*frac
+        }
+        return val;
+    }
 
-	// Math interface
-	@Override
-	/**
-	 * @see Posit#isInfinite()
-	 */
-	public boolean isInfinite() {
-		// '1' followed by zero or more '0' ("1+0*") 
-		if ( internal.length() < 1) {
-			return false;
-		}
-		if(  '1' != internal.charAt(0) ) {
-			return false;
-		}
-		for ( int i= 1; i < internal.length(); i++ ) {
-			if ( '0' != internal.charAt(i) ) {
-				return false;
-			}			
-		}
-		return true;
-	}
+    @Override
+    /**
+     * @see Posit#stringValue()
+     */
+    public String stringValue() {
+        return internal;
+    }
 
-	@Override
-	/**
-	 * @see Posit#isZero()
-	 */
-	public boolean isZero() {
-		// One or more '0' ("0+") 
-		if ( internal.length() < 1) {
-			return false;
-		}
-		for ( int i= 0; i < internal.length(); i++ ) {
-			if ( '0' != internal.charAt(i) ) {
-				return false;
-			}			
-		}
-		return true;
-	}
+    // Conversion
+    /**
+     * Sets internal representation to the given String
+     *
+     * @param s
+     *            a string of the format ("0","1")*. If the string has whitespace, it is trimmed. If the string starts
+     *            with "0b" it is trimmed.
+     * @throws NumberFormatException
+     *             if the string does not contain a parsable binary number.
+     */
+    @Override
+    public void parse(final String s) throws NumberFormatException {
+        if (null == s) {
+            internal = "";
+            return;
+        }
+        String local = s.trim();
+        if (local.startsWith("0b")) {
+            local = local.substring(2);
+        }
+        for (int i = 0; i < local.length(); i++) {
+            if ('0' != local.charAt(i) && '1' != local.charAt(i)) {
+                throw new NumberFormatException("illegal character in \"" + local + "\"");
+            }
+        }
+        internal = local;
+    }
 
-	// Comparable interface
-	/**
-	 * @see Posit#compareTo
-	 */
-	public int compareTo(final PositStringImpl anotherPosit) {
-		return PositStringImpl.compare(this, anotherPosit);
-	}
+    // Math interface
+    @Override
+    /**
+     * @see Posit#isInfinite()
+     */
+    public boolean isInfinite() {
+        return PositDomain.isInfinite(internal);
+    }
 
-	// Object methods
-	/**
-	 * @see Posit#compare
-	 */
-	public static int compare(final PositStringImpl p1, final PositStringImpl p2) {
-		return p1.compareTo(p2);
-	}
+    @Override
+    /**
+     * @see Posit#isZero()
+     */
+    public boolean isZero() {
+        return PositDomain.isZero(internal);
+    }
 
-	/**
-	 * @see Posit#hashCode
-	 */
-	@Override
-	public int hashCode() {
-		return internal.hashCode();
-	}
+    // Comparable interface
+    /**
+     * @see Posit#compareTo
+     */
+    public int compareTo(final PositStringImpl anotherPosit) {
+        return PositStringImpl.compare(this, anotherPosit);
+    }
 
-	/**
-	 * @see Posit#equals
-	 */
-	@Override
-	public boolean equals(final Object obj) {
-		if ( obj instanceof PositStringImpl) {
-			PositStringImpl other = (PositStringImpl) obj;
-			return internal.equals(other.internal);			
-		}
-		return false;
-	}
+    // Object methods
+    /**
+     * @see Posit#compare
+     */
+    public static int compare(final PositStringImpl p1, final PositStringImpl p2) {
+        return p1.compareTo(p2);
+    }
 
-	/**
-	 * @see Posit#toString
-	 */
-	@Override
-	public String toString() {
-		return this.stringValue();
-	}
+    /**
+     * @see Posit#hashCode
+     */
+    @Override
+    public int hashCode() {
+        return internal.hashCode();
+    }
 
-	// Posit domain interface
-	@Override
-	/**
-	 * @see Posit#getImplementation
-	 */
-	public Class<?> getImplementation() {
-		return String.class;
-	}
+    /**
+     * @see Posit#equals
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof PositStringImpl) {
+            final PositStringImpl other = (PositStringImpl) obj;
+            return internal.equals(other.internal);
+        }
+        return false;
+    }
 
-	@Override
-	/**
-	 * @see Posit#getBitSize()
-	 */
-	public int getBitSize() {
-		return internal.length();
-	}
+    /**
+     * @see Posit#toString
+     */
+    @Override
+    public String toString() {
+        return stringValue();
+    }
 
-	@Override
-	/**
-	 * @see Posit#isPositive()
-	 */
-	public boolean isPositive() {
-		// One or more '0' ("0+") 
-		if ( internal.length() < 1) {
-			return false;
-		}
-		return '0' == internal.charAt(0);
-	}
+    // Posit domain interface
+    @Override
+    /**
+     * @see Posit#getImplementation
+     */
+    public Class<?> getImplementation() {
+        return String.class;
+    }
 
-	@Override
-	/**
-	 * @see Posit#getRegime()
-	 */
-	public String getRegime() {
-		// If the bit size is less than 2, returns empty String.
-		// First char of Posit is sign bit.
-		// Regime is first char until terminated by end of string or until opposite char.
-		// Examples "0", "1", "00", "01", "10", "11"
-		if ( internal.length() < 2) {
-			return "";
-		}
-		char first = internal.charAt(1);
-		final StringBuilder sb = new StringBuilder(first);
-		for (int i = 1; i < internal.length(); i++) {
-			final char current = internal.charAt(i);
-			sb.append(current);
-			if ( first != current) {
-				break;
-			}
-		}
-		return sb.toString();
-	}
+    @Override
+    /**
+     * @see Posit#getBitSize()
+     */
+    public int getBitSize() {
+        return internal.length();
+    }
 
-	@Override
-	/**
-	 * @see Posit#getRegimeK()
-	 */
-	public int getRegimeK() {
-		// Returns the regime value K.
-		// Let m be the number of identical bits starting the regime;
-		// if the bits are 0, then k = −m;
-		// if the bits are 1, then k = m − 1.
-		// Examples (regime = K):
-		// 0000=-4, 0001=-3,001x=-2,01xx=-1,10xx=110x=1,1110=2,1111=3
-		final String regime = getRegime();
-		if ( regime.length() < 1) {
-			return 0;
-		}
-		char first = regime.charAt(0);
-		int k = first == '0' ? -1 : 0;
-		for( int i = 1; i < regime.length(); i++) {
-			char current = regime.charAt(i);
-			if ( current != first ) {
-				break;
-			}
-			if ( '0' == first ) {
-				k--;
-			}	else if ( '1' == first ) {
-				k++;
-			}
-		}
-		return k;
-	}
+    @Override
+    /**
+     * @see Posit#isPositive()
+     */
+    public boolean isPositive() {
+        return isPositive(internal);
+    }
 
-	@Override
-	/**
-	 * @see Posit#getUseed()
-	 */
-	public long getUseed() {
-		final int regimeLength = getRegime().length();
-		return (long) Math.pow(2, Math.pow(2, regimeLength));
-	}
+    @Override
+    /**
+     * @see Posit#isExact()
+     */
+    public boolean isExact() {
+        return PositDomain.isExact(internal);
+    }
 
-	@Override
-	/**
-	 * @see Posit#getExponent()
-	 */
-	public String getExponent() {
-		// Returns the exponent bits of this Posit as a String of "0" and "1".
-		// If the regime fills the bit size, the exponent may be empty string.
-		if ( internal.length() < 2) {
-			return "";
-		}
-		String regime = getRegime();
-		return internal.substring(regime.length() + 1);
-	}
+    /** Checks if a string of binary 0 and 1 characters is positive. */
+    public static boolean isPositive(String instance) {
+        // One or more '0' ("0+")
+        if (instance.length() < 1) {
+            return false;
+        }
+        return '0' == instance.charAt(0);
+
+    }
+
+    @Override
+    /**
+     * @see Posit#getRegime()
+     */
+    public String getRegime() {
+        return PositDomain.getRegime(internal);
+    }
+
+    @Override
+    /**
+     * @see Posit#getRegimeK()
+     */
+    public int getRegimeK() {
+        final String regime = PositDomain.getRegime(internal);
+        return PositDomain.getRegimeK(regime);
+    }
+
+    @Override
+    /**
+     * @see Posit#getExponentFraction()
+     */
+    public String getExponentFraction() {
+        return PositDomain.getExponentFraction(internal);
+    }
+
+    @Override
+    /**
+     * @see Posit#getMaxExponentSize()
+     */
+    public byte getMaxExponentSize() {
+        return maxExponentSize;
+    }
+
+    @Override
+    /**
+     * @see Posit#setMaxExponentSize()
+     */
+    public void setMaxExponentSize(byte maxExponentSize) {
+        this.maxExponentSize = maxExponentSize;
+    }
+
+    @Override
+    /**
+     * @see Posit#getExponent()
+     */
+    public String getExponent() {
+        return PositDomain.getExponent(getExponentFraction(), getMaxExponentSize());
+    }
+
+    @Override
+    /**
+     * @see Posit#getFraction()
+     */
+    public String getFraction() {
+        return PositDomain.getFraction(getExponentFraction(), getMaxExponentSize());
+    }
+
+    @Override
+    /**
+     * @see Posit#getFractionMultiplier()
+     */
+    public double getFractionMultiplier() {
+        final int fs = getBitSize() - 3 - getMaxExponentSize();
+        if (fs < 1) {
+            return 0;
+        }
+        return fs;
+    }
+
+    @Override
+    /**
+     * @see Posit#getUseed()
+     */
+    public BigInteger getUseed() {
+        // System.out.println( "Posit \"" + internal + "\", exponent=\"" + getExponent()
+        // + "\"");
+        // final String exponent = getExponent();
+        // if (null == exponent || exponent.length() < 1) {
+        // return BIGINT_2;
+        // }
+        // if (isPositive()) {
+        // return PositDomain.getUseed(Integer.parseInt(exponent, 2));
+        // }
+        // return PositDomain.getUseed(Integer.parseInt(Bit.twosComplement(exponent),
+        // 2));
+        return PositDomain.getUseed(getMaxExponentSize());
+    }
 }

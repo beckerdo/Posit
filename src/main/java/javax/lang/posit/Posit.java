@@ -1,5 +1,7 @@
 package javax.lang.posit;
 
+import java.math.BigInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,16 +67,27 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	}
 
 	/**
-	 * Constructs a newly allocated {@code Posit} object from
-	 * the given input.
+	 * Constructs a newly allocated {@code Posit} object from the given input.
 	 * representation given by the instance.
 	 *
-	 * @param s
-	 *            a string of the format ("0","1")*
+	 * @param s a legal implementation instance
 	 * @throws NumberFormatException
 	 *             if the string does not contain a parsable number.
 	 */
 	protected Posit(final Object instance) throws NumberFormatException {
+		// cannot instantiate abstract Posit
+	}
+
+	/**
+	 * Constructs a newly allocated {@code Posit} object from the given input
+	 * and maximum exponent size, es.
+	 *
+	 * @param s a legal implementation instance
+	 * @param es max exponent size
+	 * @throws NumberFormatException
+	 *             if the string does not contain a parsable number.
+	 */
+	protected Posit(final Object instance,int es) throws NumberFormatException {
 		// cannot instantiate abstract Posit
 	}
 
@@ -199,18 +212,7 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 		return false;
 	}
 
-	/**
-	 * Returns {@code true} if this {@code Posit} value is a Not-a-Number (NaN),
-	 * {@code false} otherwise.
-	 *
-	 * @return {@code true} if the value represented by this object is NaN;
-	 *         {@code false} otherwise.
-	 */
-	public boolean isNaN() {
-		return false;
-	}
-
-	// Math Consider +, -, *, /
+	// Math Consider +, -, *, /, abs, 1/x,
 
 	// Comparable interface
 	/**
@@ -242,9 +244,9 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 */
 	@Override
 	public boolean equals(final Object obj) {
-		if ( obj instanceof Posit) {
-			Posit posit = (Posit) obj;
-			return this.equals(posit);
+		if (obj instanceof Posit) {
+			final Posit posit = (Posit) obj;
+			return equals(posit);
 		}
 		return false;
 	}
@@ -254,13 +256,13 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 */
 	@Override
 	public String toString() {
-		return this.stringValue();
+		return stringValue();
 	}
 
 	// Posit domain interface
 	/**
-	 * Returns the native implementation class of this Posit.
-	 * For example: String, Byte, Short, Integer, Long, etc..
+	 * Returns the native implementation class of this Posit. For example: String,
+	 * Byte, Short, Integer, Long, etc..
 	 *
 	 * @return Class of this implementation
 	 */
@@ -275,20 +277,38 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 
 	/**
 	 * Returns whether the sign bit is set or not.
-	 * <p>If the bit size is 0, returns false.
-	 * <p>Note that Zero is considered positive, Infinity is not.
+	 * <p>
+	 * If the bit size is 0, returns false.
+	 * <p>
+	 * Note that Zero is considered positive, Infinity is not.
 	 *
 	 * @return if this Posit is positive (has the sign bit set)
 	 */
 	public abstract boolean isPositive();
 
 	/**
+	 * Returns whether the Posit is an exact number or not. Numbers such as 0, ∞, 1,
+	 * 2, 4, 1/2, 1/4 are exact. Other Posits are approximations lying in the
+	 * interval between two exacts
+	 * <p>
+	 * Posits are exact when the last bit is 0.
+	 *
+	 * @return if this Posit is exact (has the last bit unset)
+	 */
+	public abstract boolean isExact();
+
+	/**
 	 * Returns the regime bits of this Posit as a String of "0" and "1".
-	 * <p>If the bit size is less than 2, returns empty String.
-	 * <p>First char of Posit is sign bit.
-	 * <p>Regime is first char until terminated by end of string or until opposite char.
-	 * <p>Examples "0", "1", "00", "01", "10", "11"
-	 * 
+	 * <p>
+	 * If the bit size is less than 2, returns empty String.
+	 * <p>
+	 * First char of Posit is sign bit.
+	 * <p>
+	 * Regime is first char until terminated by end of string or until opposite
+	 * char.
+	 * <p>
+	 * Examples "0", "1", "00", "01", "10", "11"
+	 *
 	 * @return a string of "0" and "1" representing the regime
 	 */
 	public abstract String getRegime();
@@ -296,35 +316,91 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	/**
 	 * Returns the regime value K.
 	 * <p>
-	 * Let m be the number of identical bits starting the regime;
-	 * if the bits are 0, then k = −m;
-	 * if the bits are 1, then k = m − 1.
+	 * Let m be the number of identical bits starting the regime; if the bits are 0,
+	 * then k = −m; if the bits are 1, then k = m − 1.
 	 * <p>
-	 * Examples (regime = K):
-	 * 0000=-4, 0001=-3,001x=-2,01xx=-1,10xx=110x=1,1110=2,1111=3
+	 * Examples (regime = K): 0000=-4,
+	 * 0001=-3,001x=-2,01xx=-1,10xx=110x=1,1110=2,1111=3
 	 *
 	 * @return a value representing the K of the regime bits
 	 */
 	public abstract int getRegimeK();
 
+    /**
+     * Return the exponent and fraction part of this Posit after the sign and regime
+     * are removed.
+     * 
+     * @return the exponent and fraction part of this Posit after the sign and
+     *         regime are removed.
+     */
+    public abstract String getExponentFraction();
+
+    /**
+     * Returns the maximum exponent size or em in this Posit.
+     * <p>
+     * Normally any part of the Posit after the sign and the regime comprise the
+     * exponent and the fraction. Both may be absent. However, when present, the
+     * maximum number of exponent bits is given by this value.
+     * <p>
+     * Es or "exponent size" is the actual length of the exponent string in a posit
+     * instance. For example, in a 5 bit posit with em of 2, there are posit
+     * instances with es = 0, 1, and 2.
+     *
+     * @return maximum number of exponent bits in this Posit
+     */
+    public abstract byte getMaxExponentSize();
+
 	/**
-	 * Returns the useed of this Posit Useed is 2 ** 2 ** run length of regime.
-	 * <p>
-	 * Given es as the size of the exponent, useed = 2^2^es,
-	 * and scale = useed^k
-	 * Examples (es = useed):
-	 * 0=2,1=2^2=4,2=4^2=16,3=16^2=256,4=256^2=65536
-	 *
-	 * @return a long representing the Useed.
+	 * Sets the maximum exponent size or em in this Posit.
 	 */
-	public abstract long getUseed();
+	public abstract void setMaxExponentSize(byte maxExponentSize);
 
 	/**
 	 * Returns the exponent bits of this Posit as a String of "0" and "1".
 	 * <p>
-	 * If the regime fills the bit size, the exponent may be empty string.
+	 * If the sign and regime bits fill the bit size, the exponent may be empty
+	 * string. If the exponent and fraction are not zero length, es or "exponent
+	 * size" will be the length of this String.
 	 *
 	 * @return a string of "0" and "1" representing the exponent
 	 */
 	public abstract String getExponent();
+
+	/**
+	 * Returns the exponent bits of this Posit as a String of "0" and "1".
+	 * <p>
+	 * If the sign and regime bits fill the bit size, the exponent may be empty
+	 * string. If the exponent and fraction are not zero length, es or "exponent
+	 * size" will be the length of this String.
+	 *
+	 * @return a string of "0" and "1" representing the exponent
+	 */
+	public abstract String getFraction();
+
+    /**
+     * Returns the fraction to scale the Posit value.
+     * <p>
+     * In general, fractional bits of a posit are used to scale the value.
+     * If a fraction is given as f0..fn fraction bits, the multiplier
+     * is 1.0 + val( fn ) / 2^n
+     * <p>
+     * For example, a one bit fraction (n=1) will have multipliers
+     * fm(0,1)=1.0,1.5.
+     * A two bit fraction (n=2) will have multipliers of
+     * fm(00,01,10,11)=1.0,1.25,1.5,1.75
+     *
+     * @return the fraction scaling multiplier
+     */
+    public abstract double getFractionMultiplier();
+
+	/**
+	 * Returns the useed of this Posit Useed is 2 ** 2 ** run length of regime.
+	 * <p>
+	 * Given es as the size of the exponent, useed = 2^2^es, and scale = useed^k
+	 * Examples (es = useed): 0=2,1=2^2=4,2=4^2=16,3=16^2=256,4=256^2=65536
+	 *
+	 * @return a BigInteger representing the Useed.
+	 */
+	public abstract BigInteger getUseed();
+
 }
