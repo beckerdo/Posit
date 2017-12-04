@@ -539,7 +539,8 @@ public class PositDomainTest {
             49,50};
     public static final double[] EXPECTED_SIXBIT_ES0 = {-0.125,-0.0625,0.0,0.0625,0.125,0.875,0.9375,1.0,1.125,
             1.25,8.0,16.0,Double.POSITIVE_INFINITY,-16.0,-8.0,-1.25,-1.125,-1.0,-0.9375,-0.875,};
-    public static final double[] EXPECTED_SIXBIT_ES1 = {0.0, // "0 00000", 0
+    public static final double[] EXPECTED_SIXBIT_ES1 = {
+            0.0, // "0 00000", 0
             1.0 / 256.0, // "0 00001", 1
             1.0 / 64.0, // "0 0001 0", 2
             1.0 / 32.0, // "0 0001 1", 3
@@ -554,7 +555,7 @@ public class PositDomainTest {
             1.0 / 2.0, // "0 01 1 00", 12
             1.0 / 1.75, // "0 01 1 01", 13
             1.0 / 1.5, // "0 01 1 10", 14
-            1.0 / 1,25, // "0 01 1 11", 15
+            1.0 / 1.25, // "0 01 1 11", 15
             1.0, // "0 10 0 00", 16
             1.25, // "0 10 0 01", 17
             1.5, // "0 10 0 10", 18

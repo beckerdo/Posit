@@ -85,13 +85,13 @@ public final class PositDomain {
     }
 
     /**
-     * Returns an array consisting of sign, regime, exponent, and fraction.
-     * Components are not interpreted, simply grouped.
-     * You can use the PositEnum values to get the fields in this tuple.
+     * Returns an array consisting of sign, regime, exponent, and fraction. Components are not interpreted, simply
+     * grouped. You can use the PositEnum values to get the fields in this tuple.
      *
      * @param instance
      * @param maxExponent
-     * @param flipNegative performs twos complement if negative
+     * @param flipNegative
+     *            performs twos complement if negative
      * @return
      */
     public static String[] getComponents(String instance, int maxExponent, boolean flipNegative) {
@@ -134,8 +134,8 @@ public final class PositDomain {
     }
 
     /**
-     * Returns the regime portion of a string of binary 0 and 1 characters.
-     * The String will be twos complemented for negative instances.
+     * Returns the regime portion of a string of binary 0 and 1 characters. The String will be twos complemented for
+     * negative instances.
      */
     public static String getRegime(String instance) {
         // If the bit size is less than 2, returns empty String.
@@ -187,16 +187,17 @@ public final class PositDomain {
         return k;
     }
 
-    /** Return the exponent part of a given string of 0 and 1 characters.
-    * The String will be twos complemented for negative instances.
-    */
+    /**
+     * Return the exponent part of a given string of 0 and 1 characters. The String will be twos complemented for
+     * negative instances.
+     */
     public static String getExponent(String instance, int maxExponent) {
         // Returns the exponent bits of this Posit as a String of "0" and "1".
         // If the regime fills the bit size, the exponent may be empty string.
         if (null == instance || instance.length() < 2) {
             return "";
         }
-        boolean positive = isPositive( instance );
+        final boolean positive = isPositive(instance);
         String remaining = instance.substring(1);
         if (!positive) {
             remaining = Bit.twosComplement(remaining);
@@ -230,8 +231,9 @@ public final class PositDomain {
         return Integer.parseUnsignedInt(exponent, 2);
     }
 
-    /** Return the fraction part of a given string of 0 and 1 characters.
-    * The String will be twos complemented for negative instances.
+    /**
+     * Return the fraction part of a given string of 0 and 1 characters. The String will be twos complemented for
+     * negative instances.
      */
     public static String getFraction(String instance, int maxExponent) {
         // Returns the exponent bits of this Posit as a String of "0" and "1".
@@ -240,7 +242,7 @@ public final class PositDomain {
             return "";
         }
 
-        boolean positive = isPositive( instance );
+        final boolean positive = isPositive(instance);
         String remaining = instance.substring(1);
         if (!positive) {
             remaining = Bit.twosComplement(remaining);
@@ -370,18 +372,18 @@ public final class PositDomain {
         final StringBuilder sb = new StringBuilder();
         sb.append("\"" + spacedString + "\" es" + maxExponent + " useed" + useed.toString());
         if (isZero(instance)) {
-            sb.append(",val=0.0");
+            sb.append(", val=0.0");
             return sb.toString();
         }
         if (isInfinite(instance)) {
-            sb.append(",val=" + Double.POSITIVE_INFINITY);
+            sb.append(", val=" + Double.POSITIVE_INFINITY);
             return sb.toString();
         }
 
         final boolean positive = isPositive(instance);
-        final String [] components = getComponents( instance, maxExponent, true);
+        final String[] components = getComponents(instance, maxExponent, true);
         double val = positive ? 1.0 : -1.0;
-        final String regime = components[ PositEnum.REGIME.v()];
+        final String regime = components[PositEnum.REGIME.v()];
         if (null != regime && regime.length() > 0) {
             final int k = getRegimeK(regime);
             double useedK = 1.0;
@@ -397,7 +399,7 @@ public final class PositDomain {
         } else {
             sb.append(", r=\"\"");
         }
-        final String exponent = components[ PositEnum.EXPONENT.v() ];
+        final String exponent = components[PositEnum.EXPONENT.v()];
         if (null != exponent && exponent.length() > 0) {
             final double expVal = PositDomain.getExponentVal(exponent);
             final double twoe = Math.pow(2.0, expVal);
@@ -406,7 +408,7 @@ public final class PositDomain {
         } else {
             sb.append(", e=\"\"");
         }
-        final String fraction = components[ PositEnum.FRACTION.v() ];
+        final String fraction = components[PositEnum.FRACTION.v()];
         if (null != fraction && fraction.length() > 0) {
             final double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
             val *= fracMultiplier; // sign*regime*exp*frac
