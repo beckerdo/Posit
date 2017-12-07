@@ -465,8 +465,7 @@ public class PositDomainTest {
             }
             System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 0) + ",exp="
                     + EXPECTED_SIXBIT_ES1[i] + outOfSpec);
-            // assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),
-            // PositDomainTest.COMPARE_PRECISION);
+            assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("Out of spec count=" + oosCount);
     }
@@ -484,8 +483,7 @@ public class PositDomainTest {
             }
             System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) + ",exp="
                     + EXPECTED_SIXBIT_ES1[i] + outOfSpec);
-            // assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),
-            // PositDomainTest.COMPARE_PRECISION);
+            // assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("Out of spec count=" + oosCount);
     }
@@ -503,8 +501,7 @@ public class PositDomainTest {
             }
             System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + ",exp="
                     + EXPECTED_FOURBIT_ES2[i] + outOfSpec);
-            // assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),
-            // PositDomainTest.COMPARE_PRECISION);
+            // assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(),PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("Out of spec count=" + oosCount);
     }
