@@ -212,7 +212,10 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 		return false;
 	}
 
-	// Math Consider +, -, *, /, abs, 1/x,
+	// Math 
+	// consider http://web.stanford.edu/class/ee380/Abstracts/170201-slides.pdf
+	// Unary operations 1/x, sqrtX,x^2,log2X,2^x
+	// Binary operations, +,-,*,/
 
 	// Comparable interface
 	/**
