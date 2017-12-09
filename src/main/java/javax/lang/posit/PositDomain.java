@@ -222,13 +222,19 @@ public final class PositDomain {
     }
 
     /** Return the value of an exponent string of 0 and 1 characters. */
-    public static double getExponentVal(String exponent) {
+    public static double getExponentVal(String exponent, int maxExponent) {
         // Returns the exponent bits of this Posit as a String of "0" and "1".
         // If the regime fills the bit size, the exponent may be empty string.
         if (null == exponent || exponent.length() < 1) {
             return 0.0;
         }
-        return Integer.parseUnsignedInt(exponent, 2);
+        int unsignedVal = Integer.parseUnsignedInt(exponent, 2);
+        if ( exponent.length() < maxExponent ) {
+            // rotate left to make bigger, left adjust a truncated exponent.
+            System.out.println( "Exponent original val=" + unsignedVal + ", adjusted val=" + (unsignedVal << maxExponent - exponent.length()));
+            unsignedVal  = unsignedVal << maxExponent - exponent.length();
+        }
+        return unsignedVal;
     }
 
     /**
@@ -401,7 +407,7 @@ public final class PositDomain {
         }
         final String exponent = components[PositEnum.EXPONENT.v()];
         if (null != exponent && exponent.length() > 0) {
-            final double expVal = PositDomain.getExponentVal(exponent);
+            final double expVal = PositDomain.getExponentVal(exponent, maxExponent);
             final double twoe = Math.pow(2.0, expVal);
             val *= twoe;// sign*regime*exp
             sb.append(", e=\"" + exponent + "\" e=" + expVal + " 2^e=" + twoe + " val=" + val);

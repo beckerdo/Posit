@@ -130,7 +130,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
         }
         final String exponent = components[PositEnum.EXPONENT.v()];
         if (null != exponent && exponent.length() > 0) {
-            final double expVal = PositDomain.getExponentVal(exponent);
+            final double expVal = PositDomain.getExponentVal(exponent, getMaxExponentSize());
             final double twoe = Math.pow(2.0, expVal);
             val *= twoe;// sign*regime*exp
         }
