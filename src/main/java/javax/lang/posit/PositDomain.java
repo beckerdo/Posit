@@ -231,7 +231,7 @@ public final class PositDomain {
         int unsignedVal = Integer.parseUnsignedInt(exponent, 2);
         if ( exponent.length() < maxExponent ) {
             // rotate left to make bigger, left adjust a truncated exponent.
-            System.out.println( "Exponent original val=" + unsignedVal + ", adjusted val=" + (unsignedVal << maxExponent - exponent.length()));
+            // System.out.println( "Exponent original val=" + unsignedVal + ", adjusted val=" + (unsignedVal << maxExponent - exponent.length()));
             unsignedVal  = unsignedVal << maxExponent - exponent.length();
         }
         return unsignedVal;
