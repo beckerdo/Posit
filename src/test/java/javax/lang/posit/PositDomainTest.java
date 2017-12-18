@@ -2,8 +2,8 @@ package javax.lang.posit;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import java.math.BigInteger;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +15,8 @@ import org.junit.Test;
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
 public class PositDomainTest {
-    public static final double COMPARE_PRECISION = 0.00000001;
+    // Seven bit ES2 have this range ............. 0.00000095367431640625 to 1048576.0
+    public static final double COMPARE_PRECISION = 0.0000000000000001;
 
     public static final String[] BINARY_TEST_CASES = {
             "", // 0
@@ -177,15 +178,15 @@ public class PositDomainTest {
         final String instance = "10100";
         final int i = Integer.parseInt(instance, 2);
         // System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2));
-        String returned = PositDomain.toDetailsString(instance, 2);
-        assertNotNull( returned );
-        assertTrue( returned.length() > 0 );
-        assertTrue( returned.contains("es2"));
-        assertTrue( returned.contains("useed16"));
-        assertTrue( returned.contains("useed^k"));
-        assertTrue( returned.contains("e="));
-        assertTrue( returned.contains("f="));
-        assertTrue( returned.contains("val=-16.0"));
+        final String returned = PositDomain.toDetailsString(instance, 2);
+        assertNotNull(returned);
+        assertTrue(returned.length() > 0);
+        assertTrue(returned.contains("es2"));
+        assertTrue(returned.contains("useed16"));
+        assertTrue(returned.contains("useed^k"));
+        assertTrue(returned.contains("e="));
+        assertTrue(returned.contains("f="));
+        assertTrue(returned.contains("val=-16.0"));
     }
 
     @Test
@@ -526,7 +527,7 @@ public class PositDomainTest {
                 System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + ",exp="
                         + EXPECTED_FOURBIT_ES2[i] + outOfSpec);
             }
-            assertEquals(EXPECTED_FOURBIT_ES2[i], p.doubleValue(),PositDomainTest.COMPARE_PRECISION);
+            assertEquals(EXPECTED_FOURBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("fourBitES2 out of spec count=" + oosCount + "/" + EXPECTED_FOURBIT_ES2.length + ".");
     }
@@ -537,20 +538,19 @@ public class PositDomainTest {
             Double.POSITIVE_INFINITY, -8.0, -4.0, -3.0, -2.0, -1.75, -1.5, -1.25,
             -1.0, -0.875, -0.75, -0.625, -0.5, -0.375, -0.25, -0.125 };
     public static final double[] EXPECTED_FIVEBIT_ES1 = {
-            0.0, 1.0 / 64.0, 1.0 / 16.0, 1.0 / 8.0, 1.0 / 4.0, 3.0/8.0, 1.0 / 2.0, 3.0/4.0,
-            1.0, 3.0/2.0, 2.0, 3.0, 4.0, 8.0, 16.0, 64.0,
-            Double.POSITIVE_INFINITY, -64.0, -16.0, -8.0, -4.0, -3.0, -2.0, -3.0/2.0,
-            -1.0, -3.0/4.0, -1.0 / 2.0, -3.0/8.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0 };
+            0.0, 1.0 / 64.0, 1.0 / 16.0, 1.0 / 8.0, 1.0 / 4.0, 3.0 / 8.0, 1.0 / 2.0, 3.0 / 4.0,
+            1.0, 3.0 / 2.0, 2.0, 3.0, 4.0, 8.0, 16.0, 64.0,
+            Double.POSITIVE_INFINITY, -64.0, -16.0, -8.0, -4.0, -3.0, -2.0, -3.0 / 2.0,
+            -1.0, -3.0 / 4.0, -1.0 / 2.0, -3.0 / 8.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0 };
     public static final double[] EXPECTED_FIVEBIT_ES2 = {
             0.0, 1.0 / 4096.0, 1.0 / 256.0, 1.0 / 64.0, 1.0 / 16.0, 1.0 / 8.0, 1.0 / 4.0, 1.0 / 2.0,
             1.0, 2.0, 4.0, 8.0, 16.0, 64.0, 256.0, 4096.0,
             Double.POSITIVE_INFINITY, -4096.0, -256.0, -64.0, -16.0, -8.0, -4.0, -2.0,
-            -1.0, -1.0/2.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0, -1.0 / 256.0, -1.0 / 4096.0 };
+            -1.0, -1.0 / 2.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0, -1.0 / 256.0, -1.0 / 4096.0 };
 
     @Test
     public void fiveBitES0() {
         int oosCount = 0;
-        // es50
         for (int i = 0; i < EXPECTED_FIVEBIT_ES0.length; i++) {
             final String instance = String.format("%5s", Integer.toBinaryString(i)).replace(" ", "0");
             final Posit p = new PositStringImpl(instance, 0);
@@ -560,15 +560,14 @@ public class PositDomainTest {
                 System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 0) + ",exp="
                         + EXPECTED_FIVEBIT_ES0[i] + outOfSpec);
             }
-            assertEquals(EXPECTED_FIVEBIT_ES0[i], p.doubleValue(),PositDomainTest.COMPARE_PRECISION);
+            assertEquals(EXPECTED_FIVEBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
-        System.out.println("fiveBitESS0 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES1.length + ".");
+        System.out.println("fiveBitES0 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES1.length + ".");
     }
 
     @Test
     public void fiveBitES1() {
         int oosCount = 0;
-        // es62
         for (int i = 0; i < EXPECTED_FIVEBIT_ES1.length; i++) {
             final String instance = String.format("%5s", Integer.toBinaryString(i)).replace(" ", "0");
             final Posit p = new PositStringImpl(instance, 1);
@@ -578,7 +577,7 @@ public class PositDomainTest {
                 System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) + ",exp="
                         + EXPECTED_FIVEBIT_ES1[i] + outOfSpec);
             }
-            assertEquals(EXPECTED_FIVEBIT_ES1[i], p.doubleValue(),PositDomainTest.COMPARE_PRECISION);
+            assertEquals(EXPECTED_FIVEBIT_ES1[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("fiveBitES1 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES1.length + ".");
     }
@@ -586,7 +585,6 @@ public class PositDomainTest {
     @Test
     public void fiveBitES2() {
         int oosCount = 0;
-        // es62
         for (int i = 0; i < EXPECTED_FIVEBIT_ES2.length; i++) {
             final String instance = String.format("%5s", Integer.toBinaryString(i)).replace(" ", "0");
             final Posit p = new PositStringImpl(instance, 2);
@@ -596,12 +594,12 @@ public class PositDomainTest {
                 System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + ",exp="
                         + EXPECTED_FIVEBIT_ES2[i] + outOfSpec);
             }
-            assertEquals(EXPECTED_FIVEBIT_ES2[i], p.doubleValue(),PositDomainTest.COMPARE_PRECISION);
+            assertEquals(EXPECTED_FIVEBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("fiveBitES2 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES2.length + ".");
     }
 
-    public static final double[] EXPECTED_SIXBIT_ES0 = { 
+    public static final double[] EXPECTED_SIXBIT_ES0 = {
             0.0, // "0 00000", 0
             1.0 / 16.0, // "0 00001", 1
             1.0 / 8.0, // "0 0001 0", 2
@@ -667,10 +665,10 @@ public class PositDomainTest {
             -1.0 / 8.0, // "1 11110", 62
             -1.0 / 16.0, // "1 11111", 63
     };
+
     @Test
     public void sixBitES0() {
         int oosCount = 0;
-        // es60
         for (int i = 0; i < EXPECTED_SIXBIT_ES0.length; i++) {
             final String instance = String.format("%6s", Integer.toBinaryString(i)).replace(" ", "0");
             final Posit p = new PositStringImpl(instance, 0);
@@ -680,7 +678,7 @@ public class PositDomainTest {
                 System.out.println("sixBitES0 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 0) + ",exp="
                         + EXPECTED_SIXBIT_ES0[i] + ",1.0/exp=" + 1.0 / EXPECTED_SIXBIT_ES0[i] + outOfSpec);
             }
-            // assertEquals(EXPECTED_SIXBIT_ES0[i], p.doubleValue(),PositDomainTest.COMPARE_PRECISION);
+            // assertEquals(EXPECTED_SIXBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("sixBitES0 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES0.length + ".");
     }
@@ -751,11 +749,10 @@ public class PositDomainTest {
             -1.0 / 64.0, // "1 11110", 62
             -1.0 / 256.0, // "1 11111", 63
     };
-    
+
     @Test
     public void sixBitES1() {
         int oosCount = 0;
-        // es61
         for (int i = 0; i < EXPECTED_SIXBIT_ES1.length; i++) {
             final String instance = String.format("%6s", Integer.toBinaryString(i)).replace(" ", "0");
             final Posit p = new PositStringImpl(instance, 1);
@@ -765,7 +762,7 @@ public class PositDomainTest {
                 System.out.println("sixBitES1 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) + ",exp="
                         + EXPECTED_SIXBIT_ES1[i] + ",1.0/exp=" + 1.0 / EXPECTED_SIXBIT_ES1[i] + outOfSpec);
             }
-            // assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(),PositDomainTest.COMPARE_PRECISION);
+            // assertEquals(EXPECTED_SIXBIT_ES1[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("sixBitES1 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES1.length + ".");
     }
@@ -835,10 +832,10 @@ public class PositDomainTest {
             -1.0 / 4096.0, // "1 11110", 62
             -1.0 / 65536.0, // "1 11111", 63
     };
+
     @Test
     public void sixBitES2() {
         int oosCount = 0;
-        // es62
         for (int i = 0; i < EXPECTED_SIXBIT_ES2.length; i++) {
             final String instance = String.format("%6s", Integer.toBinaryString(i)).replace(" ", "0");
             final Posit p = new PositStringImpl(instance, 2);
@@ -848,7 +845,7 @@ public class PositDomainTest {
                 System.out.println("sixBitES2 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + ",exp="
                         + EXPECTED_SIXBIT_ES2[i] + ",1.0/exp=" + 1.0 / EXPECTED_SIXBIT_ES2[i] + outOfSpec);
             }
-            // assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(),PositDomainTest.COMPARE_PRECISION);
+            // assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("sixBitES2 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES2.length + ".");
     }
@@ -858,153 +855,169 @@ public class PositDomainTest {
             0.0009765625, // 0b0000001
             0.00390625, // 0b000001_0
             0.0078125, // 0b000001_1
-            // @test M7_1(0b00001_0_0) == M7_1(0.015625)
-            // @test M7_1(0b00001_0_1) == M7_1(0.0234375)
-            // @test M7_1(0b00001_1_0) == M7_1(0.03125)
-            // @test M7_1(0b00001_1_1) == M7_1(0.046875)
-            // @test M7_1(0b0001_0_00) == M7_1(0.0625)
-            // @test M7_1(0b0001_0_01) == M7_1(0.078125)
-            // @test M7_1(0b0001_0_10) == M7_1(0.09375)
-            // @test M7_1(0b0001_0_11) == M7_1(0.109375)
-            // @test M7_1(0b0001_1_00) == M7_1(0.125)
-            // @test M7_1(0b0001_1_01) == M7_1(0.15625)
-            // @test M7_1(0b0001_1_10) == M7_1(0.1875)
-            // @test M7_1(0b0001_1_11) == M7_1(0.21875)
-            // @test M7_1(0b001_0_000) == M7_1(0.25)
-            // @test M7_1(0b001_0_001) == M7_1(0.28125)
-            // @test M7_1(0b001_0_010) == M7_1(0.3125)
-            // @test M7_1(0b001_0_011) == M7_1(0.34375)
-            // @test M7_1(0b001_0_100) == M7_1(0.375)
-            // @test M7_1(0b001_0_101) == M7_1(0.40625)
-            // @test M7_1(0b001_0_110) == M7_1(0.4375)
-            // @test M7_1(0b001_0_111) == M7_1(0.46875)
-            // @test M7_1(0b001_1_000) == M7_1(0.5)
-            // @test M7_1(0b001_1_001) == M7_1(0.5625)
-            // @test M7_1(0b001_1_010) == M7_1(0.625)
-            // @test M7_1(0b001_1_011) == M7_1(0.6875)
-            // @test M7_1(0b001_1_100) == M7_1(0.75)
-            // @test M7_1(0b001_1_101) == M7_1(0.8125)
-            // @test M7_1(0b001_1_110) == M7_1(0.875)
-            // @test M7_1(0b001_1_111) == M7_1(0.9375)
+            0.015625, // @test M7_1(0b00001_0_0) == M7_1(0.015625)
+            0.0234375, // @test M7_1(0b00001_0_1) == M7_1(0.0234375)
+            0.03125, // @test M7_1(0b00001_1_0) == M7_1(0.03125)
+            0.046875, // @test M7_1(0b00001_1_1) == M7_1(0.046875)
+            0.0625, // @test M7_1(0b0001_0_00) == M7_1(0.0625)
+            0.078125, // @test M7_1(0b0001_0_01) == M7_1(0.078125)
+            0.09375, // @test M7_1(0b0001_0_10) == M7_1(0.09375)
+            0.109375, // @test M7_1(0b0001_0_11) == M7_1(0.109375)
+            0.125, // @test M7_1(0b0001_1_00) == M7_1(0.125)
+            0.15625, // @test M7_1(0b0001_1_01) == M7_1(0.15625)
+            0.1875, // @test M7_1(0b0001_1_10) == M7_1(0.1875)
+            0.21875, // @test M7_1(0b0001_1_11) == M7_1(0.21875)
+            0.25, // @test M7_1(0b001_0_000) == M7_1(0.25)
+            0.28125, // @test M7_1(0b001_0_001) == M7_1(0.28125)
+            0.3125, // @test M7_1(0b001_0_010) == M7_1(0.3125)
+            0.34375, // @test M7_1(0b001_0_011) == M7_1(0.34375)
+            0.375, // @test M7_1(0b001_0_100) == M7_1(0.375)
+            0.40625, // @test M7_1(0b001_0_101) == M7_1(0.40625)
+            0.4375, // @test M7_1(0b001_0_110) == M7_1(0.4375)
+            0.46875, // @test M7_1(0b001_0_111) == M7_1(0.46875)
+            0.5, // @test M7_1(0b001_1_000) == M7_1(0.5)
+            0.5625, // @test M7_1(0b001_1_001) == M7_1(0.5625)
+            0.625, // @test M7_1(0b001_1_010) == M7_1(0.625)
+            0.6875, // @test M7_1(0b001_1_011) == M7_1(0.6875)
+            0.75, // @test M7_1(0b001_1_100) == M7_1(0.75)
+            0.8125, // @test M7_1(0b001_1_101) == M7_1(0.8125)
+            0.875, // @test M7_1(0b001_1_110) == M7_1(0.875)
+            0.9375, // @test M7_1(0b001_1_111) == M7_1(0.9375)
 
-            // @test M7_1(0b010_0_000) == M7_1(1.0)
-            // @test M7_1(0b010_0_001) == M7_1(1.125)
-            // @test M7_1(0b010_0_010) == M7_1(1.25)
-            // @test M7_1(0b010_0_011) == M7_1(1.375)
-            // @test M7_1(0b010_0_100) == M7_1(1.5)
-            // @test M7_1(0b010_0_101) == M7_1(1.625)
-            // @test M7_1(0b010_0_110) == M7_1(1.75)
-            // @test M7_1(0b010_0_111) == M7_1(1.875)
-            // @test M7_1(0b010_1_000) == M7_1(2.0)
-            // @test M7_1(0b010_1_001) == M7_1(2.25)
-            // @test M7_1(0b010_1_010) == M7_1(2.5)
-            // @test M7_1(0b010_1_011) == M7_1(2.75)
-            // @test M7_1(0b010_1_100) == M7_1(3.0)
-            // @test M7_1(0b010_1_101) == M7_1(3.25)
-            // @test M7_1(0b010_1_110) == M7_1(3.5)
-            // @test M7_1(0b010_1_111) == M7_1(3.75)
-            // @test M7_1(0b0110_0_00) == M7_1(4.0)
-            // @test M7_1(0b0110_0_01) == M7_1(5.0)
-            // @test M7_1(0b0110_0_10) == M7_1(6.0)
-            // @test M7_1(0b0110_0_11) == M7_1(7.0)
-            // @test M7_1(0b0110_1_00) == M7_1(8.0)
-            // @test M7_1(0b0110_1_01) == M7_1(10.0)
-            // @test M7_1(0b0110_1_10) == M7_1(12.0)
-            // @test M7_1(0b0110_1_11) == M7_1(14.0)
-            // @test M7_1(0b01110_0_0) == M7_1(16.0)
-            // @test M7_1(0b01110_0_1) == M7_1(24.0)
-            // @test M7_1(0b01110_1_0) == M7_1(32.0)
-            // @test M7_1(0b01110_1_1) == M7_1(48.0)
-            // @test M7_1(0b011110_0) == M7_1(64.0)
-            // @test M7_1(0b011110_1) == M7_1(128.0)
-            // @test M7_1(0b0111110) == M7_1(256.0)
-            // @test M7_1(0b0111111) == M7_1(1024.0)
+            1.0, // @test M7_1(0b010_0_000) == M7_1(1.0)
+            1.125, // @test M7_1(0b010_0_001) == M7_1(1.125)
+            1.25, // @test M7_1(0b010_0_010) == M7_1(1.25)
+            1.375, // @test M7_1(0b010_0_011) == M7_1(1.375)
+            1.5, // @test M7_1(0b010_0_100) == M7_1(1.5)
+            1.625, // @test M7_1(0b010_0_101) == M7_1(1.625)
+            1.75, // @test M7_1(0b010_0_110) == M7_1(1.75)
+            1.875, // @test M7_1(0b010_0_111) == M7_1(1.875)
+            2.0, // @test M7_1(0b010_1_000) == M7_1(2.0)
+            2.25, // @test M7_1(0b010_1_001) == M7_1(2.25)
+            2.5, // @test M7_1(0b010_1_010) == M7_1(2.5)
+            2.75, // @test M7_1(0b010_1_011) == M7_1(2.75)
+            3.0, // @test M7_1(0b010_1_100) == M7_1(3.0)
+            3.25, // @test M7_1(0b010_1_101) == M7_1(3.25)
+            3.5, // @test M7_1(0b010_1_110) == M7_1(3.5)
+            3.75, // @test M7_1(0b010_1_111) == M7_1(3.75)
+            4.0, // @test M7_1(0b0110_0_00) == M7_1(4.0)
+            5.0, // @test M7_1(0b0110_0_01) == M7_1(5.0)
+            6.0, // @test M7_1(0b0110_0_10) == M7_1(6.0)
+            7.0, // @test M7_1(0b0110_0_11) == M7_1(7.0)
+            8.0, // @test M7_1(0b0110_1_00) == M7_1(8.0)
+            10.0, // @test M7_1(0b0110_1_01) == M7_1(10.0)
+            12.0, // @test M7_1(0b0110_1_10) == M7_1(12.0)
+            14.0, // @test M7_1(0b0110_1_11) == M7_1(14.0)
+            16.0, // @test M7_1(0b01110_0_0) == M7_1(16.0)
+            24.0, // @test M7_1(0b01110_0_1) == M7_1(24.0)
+            32.0, // @test M7_1(0b01110_1_0) == M7_1(32.0)
+            48.0, // @test M7_1(0b01110_1_1) == M7_1(48.0)
+            64.0, // @test M7_1(0b011110_0) == M7_1(64.0)
+            128.0, // @test M7_1(0b011110_1) == M7_1(128.0)
+            256.0, // @test M7_1(0b0111110) == M7_1(256.0)
+            1024.0, // @test M7_1(0b0111111) == M7_1(1024.0)
     };
 
     @Test
     public void sevenBitES1() {
         int oosCount = 0;
-        // es61
         for (int i = 0; i < EXPECTED_SEVENBIT_ES1.length; i++) {
             final String instance = String.format("%7s", Integer.toBinaryString(i)).replace(" ", "0");
             final Posit p = new PositStringImpl(instance, 1);
             final String outOfSpec = outOfSpec(p.doubleValue(), EXPECTED_SEVENBIT_ES1[i], COMPARE_PRECISION);
             if (outOfSpec.length() > 0) {
                 oosCount++;
-                System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) + ",exp="
-                        + EXPECTED_SEVENBIT_ES1[i] + ",1.0/exp=" + 1.0 / EXPECTED_SEVENBIT_ES1[i] + outOfSpec);
+                System.out.println("sevenBitES1 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) +
+                        ",exp=" + EXPECTED_SEVENBIT_ES1[i] + ",1.0/exp=" + 1.0 / EXPECTED_SEVENBIT_ES1[i] + outOfSpec);
             }
-            // assertEquals(EXPECTED_SEVENBIT_ES2[i], p.doubleValue(),
-            // PositDomainTest.COMPARE_PRECISION);
+            assertEquals(EXPECTED_SEVENBIT_ES1[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("sevenBitES1 out of spec count=" + oosCount + "/" + EXPECTED_SEVENBIT_ES1.length + ".");
     }
 
-    //
-    // @test M7_2(0b0000000) == M7_2(0.0)
-    // @test M7_2(0b0000001) == M7_2(0.00000095367431640625)
-    // @test M7_2(0b000001_0) == M7_2(0.0000152587890625)
-    // @test M7_2(0b000001_1) == M7_2(0.00006103515625)
-    // @test M7_2(0b00001_00) == M7_2(0.000244140625)
-    // @test M7_2(0b00001_01) == M7_2(0.00048828125)
-    // @test M7_2(0b00001_10) == M7_2(0.0009765625)
-    // @test M7_2(0b00001_11) == M7_2(0.001953125)
-    // @test M7_2(0b0001_00_0) == M7_2(0.00390625)
-    // @test M7_2(0b0001_00_1) == M7_2(0.005859375)
-    // @test M7_2(0b0001_01_0) == M7_2(0.0078125)
-    // @test M7_2(0b0001_01_1) == M7_2(0.01171875)
-    // @test M7_2(0b0001_10_0) == M7_2(0.015625)
-    // @test M7_2(0b0001_10_1) == M7_2(0.0234375)
-    // @test M7_2(0b0001_11_0) == M7_2(0.03125)
-    // @test M7_2(0b0001_11_1) == M7_2(0.046875)
-    // @test M7_2(0b001_00_00) == M7_2(0.0625)
-    // @test M7_2(0b001_00_01) == M7_2(0.078125)
-    // @test M7_2(0b001_00_10) == M7_2(0.09375)
-    // @test M7_2(0b001_00_11) == M7_2(0.109375)
-    // @test M7_2(0b001_01_00) == M7_2(0.125)
-    // @test M7_2(0b001_01_01) == M7_2(0.15625)
-    // @test M7_2(0b001_01_10) == M7_2(0.1875)
-    // @test M7_2(0b001_01_11) == M7_2(0.21875)
-    // @test M7_2(0b001_10_00) == M7_2(0.25)
-    // @test M7_2(0b001_10_01) == M7_2(0.3125)
-    // @test M7_2(0b001_10_10) == M7_2(0.375)
-    // @test M7_2(0b001_10_11) == M7_2(0.4375)
-    // @test M7_2(0b001_11_00) == M7_2(0.5)
-    // @test M7_2(0b001_11_01) == M7_2(0.625)
-    // @test M7_2(0b001_11_10) == M7_2(0.75)
-    // @test M7_2(0b001_11_11) == M7_2(0.875)
-    // @test M7_2(0b010_00_00) == M7_2(1.0)
-    // @test M7_2(0b010_00_01) == M7_2(1.25)
-    // @test M7_2(0b010_00_10) == M7_2(1.5)
-    // @test M7_2(0b010_00_11) == M7_2(1.75)
-    // @test M7_2(0b010_01_00) == M7_2(2.0)
-    // @test M7_2(0b010_01_01) == M7_2(2.5)
-    // @test M7_2(0b010_01_10) == M7_2(3.0)
-    // @test M7_2(0b010_01_11) == M7_2(3.5)
-    // @test M7_2(0b010_10_00) == M7_2(4.0)
-    // @test M7_2(0b010_10_01) == M7_2(5.0)
-    // @test M7_2(0b010_10_10) == M7_2(6.0)
-    // @test M7_2(0b010_10_11) == M7_2(7.0)
-    // @test M7_2(0b010_11_00) == M7_2(8.0)
-    // @test M7_2(0b010_11_01) == M7_2(10.0)
-    // @test M7_2(0b010_11_10) == M7_2(12.0)
-    // @test M7_2(0b010_11_11) == M7_2(14.0)
-    // @test M7_2(0b0110_00_0) == M7_2(16.0)
-    // @test M7_2(0b0110_00_1) == M7_2(24.0)
-    // @test M7_2(0b0110_01_0) == M7_2(32.0)
-    // @test M7_2(0b0110_01_1) == M7_2(48.0)
-    // @test M7_2(0b0110_10_0) == M7_2(64.0)
-    // @test M7_2(0b0110_10_1) == M7_2(96.0)
-    // @test M7_2(0b0110_11_0) == M7_2(128.0)
-    // @test M7_2(0b0110_11_1) == M7_2(192.0)
-    // @test M7_2(0b01110_00) == M7_2(256.0)
-    // @test M7_2(0b01110_01) == M7_2(512.0)
-    // @test M7_2(0b01110_10) == M7_2(1024.0)
-    // @test M7_2(0b01110_11) == M7_2(2048.0)
-    // @test M7_2(0b011110_0) == M7_2(4096.0)
-    // @test M7_2(0b011110_1) == M7_2(16384.0)
-    // @test M7_2(0b0111110) == M7_2(65536.0)
-    // @test M7_2(0b0111111) == M7_2(1048576.0)
+    public static final double[] EXPECTED_SEVENBIT_ES2 = {
+            0.0, // @test M7_2(0b0000000) == M7_2(0.0)
+            0.00000095367431640625, // @test M7_2(0b0000001) == M7_2(0.00000095367431640625)
+            0.0000152587890625, // @test M7_2(0b000001_0) == M7_2(0.0000152587890625)
+            0.00006103515625, // @test M7_2(0b000001_1) == M7_2(0.00006103515625)
+            0.000244140625, // @test M7_2(0b00001_00) == M7_2(0.000244140625)
+            0.00048828125, // @test M7_2(0b00001_01) == M7_2(0.00048828125)
+            0.0009765625, // @test M7_2(0b00001_10) == M7_2(0.0009765625)
+            0.001953125, // @test M7_2(0b00001_11) == M7_2(0.001953125)
+            0.00390625, // @test M7_2(0b0001_00_0) == M7_2(0.00390625)
+            0.005859375, // @test M7_2(0b0001_00_1) == M7_2(0.005859375)
+            0.0078125, // @test M7_2(0b0001_01_0) == M7_2(0.0078125)
+            0.01171875, // @test M7_2(0b0001_01_1) == M7_2(0.01171875)
+            0.015625, // @test M7_2(0b0001_10_0) == M7_2(0.015625)
+            0.0234375, // @test M7_2(0b0001_10_1) == M7_2(0.0234375)
+            0.03125, // @test M7_2(0b0001_11_0) == M7_2(0.03125)
+            0.046875, // @test M7_2(0b0001_11_1) == M7_2(0.046875)
+            0.0625, // @test M7_2(0b001_00_00) == M7_2(0.0625)
+            0.078125, // @test M7_2(0b001_00_01) == M7_2(0.078125)
+            0.09375, // @test M7_2(0b001_00_10) == M7_2(0.09375)
+            0.109375, // @test M7_2(0b001_00_11) == M7_2(0.109375)
+            0.125, // @test M7_2(0b001_01_00) == M7_2(0.125)
+            0.15625, // @test M7_2(0b001_01_01) == M7_2(0.15625)
+            0.1875, // @test M7_2(0b001_01_10) == M7_2(0.1875)
+            0.21875, // @test M7_2(0b001_01_11) == M7_2(0.21875)
+            0.25, // @test M7_2(0b001_10_00) == M7_2(0.25)
+            0.3125, // @test M7_2(0b001_10_01) == M7_2(0.3125)
+            0.375, // @test M7_2(0b001_10_10) == M7_2(0.375)
+            0.4375, // @test M7_2(0b001_10_11) == M7_2(0.4375)
+            0.5, // @test M7_2(0b001_11_00) == M7_2(0.5)
+            0.625, // @test M7_2(0b001_11_01) == M7_2(0.625)
+            0.75, // @test M7_2(0b001_11_10) == M7_2(0.75)
+            0.875, // @test M7_2(0b001_11_11) == M7_2(0.875)
+            1.0, // @test M7_2(0b010_00_00) == M7_2(1.0)
+            1.25, // @test M7_2(0b010_00_01) == M7_2(1.25)
+            1.5, // @test M7_2(0b010_00_10) == M7_2(1.5)
+            1.75, // @test M7_2(0b010_00_11) == M7_2(1.75)
+            2.0, // @test M7_2(0b010_01_00) == M7_2(2.0)
+            2.5, // @test M7_2(0b010_01_01) == M7_2(2.5)
+            3.0, // @test M7_2(0b010_01_10) == M7_2(3.0)
+            3.5, // @test M7_2(0b010_01_11) == M7_2(3.5)
+            4.0, // @test M7_2(0b010_10_00) == M7_2(4.0)
+            5.0, // @test M7_2(0b010_10_01) == M7_2(5.0)
+            6.0, // @test M7_2(0b010_10_10) == M7_2(6.0)
+            7.0, // @test M7_2(0b010_10_11) == M7_2(7.0)
+            8.0, // @test M7_2(0b010_11_00) == M7_2(8.0)
+            10.0, // @test M7_2(0b010_11_01) == M7_2(10.0)
+            12.0, // @test M7_2(0b010_11_10) == M7_2(12.0)
+            14.0, // @test M7_2(0b010_11_11) == M7_2(14.0)
+            16.0, // @test M7_2(0b0110_00_0) == M7_2(16.0)
+            24.0, // @test M7_2(0b0110_00_1) == M7_2(24.0)
+            32.0, // @test M7_2(0b0110_01_0) == M7_2(32.0)
+            48.0, // @test M7_2(0b0110_01_1) == M7_2(48.0)
+            64.0, // @test M7_2(0b0110_10_0) == M7_2(64.0)
+            96.0, // @test M7_2(0b0110_10_1) == M7_2(96.0)
+            128.0, // @test M7_2(0b0110_11_0) == M7_2(128.0)
+            192.0, // @test M7_2(0b0110_11_1) == M7_2(192.0)
+            256.0, // @test M7_2(0b01110_00) == M7_2(256.0)
+            512.0, // @test M7_2(0b01110_01) == M7_2(512.0)
+            1024.0, // @test M7_2(0b01110_10) == M7_2(1024.0)
+            2048.0, // @test M7_2(0b01110_11) == M7_2(2048.0)
+            4096.0, // @test M7_2(0b011110_0) == M7_2(4096.0)
+            16384.0, // @test M7_2(0b011110_1) == M7_2(16384.0)
+            65536.0, // @test M7_2(0b0111110) == M7_2(65536.0)
+            1048576.0 // @test M7_2(0b0111111) == M7_2(1048576.0)
+    };
+
+    @Test
+    public void sevenBitES2() {
+        int oosCount = 0;
+        for (int i = 0; i < EXPECTED_SEVENBIT_ES2.length; i++) {
+            final String instance = String.format("%7s", Integer.toBinaryString(i)).replace(" ", "0");
+            final Posit p = new PositStringImpl(instance, 1);
+            final String outOfSpec = outOfSpec(p.doubleValue(), EXPECTED_SEVENBIT_ES2[i], COMPARE_PRECISION);
+            if (outOfSpec.length() > 0) {
+                oosCount++;
+                System.out.println("sevenBitES2 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) +
+                        ",exp=" + EXPECTED_SEVENBIT_ES2[i] + ",1.0/exp=" + 1.0 / EXPECTED_SEVENBIT_ES2[i] + outOfSpec);
+            }
+            // assertEquals(EXPECTED_SEVENBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+        }
+        System.out.println("sevenBitES2 out of spec count=" + oosCount + "/" + EXPECTED_SEVENBIT_ES2.length + ".");
+    }
 
     /** Returns empty string for in spec, sentinal and percentage for out of spec compare. */
     public String outOfSpec(final double value, final double expected, final double precision) {
