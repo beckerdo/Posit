@@ -189,23 +189,6 @@ public class PositDomainTest {
         assertTrue(returned.contains("val=-16.0"));
     }
 
-    @Test
-    public void positPaperExample() {
-        // Figure 5 example from "Beating Floating Point"
-        final String instance = "0000110111011101";
-        final int i = Integer.parseInt(instance, 2);
-        final int MAX_ES = 3;
-
-        assertTrue(PositDomain.isPositive(instance));
-        assertEquals("0001", PositDomain.getRegime(instance));
-        assertEquals("101", PositDomain.getExponent(instance, MAX_ES));
-        assertEquals("11011101", PositDomain.getFraction(instance, MAX_ES));
-        // System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, MAX_ES));
-        final Posit p = new PositStringImpl(instance, MAX_ES);
-        assertTrue(equals(p.doubleValue(), 0.00000355392694, 0.00000000000001));
-
-    }
-
     public static final BigInteger[] EXPECTED_USEED = new BigInteger[] { new BigInteger("2"), new BigInteger("4"),
             new BigInteger("16"), new BigInteger("256"), new BigInteger("65536"), new BigInteger("4294967296"),
             new BigInteger("18446744073709551616"), new BigInteger("340282366920938463463374607431768211456"),
@@ -537,17 +520,7 @@ public class PositDomainTest {
             1.0, 1.25, 1.5, 1.75, 2.0, 3.0, 4.0, 8.0,
             Double.POSITIVE_INFINITY, -8.0, -4.0, -3.0, -2.0, -1.75, -1.5, -1.25,
             -1.0, -0.875, -0.75, -0.625, -0.5, -0.375, -0.25, -0.125 };
-    public static final double[] EXPECTED_FIVEBIT_ES1 = {
-            0.0, 1.0 / 64.0, 1.0 / 16.0, 1.0 / 8.0, 1.0 / 4.0, 3.0 / 8.0, 1.0 / 2.0, 3.0 / 4.0,
-            1.0, 3.0 / 2.0, 2.0, 3.0, 4.0, 8.0, 16.0, 64.0,
-            Double.POSITIVE_INFINITY, -64.0, -16.0, -8.0, -4.0, -3.0, -2.0, -3.0 / 2.0,
-            -1.0, -3.0 / 4.0, -1.0 / 2.0, -3.0 / 8.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0 };
-    public static final double[] EXPECTED_FIVEBIT_ES2 = {
-            0.0, 1.0 / 4096.0, 1.0 / 256.0, 1.0 / 64.0, 1.0 / 16.0, 1.0 / 8.0, 1.0 / 4.0, 1.0 / 2.0,
-            1.0, 2.0, 4.0, 8.0, 16.0, 64.0, 256.0, 4096.0,
-            Double.POSITIVE_INFINITY, -4096.0, -256.0, -64.0, -16.0, -8.0, -4.0, -2.0,
-            -1.0, -1.0 / 2.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0, -1.0 / 256.0, -1.0 / 4096.0 };
-
+    
     @Test
     public void fiveBitES0() {
         int oosCount = 0;
@@ -564,6 +537,12 @@ public class PositDomainTest {
         }
         System.out.println("fiveBitES0 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES1.length + ".");
     }
+
+    public static final double[] EXPECTED_FIVEBIT_ES1 = {
+            0.0, 1.0 / 64.0, 1.0 / 16.0, 1.0 / 8.0, 1.0 / 4.0, 3.0 / 8.0, 1.0 / 2.0, 3.0 / 4.0,
+            1.0, 3.0 / 2.0, 2.0, 3.0, 4.0, 8.0, 16.0, 64.0,
+            Double.POSITIVE_INFINITY, -64.0, -16.0, -8.0, -4.0, -3.0, -2.0, -3.0 / 2.0,
+            -1.0, -3.0 / 4.0, -1.0 / 2.0, -3.0 / 8.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0 };
 
     @Test
     public void fiveBitES1() {
@@ -582,6 +561,27 @@ public class PositDomainTest {
         System.out.println("fiveBitES1 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES1.length + ".");
     }
 
+    // es = 2, useed = 2^2^2 = 16
+    public static final double[] EXPECTED_FIVEBIT_ES2 = {
+            0.0, // 0 "0 0000"
+            1.0 / 4096.0, // 1 "0 0001"
+            1.0 / 256.0, // 2 "0 001 e0"
+            1.0 / 64.0, // 3 "0 001 e1"
+            1.0 / 16.0, // 4 "0 01 e00"
+            1.0 / 8.0, // 5 "0 01 e01"
+            1.0 / 4.0, // 6 "0 01 e10"
+            1.0 / 2.0, // 7 "0 01 e11"
+            1.0,
+            2.0,
+            4.0,
+            8.0,
+            16.0,
+            64.0,
+            256.0,
+            4096.0,
+            Double.POSITIVE_INFINITY,
+            -4096.0, -256.0, -64.0, -16.0, -8.0, -4.0, -2.0, -1.0,
+            -1.0 / 2.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0, -1.0 / 256.0, -1.0 / 4096.0 };
     @Test
     public void fiveBitES2() {
         int oosCount = 0;
@@ -594,15 +594,17 @@ public class PositDomainTest {
                 System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + ",exp="
                         + EXPECTED_FIVEBIT_ES2[i] + outOfSpec);
             }
+//            System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + ",exp="
+//                    + EXPECTED_FIVEBIT_ES2[i] + outOfSpec);
             assertEquals(EXPECTED_FIVEBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("fiveBitES2 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES2.length + ".");
     }
 
-    // useed 2,
+    // es = 0, useed = 2^2^0 = 2
     public static final double[] EXPECTED_SIXBIT_ES0 = {
             0.0, // "0 00000", 0
-            1.0 / 16.0, // "0 00001", 1
+            1.0 / 16.0, // "0 00001", 1, k=-4, 1/2^4=0.0625
             1.0 / 8.0, // "0 0001 0", 2, k=-3, 1/2^3=0.125
             1.0 / 6.0, // "0 0001 1", 3, k=-3, 1/2^3=0.125, 1 = 1/2^3 + 1/2^2 * 1/2
             1.0 / 4.0, // "0 001 00", 4, k=-2, 1/2^2=0.25
@@ -684,6 +686,7 @@ public class PositDomainTest {
         System.out.println("sixBitES0 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES0.length + ".");
     }
 
+    // es = 1, useed = 2^2^1 = 4
     public static final double[] EXPECTED_SIXBIT_ES1 = {
             0.0, // "0 00000", 0
             1.0 / 256.0, // "0 00001", 1
@@ -768,7 +771,9 @@ public class PositDomainTest {
         System.out.println("sixBitES1 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES1.length + ".");
     }
 
-    public static final double[] EXPECTED_SIXBIT_ES2 = { 0.0, // "0 00000", 0
+    // es = 2, useed = 2^2^2 = 16
+    public static final double[] EXPECTED_SIXBIT_ES2 = { 
+            0.0, // "0 00000", 0
             1.0 / 65536.0, // "0 00001", 1
             1.0 / 4096.0, // "0 0001 0", 2
             1.0 / 1024.0, // "0 0001 1", 3
@@ -776,14 +781,14 @@ public class PositDomainTest {
             1.0 / 128.0, // "0 001 01", 5
             1.0 / 64.0, // "0 001 10", 6
             1.0 / 32.0, // "0 001 11", 7
-            1.0 / 16.0, // "0 01 000", 8
-            1.0 / 12.0, // "0 01 001", 9
-            1.0 / 8.0, // "0 01 010", 10
-            1.0 / 6.0, // "0 01 011", 11
-            1.0 / 4.0, // "0 01 100", 12
-            1.0 / 3.0, // "0 01 101", 13
-            1.0 / 2.0, // "0 01 110", 14
-            1.0 / 1.5, // "0 01 111", 15
+            1.0 / 16.0, // "0 01 00 0", 8
+            1.0 / 12.0, // "0 01 00 1", 9
+            1.0 / 8.0, // "0 01 01 0", 10
+            1.0 / 6.0, // "0 01 01 1", 11
+            1.0 / 4.0, // "0 01 10 0", 12
+            1.0 / 3.0, // "0 01 10 1", 13
+            1.0 / 2.0, // "0 01 11 0", 14
+            1.0 / 1.5, // "0 01 11 1", 15
             1.0, // "0 10 000", 16
             1.5, // "0 10 001", 17
             2.0, // "0 10 010", 18
@@ -851,6 +856,7 @@ public class PositDomainTest {
         System.out.println("sixBitES2 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES2.length + ".");
     }
 
+    // es = 1, useed = 2^2^1 = 4
     public static final double[] EXPECTED_SEVENBIT_ES1 = {
             0.0, // 0b0000000,
             0.0009765625, // 0b0000001
@@ -1065,6 +1071,28 @@ public class PositDomainTest {
     public static final double[] EXPECTED_EIGHTBIT_ES2 = { -9.5367431640625e-7, -5.960464477539063e-8, 0.0,
             5.960464477539063e-8, 9.5367431640625e-7, 0.875, 0.9375, 1.0, 1.125, 1.25, 1.048576e6, 1.6777216e7,
             Double.POSITIVE_INFINITY, -1.6777216e7, -1.048576e6, -1.25, -1.125, -1.0, -0.9375, -0.875, };
+
+    
+    /**
+     * A sixteenBit, es = 3 example.
+     * <p>
+     * Figure 5 example from "Beating Floating Point"
+     */
+    @Test
+    public void sixteenBitES3PositPaperExample() {
+        final String instance = "0000110111011101";
+        final int i = Integer.parseInt(instance, 2);
+        final int MAX_ES = 3;
+
+        assertTrue(PositDomain.isPositive(instance));
+        assertEquals("0001", PositDomain.getRegime(instance));
+        assertEquals("101", PositDomain.getExponent(instance, MAX_ES));
+        assertEquals("11011101", PositDomain.getFraction(instance, MAX_ES));
+        System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, MAX_ES));
+        final Posit p = new PositStringImpl(instance, MAX_ES);
+        assertTrue(equals(p.doubleValue(), 0.000003553926944732, COMPARE_PRECISION));
+    }
+
 
     // Scalar product a.b = sum a1b1+a2b2+...+anbn
     // [1,3,-5].[4,-2,-2] = 1.4 + 3.-2 + (-5.-1)=3

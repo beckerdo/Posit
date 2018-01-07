@@ -1,5 +1,6 @@
 package javax.lang.posit;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 
@@ -20,6 +21,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 
     /** internal representation */
     private String internal;
+    /** consider making a class/static or factory method. */
     private byte maxExponentSize = 2;
 
     // Constructors
@@ -120,26 +122,34 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
         final BigInteger useed = getUseed();
         final String [] components = PositDomain.getComponents(internal, getMaxExponentSize(), true);
         final int k = PositDomain.getRegimeK(components[PositEnum.REGIME.v()]);
-        double useedK = 1.0;
-        if (k >= 0) {
-            useedK = useed.pow(k).doubleValue();
-            val *= useedK; // sign*regime
-        } else {
-            useedK = useed.pow(Math.abs(k)).doubleValue();
-            val /= useedK; // sign*regime
-        }
+//        double useedK = 1.0;
+//        if (k >= 0) {
+//            useedK = useed.pow(k).doubleValue();
+//            val *= useedK; // sign*regime
+//        } else {
+//            useedK = useed.pow(Math.abs(k)).doubleValue();
+//            val /= useedK; // sign*regime
+//        }
+        double useedK = useed.pow(Math.abs(k)).doubleValue();
+        double expFrac = 1.0;
         final String exponent = components[PositEnum.EXPONENT.v()];
         if (null != exponent && exponent.length() > 0) {
             final double expVal = PositDomain.getExponentVal(exponent, getMaxExponentSize());
             final double twoe = Math.pow(2.0, expVal);
-            val *= twoe;// sign*regime*exp
+            // val *= twoe;// sign*regime*exp
+            expFrac = twoe;
         }
         final String fraction = components[PositEnum.FRACTION.v()];
         if (null != fraction && fraction.length() > 0) {
             final double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
-            val *= fracMultiplier; // sign*regime*exp*frac
+            // val *= fracMultiplier; // sign*regime*exp*frac
+            expFrac *= fracMultiplier;
         }
-        return val;
+        // Make fraction for ranges 0..1 or 0..-1
+        if (k < 0) {
+            return val / useedK * expFrac;
+        }
+        return val * useedK * expFrac;
     }
 
     @Override

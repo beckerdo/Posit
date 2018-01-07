@@ -85,14 +85,15 @@ public final class PositDomain {
     }
 
     /**
-     * Returns an array consisting of sign, regime, exponent, and fraction. Components are not interpreted, simply
-     * grouped. You can use the PositEnum values to get the fields in this tuple.
+     * Returns an array consisting of sign, regime, exponent, and fraction components.
+     * <p>
+     * Components are not interpreted, simply grouped.
+     * You can use the PositEnum values to get the fields in this tuple.
      *
      * @param instance
      * @param maxExponent
-     * @param flipNegative
-     *            performs twos complement if negative
-     * @return
+     * @param flipNegative performs twos complement if negative
+     * @return an array of sign, regime, exponent, and fraction components.
      */
     public static String[] getComponents(String instance, int maxExponent, boolean flipNegative) {
         if (null == instance || instance.length() < 1) {
@@ -134,8 +135,9 @@ public final class PositDomain {
     }
 
     /**
-     * Returns the regime portion of a string of binary 0 and 1 characters. The String will be twos complemented for
-     * negative instances.
+     * Returns the regime component of a string of binary 0 and 1 characters.
+     * <p>
+     * The String will be twos complemented for negative instances.
      */
     public static String getRegime(String instance) {
         // If the bit size is less than 2, returns empty String.
@@ -160,14 +162,20 @@ public final class PositDomain {
         return sb.toString();
     }
 
-    /** Returns the regime value of a string of binary 0 and 1 characters. */
+    /** Returns the regime value K of a string of binary 0 and 1 characters. 
+     *  <p>
+     *  Let m be the number (run length) of identical bits starting the regime:
+     *  <ul>
+     *  <li>if the bits are 0s, then k = −m;
+     *  <li>if the bits are 1s, then k = m − 1.
+     *  </ul>
+     *  <p>
+     *  Examples (regime=K):
+     *  <code>
+     *  0000=-4, 0001=-3,001x=-2,01xx=-1,10xx=0,110x=1,1110=2,1111=3
+     *  </code>
+    */
     public static int getRegimeK(String regime) {
-        // Returns the regime value K.
-        // Let m be the number of identical bits starting the regime;
-        // if the bits are 0, then k = −m;
-        // if the bits are 1, then k = m − 1.
-        // Examples (regime = K):
-        // 0000=-4, 0001=-3,001x=-2,01xx=-1,10xx=0,110x=1,1110=2,1111=3
         if (null == regime || regime.length() < 1) {
             return 0;
         }
@@ -188,8 +196,9 @@ public final class PositDomain {
     }
 
     /**
-     * Return the exponent part of a given string of 0 and 1 characters. The String will be twos complemented for
-     * negative instances.
+     * Return the exponent component of a given string of 0 and 1 characters.
+     * <p>
+     * The String will be twos complemented for negative instances.
      */
     public static String getExponent(String instance, int maxExponent) {
         // Returns the exponent bits of this Posit as a String of "0" and "1".
@@ -223,7 +232,6 @@ public final class PositDomain {
 
     /** Return the value of an exponent string of 0 and 1 characters. */
     public static double getExponentVal(String exponent, int maxExponent) {
-        // Returns the exponent bits of this Posit as a String of "0" and "1".
         // If the regime fills the bit size, the exponent may be empty string.
         if (null == exponent || exponent.length() < 1) {
             return 0.0;
@@ -238,11 +246,11 @@ public final class PositDomain {
     }
 
     /**
-     * Return the fraction part of a given string of 0 and 1 characters. The String will be twos complemented for
-     * negative instances.
+     * Return the fraction component of a given string of 0 and 1 characters.
+     * <p>
+     * The String will be twos complemented for negative instances.
      */
     public static String getFraction(String instance, int maxExponent) {
-        // Returns the exponent bits of this Posit as a String of "0" and "1".
         // If the regime fills the bit size, the exponent may be empty string.
         if (null == instance || instance.length() < 2) {
             return "";
@@ -279,7 +287,6 @@ public final class PositDomain {
 
     /** Return the value of a given fraction of 0 and 1 characters. */
     public static long getFractionVal(String fraction, boolean positive) {
-        // Returns the exponent bits of this Posit as a String of "0" and "1".
         // If the regime fills the bit size, the exponent may be empty string.
         if (null == fraction || fraction.length() < 1) {
             return 0;
@@ -316,14 +323,32 @@ public final class PositDomain {
         return result;
     }
 
-    // Puny long runs out at es=6, puny double rounds at es=6.
-    // public static final BigInteger [] LOOKUP_2_2_N = new BigInteger [] { };
+    /*
+     * A lookup table of 2^2^N. 
+     * <table>
+     * <th><td>N<td>2^2^N</td>
+     * <tr><td>0<td>2^2^0=2^1=2</tr>
+     * <tr><td>1<td>2^2^1=2^2=4</tr>
+     * <tr><td>2<td>2^2^2=2^4=16</tr>
+     * <tr><td>3<td>2^2^3=2^8=256</tr>
+     * <tr><td>4<td>2^2^4=2^16=65536</tr>
+     * </table>
+     * <p>
+     * Puny long runs out at N=6, puny double rounds at N=6.
+     */
     public static final BigInteger[] LOOKUP_2_2_N = new BigInteger[]{BIGINT_2,new BigInteger("4"),
             new BigInteger("16"),new BigInteger("256"),new BigInteger("65536"),new BigInteger("4294967296"),
             new BigInteger("18446744073709551616"),new BigInteger("340282366920938463463374607431768211456"),
             new BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639936")};
 
-    /** Get the useed of a given exponent size (2^2^exponentSize). */
+    /**
+     * Get the useed value of a given exponent size es.
+     * <p>
+     * Useed is a scaling component equal to 2^2^es.
+     * <p>
+     * Implementation detail.
+     * Consider making es part of factory method or class/static value.
+     */
     public static BigInteger getUseed(int es) {
         if (es < 0) {
             return BigInteger.ZERO;
@@ -331,11 +356,11 @@ public final class PositDomain {
         if (es < LOOKUP_2_2_N.length) {
             return LOOKUP_2_2_N[es];
         }
+        // Perform a loop of squaring 2, n times.
         BigInteger previous = BigInteger.valueOf(2);
         for (int i = 0; i < es; i++) {
             previous = previous.pow(2);
         }
-        // System.out.println( "Es is " + es + ", returning " + previous);
         return previous;
     }
 
