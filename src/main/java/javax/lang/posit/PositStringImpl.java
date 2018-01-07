@@ -118,38 +118,28 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
             return Double.POSITIVE_INFINITY;
         }
         final boolean positive = isPositive();
-        double val = positive ? 1.0 : -1.0;
+        double sign = positive ? 1.0 : -1.0;
         final BigInteger useed = getUseed();
         final String [] components = PositDomain.getComponents(internal, getMaxExponentSize(), true);
         final int k = PositDomain.getRegimeK(components[PositEnum.REGIME.v()]);
-//        double useedK = 1.0;
-//        if (k >= 0) {
-//            useedK = useed.pow(k).doubleValue();
-//            val *= useedK; // sign*regime
-//        } else {
-//            useedK = useed.pow(Math.abs(k)).doubleValue();
-//            val /= useedK; // sign*regime
-//        }
-        double useedK = useed.pow(Math.abs(k)).doubleValue();
-        double expFrac = 1.0;
+        double useedK = 1.0;
+        if (k >= 0) {
+            useedK = useed.pow(k).doubleValue();
+        } else {
+            useedK = 1.0 / useed.pow(Math.abs(k)).doubleValue();
+        }
         final String exponent = components[PositEnum.EXPONENT.v()];
+        double twoe = 1.0;
         if (null != exponent && exponent.length() > 0) {
             final double expVal = PositDomain.getExponentVal(exponent, getMaxExponentSize());
-            final double twoe = Math.pow(2.0, expVal);
-            // val *= twoe;// sign*regime*exp
-            expFrac = twoe;
+            twoe = Math.pow(2.0, expVal);
         }
         final String fraction = components[PositEnum.FRACTION.v()];
+        double fracMultiplier = 0.0;
         if (null != fraction && fraction.length() > 0) {
-            final double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
-            // val *= fracMultiplier; // sign*regime*exp*frac
-            expFrac *= fracMultiplier;
+            fracMultiplier = PositDomain.getFractionMultiplier(fraction);
         }
-        // Make fraction for ranges 0..1 or 0..-1
-        if (k < 0) {
-            return val / useedK * expFrac;
-        }
-        return val * useedK * expFrac;
+        return sign * (useedK * twoe + (fracMultiplier * useedK));
     }
 
     @Override

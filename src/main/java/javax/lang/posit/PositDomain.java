@@ -305,7 +305,8 @@ public final class PositDomain {
         }
         final double fnumerator = Long.parseUnsignedLong(fraction, 2);
         final double fdenominator = powerN(2, fraction.length());
-        final double fmultiplier = 1.0 + fnumerator / fdenominator;
+        // final double fmultiplier = 1.0 + fnumerator / fdenominator;
+        final double fmultiplier = fnumerator / fdenominator;
         return fmultiplier;
     }
 
