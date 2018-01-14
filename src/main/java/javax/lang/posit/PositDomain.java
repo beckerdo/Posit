@@ -134,6 +134,38 @@ public final class PositDomain {
         return components;
     }
 
+    // Like getComponents, but used for reflected regime, exponent, fraction.
+    // For example 5 bit, es0, "0_10_01"=1.25, "0_01_11" == "0" + twosComp( "01_11" ) = 1/1.25;
+    // Please twosComp/reflect remaining before sending.
+    public static String[] getComponents(String[] components, String remaining, int maxExponent) {
+        if (null == remaining || remaining.length() < 2) {
+            return components;
+        }
+        // Regime is second char until terminated by end of string or opposite char.
+        final char first = remaining.charAt(0);
+        int rs = 0;
+        for (int i = 0; i < remaining.length(); i++) {
+            final char current = remaining.charAt(i);
+            rs++;
+            if (first != current) {
+                break;
+            }
+        }
+        components[PositEnum.REGIME.v()] = remaining.substring(0, rs);
+
+        // 0123456789
+        // 1001eeeeff
+        final int esMax = remaining.length() - rs;
+        final int es = Math.min(maxExponent, esMax);
+        components[PositEnum.EXPONENT.v()] = remaining.substring(rs, rs + es);
+
+        final int fs = remaining.length() - es - rs;
+        if (fs > 0) {
+            components[PositEnum.FRACTION.v()] = remaining.substring(rs + es);
+        }
+        return components;
+    }
+
     /**
      * Returns the regime component of a string of binary 0 and 1 characters.
      * <p>
@@ -305,8 +337,8 @@ public final class PositDomain {
         }
         final double fnumerator = Long.parseUnsignedLong(fraction, 2);
         final double fdenominator = powerN(2, fraction.length());
-        // final double fmultiplier = 1.0 + fnumerator / fdenominator;
-        final double fmultiplier = fnumerator / fdenominator;
+        final double fmultiplier = 1.0 + fnumerator / fdenominator;
+        // final double fmultiplier = fnumerator / fdenominator;
         return fmultiplier;
     }
 
@@ -379,11 +411,12 @@ public final class PositDomain {
         // for SIGN, REGIME, EXPONENT, FRACTION
         for (final PositEnum component : PositEnum.values()) {
             final int position = component.ordinal();
-            if (null == components[position] || components[position].length() < 1) {
-                return sb.toString();
-            }
             sb.append(spacers[position]);
-            sb.append(components[position]);
+            if (null == components[position] || components[position].length() < 1) {
+                sb.append("_"); // empty component
+            } else {
+                sb.append(components[position]);
+            }
         }
         return sb.toString();
     }
@@ -392,17 +425,17 @@ public final class PositDomain {
     public static String toDetailsString(String instance, int maxExponent) {
         final BigInteger useed = getUseed(maxExponent);
         if (null == instance) {
-            return "null es" + maxExponent + "useed=" + useed.toString();
+            return "null es" + maxExponent + "us" + useed.toString();
         }
         if (instance.length() < 1) {
-            return "\"\" es" + maxExponent + "useed=" + useed.toString();
+            return "\"\" es" + maxExponent + "us" + useed.toString();
         }
         if (instance.length() == 1) {
-            return "\"" + instance + "\" es" + maxExponent + "useed=" + useed.toString();
+            return "\"" + instance + "\" es" + maxExponent + "us" + useed.toString();
         }
         final String spacedString = toSpacedString(instance, maxExponent, true);
         final StringBuilder sb = new StringBuilder();
-        sb.append("\"" + spacedString + "\" es" + maxExponent + " useed" + useed.toString());
+        sb.append("\"" + spacedString + "\" es" + maxExponent + " us" + useed.toString());
         if (isZero(instance)) {
             sb.append(", val=0.0");
             return sb.toString();
@@ -412,22 +445,18 @@ public final class PositDomain {
             return sb.toString();
         }
 
-        final boolean positive = isPositive(instance);
         final String[] components = getComponents(instance, maxExponent, true);
-        double val = positive ? 1.0 : -1.0;
         final String regime = components[PositEnum.REGIME.v()];
         if (null != regime && regime.length() > 0) {
             final int k = getRegimeK(regime);
             double useedK = 1.0;
             if (k >= 0) {
                 useedK = useed.pow(k).doubleValue();
-                val *= useedK;
             } else {
                 useedK = useed.pow(Math.abs(k)).doubleValue();
-                val /= useedK;
                 useedK = 1.0 / useedK;
             }
-            sb.append(", r=\"" + regime + "\" k=" + k + " useed^k=" + useedK + " val=" + val);
+            sb.append(", r=\"" + regime + "\" k=" + k + " us^k=" + useedK );
         } else {
             sb.append(", r=\"\"");
         }
@@ -435,22 +464,19 @@ public final class PositDomain {
         if (null != exponent && exponent.length() > 0) {
             final double expVal = PositDomain.getExponentVal(exponent, maxExponent);
             final double twoe = Math.pow(2.0, expVal);
-            val *= twoe;// sign*regime*exp
-            sb.append(", e=\"" + exponent + "\" e=" + expVal + " 2^e=" + twoe + " val=" + val);
+            sb.append(", e=\"" + exponent + " 2^e=" + twoe);
         } else {
             sb.append(", e=\"\"");
         }
         final String fraction = components[PositEnum.FRACTION.v()];
         if (null != fraction && fraction.length() > 0) {
             final double fracMultiplier = PositDomain.getFractionMultiplier(fraction);
-            val *= fracMultiplier; // sign*regime*exp*frac
-            sb.append(", f=\"" + fraction + "\" fm " + fracMultiplier + " val=" + val);
+            sb.append(", f=\"" + fraction + "\" fm " + fracMultiplier );
         } else {
             sb.append(", f=\"\"");
         }
-        if (0.0 != val) {
-            sb.append(",1/val=" + 1.0 / val);
-        }
+        Posit p = new PositStringImpl( instance, maxExponent);
+        sb.append(", val="+ p.doubleValue() + ",1/val=" + 1.0 / p.doubleValue());
         return sb.toString();
     }
 }

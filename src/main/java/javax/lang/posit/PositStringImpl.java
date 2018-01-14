@@ -103,6 +103,11 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
      * For example p="0 0001 101 11011101" with es=3<br/>
      * x=1*256^(-3)*2^(5)*(1+221/256)=477/134217728 ~=3.55393*10^(-6)
      * <p>
+     * The calculation relies on certain reflections:
+     * pos,<1,  unflipped regime begins with 0, result = 1.0 * 1.0 / calculation( twosComp( regime, exponent, fraction ) )
+     * pos,>=1, unflipped regime begins with 1, result = 1.0 * calculation( regime, exponent, fraction )
+     * neg,>=1, unflipped regime begins with 0, result = -1.0 * calculation( twosComp( regime, exponent, fraction ) 
+     * neg,<1,  unflipped regime begins with 1, result = -1.0 * 1.0 / calculation( regime, exponent, fraction ) 
      *
      * @see Posit#doubleValue()
      */
@@ -120,28 +125,68 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
         final boolean positive = isPositive();
         double sign = positive ? 1.0 : -1.0;
         final BigInteger useed = getUseed();
-        final String [] components = PositDomain.getComponents(internal, getMaxExponentSize(), true);
-        final int k = PositDomain.getRegimeK(components[PositEnum.REGIME.v()]);
-        double useedK = 1.0;
-        if (k >= 0) {
-            useedK = useed.pow(k).doubleValue();
-        } else {
-            useedK = 1.0 / useed.pow(Math.abs(k)).doubleValue();
+        final String [] components = PositDomain.getComponents(internal, getMaxExponentSize(), false);
+        String regime = components[PositEnum.REGIME.v()];
+        String exponent = components[PositEnum.EXPONENT.v()];
+        String fraction = components[PositEnum.FRACTION.v()];
+        // Use symmetry to adjust regime, exponent, fraction
+        boolean twos = false;
+        if ( null != regime && regime.length() > 0 && regime.charAt(0) == '0') {
+            PositDomain.getComponents(components, Bit.twosComplement( regime + exponent + fraction ), getMaxExponentSize());
+            twos = true;
+            regime = components[PositEnum.REGIME.v()];
+            exponent = components[PositEnum.EXPONENT.v()];
+            fraction = components[PositEnum.FRACTION.v()];
         }
-        final String exponent = components[PositEnum.EXPONENT.v()];
+        final int k = PositDomain.getRegimeK(regime);
+        double useedK = useed.pow(Math.abs(k)).doubleValue();
         double twoe = 1.0;
         if (null != exponent && exponent.length() > 0) {
             final double expVal = PositDomain.getExponentVal(exponent, getMaxExponentSize());
             twoe = Math.pow(2.0, expVal);
         }
-        final String fraction = components[PositEnum.FRACTION.v()];
-        double fracMultiplier = 0.0;
+        double fracMultiplier = 1.0;
         if (null != fraction && fraction.length() > 0) {
             fracMultiplier = PositDomain.getFractionMultiplier(fraction);
         }
-        return sign * (useedK * twoe + (fracMultiplier * useedK));
+        // return sign * (useedK * twoe + (fracMultiplier * useedK));
+        if ( positive ) {
+            if ( !twos ) {
+                return useedK * twoe * fracMultiplier;
+            } else {
+                return sign / ( useedK * twoe * fracMultiplier );
+            }
+        } else {
+            if ( twos ) {
+                return sign * useedK * twoe * fracMultiplier;
+            } else {
+                return sign / ( useedK * twoe * fracMultiplier );
+            }            
+        }
     }
 
+//    final String [] components = PositDomain.getComponents(internal, getMaxExponentSize(), true);
+//    double useedK = 1.0;
+//    if (k >= 0) {
+//        useedK = useed.pow(k).doubleValue();
+//    } else {
+//        useedK = 1.0 / useed.pow(Math.abs(k)).doubleValue();
+//    }
+//    final String exponent = components[PositEnum.EXPONENT.v()];
+//    double twoe = 1.0;
+//    if (null != exponent && exponent.length() > 0) {
+//        final double expVal = PositDomain.getExponentVal(exponent, getMaxExponentSize());
+//        twoe = Math.pow(2.0, expVal);
+//    }
+//    final String fraction = components[PositEnum.FRACTION.v()];
+//    double fracMultiplier = 1.0;
+//    if (null != fraction && fraction.length() > 0) {
+//        fracMultiplier = PositDomain.getFractionMultiplier(fraction);
+//    }
+//    // return sign * (useedK * twoe + (fracMultiplier * useedK));
+//    return sign * useedK * twoe * fracMultiplier;
+    
+    
     @Override
     /**
      * @see Posit#stringValue()

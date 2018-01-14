@@ -16,7 +16,8 @@ import org.junit.Test;
  */
 public class PositDomainTest {
     // Seven bit ES2 have this range ............. 0.00000095367431640625 to 1048576.0
-    public static final double COMPARE_PRECISION = 0.0000000000000001;
+    // public static final double COMPARE_PRECISION = 0.0000000000000001;
+    public static final double COMPARE_PRECISION = 0.000000000001;
 
     public static final String[] BINARY_TEST_CASES = {
             "", // 0
@@ -182,8 +183,8 @@ public class PositDomainTest {
         assertNotNull(returned);
         assertTrue(returned.length() > 0);
         assertTrue(returned.contains("es2"));
-        assertTrue(returned.contains("useed16"));
-        assertTrue(returned.contains("useed^k"));
+        assertTrue(returned.contains("us16"));
+        assertTrue(returned.contains("us^k="));
         assertTrue(returned.contains("e="));
         assertTrue(returned.contains("f="));
         assertTrue(returned.contains("val=-16.0"));
@@ -453,34 +454,41 @@ public class PositDomainTest {
                     PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2, true));
         }
     }
-
+    
+    // es = 0, useed = 2^2^0 = 2
     public static final double[] EXPECTED_FOURBIT_ES0 = {
-            // "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", // 4
+            // k            -2      -1        -1         0         0          0        2
+            // u^k         1/4                             1                  2        4
+            // "0 000", "0 001", "0 01 0", "0 01 1", "0 10 0", "0 10 1", "0 110", "0 111", // 4
             // "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111", // 4
-            0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 4.0, Double.POSITIVE_INFINITY, -4.0, -2.0, -1.5, -1.0, -0.75, -0.5,
-            -0.25, };
-    public static final double[] EXPECTED_FOURBIT_ES1 = { 0.0, 0.0625, 0.25, 0.5, 1.0, 2.0, 4.0, 16.0,
-            Double.POSITIVE_INFINITY, -16.0, -4.0, -2.0, -1.0, -0.5, -0.25, -0.0625, };
-    public static final double[] EXPECTED_FOURBIT_ES2 = { 0.0, 0.00390625, 0.0625, 0.25, 1.0, 4.0, 16.0, 256.0,
-            Double.POSITIVE_INFINITY, -256.0, -16.0, -4.0, -1.0, -0.25, -0.0625, -0.00390625, };
-
+            0.0, 1.0/4.0, 1.0/2.0, 2.0/3.0, 1.0, 3.0/2.0, 2.0, 4.0, 
+            Double.POSITIVE_INFINITY, -4.0, -2.0, -3.0/2.0, -1.0, -2.0/3.0, -1.0/2.0, -1.0/4.0 };
     @Test
     public void fourBitES0() {
         int oosCount = 0;
         for (int i = 0; i < EXPECTED_FOURBIT_ES0.length; i++) {
             final String instance = String.format("%4s", Integer.toBinaryString(i)).replace(" ", "0");
             final Posit p = new PositStringImpl(instance, 0);
-            final String outOfSpec = outOfSpec(p.doubleValue(), EXPECTED_FOURBIT_ES0[i], COMPARE_PRECISION);
+            final String outOfSpec = outOfSpec(p.doubleValue(), EXPECTED_FOURBIT_ES0[i], COMPARE_PRECISION );
             if (outOfSpec.length() > 0) {
+                System.out.println("val=" + p.doubleValue() );
                 System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 0) + ",exp="
-                        + EXPECTED_SIXBIT_ES1[i] + outOfSpec);
+                        + EXPECTED_FOURBIT_ES0[i] + outOfSpec);
                 oosCount++;
             }
+            // System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 0) + ",exp="
+            //         + EXPECTED_FOURBIT_ES0[i] + outOfSpec);
             assertEquals(EXPECTED_FOURBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("fourBitES0 out of spec count=" + oosCount + "/" + EXPECTED_FOURBIT_ES0.length + ".");
     }
 
+    // es = 1, useed = 2^2^1 = 4
+    public static final double[] EXPECTED_FOURBIT_ES1 = { 
+            0.0, 1.0/16.0, 1.0/4.0, 1.0/2.0, 
+            1.0, 2.0, 4.0, 16.0,
+            Double.POSITIVE_INFINITY, -16.0, -4.0, -2.0, 
+            -1.0, -1.0/2.0, -1.0/4.0, -1.0/16.0 };
     @Test
     public void fourBitES1() {
         int oosCount = 0;
@@ -491,13 +499,17 @@ public class PositDomainTest {
             if (outOfSpec.length() > 0) {
                 oosCount++;
                 System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) + ",exp="
-                        + EXPECTED_SIXBIT_ES1[i] + outOfSpec);
+                        + EXPECTED_FOURBIT_ES1[i] + outOfSpec);
             }
             assertEquals(EXPECTED_FOURBIT_ES1[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("fourBitES1 out of spec count=" + oosCount + "/" + EXPECTED_FOURBIT_ES1.length + ".");
     }
 
+    // es = 2, useed = 2^2^2 = 256
+    public static final double[] EXPECTED_FOURBIT_ES2 = { 
+            0.0, 1.0 / 256.0, 1.0 / 16.0, 1.0 / 4.0, 1.0, 4.0, 16.0, 256.0,
+            Double.POSITIVE_INFINITY, -256.0, -16.0, -4.0, -1.0, -1.0 / 4.0, -1.0 / 16.0, -1.0 / 256 };
     @Test
     public void fourBitES2() {
         int oosCount = 0;
@@ -515,12 +527,139 @@ public class PositDomainTest {
         System.out.println("fourBitES2 out of spec count=" + oosCount + "/" + EXPECTED_FOURBIT_ES2.length + ".");
     }
 
-    public static final double[] EXPECTED_FIVEBIT_ES0 = {
-            0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875,
-            1.0, 1.25, 1.5, 1.75, 2.0, 3.0, 4.0, 8.0,
-            Double.POSITIVE_INFINITY, -8.0, -4.0, -3.0, -2.0, -1.75, -1.5, -1.25,
-            -1.0, -0.875, -0.75, -0.625, -0.5, -0.375, -0.25, -0.125 };
+    // Check that posits invert and negate symmetrically.
+    @Test
+    public void fourBitSymmetry() {
+        int oosCount = 0;
+        final int FULL = EXPECTED_FOURBIT_ES2.length;
+        final int HALF = FULL / 2;
+        final int QUARTER = FULL / 4;
+        for (int maxEs = 0; maxEs < 3; maxEs++) {
+            System.out.println("fourBitSymmetry of maxEs=" + maxEs + ".");
+            
+            
+            for (int i = 1; i < QUARTER; i++) {
+                final String instance1 = String.format("%4s", Integer.toBinaryString(i)).replace(" ", "0");
+                final String instance2 = String.format("%4s", Integer.toBinaryString(HALF - i)).replace(" ", "0");
+                final String instance3 = String.format("%4s", Integer.toBinaryString(HALF + i)).replace(" ", "0");
+                final String instance4 = String.format("%4s", Integer.toBinaryString(FULL - i)).replace(" ", "0");
+            
+                final Posit p1 = new PositStringImpl(instance1, maxEs);
+                final Posit p2 = new PositStringImpl(instance2, maxEs);
+                final Posit p3 = new PositStringImpl(instance3, maxEs);
+                final Posit p4 = new PositStringImpl(instance4, maxEs);
+            
+                // 1/p1 to p2
+                String outOfSpec = outOfSpec(1.0 / p1.doubleValue(), p2.doubleValue(), COMPARE_PRECISION);
+                if (outOfSpec.length() > 0) {
+                    oosCount++;
+                    System.out.println("i=" + i + ", posit=" + p2 
+                       + ", 1.0/p1=" + 1.0 / p1.doubleValue() + ", p2=" + p2.doubleValue()
+                       + outOfSpec);
+                }
+                assertEquals(1.0 / p1.doubleValue(), p2.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+                
+                // p1 to -p4
+                outOfSpec = outOfSpec(p1.doubleValue(), -1.0 * p4.doubleValue(), COMPARE_PRECISION);
+                if (outOfSpec.length() > 0) {
+                    oosCount++;
+                    System.out.println("i=" + i + ", posit=" + p1 
+                       + ", p1=" + p1.doubleValue() + ", -p4=" + -1.0 * p4.doubleValue()
+                       + outOfSpec);
+                }
+                assertEquals(p1.doubleValue(), -1.0 * p4.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+
+                // p2 to -p3
+                outOfSpec = outOfSpec(p2.doubleValue(), -1.0 * p3.doubleValue(), COMPARE_PRECISION);
+                if (outOfSpec.length() > 0) {
+                    oosCount++;
+                    System.out.println("i=" + i + ", posit=" + p2 
+                       + ", p2=" + p2.doubleValue() + ", -p3=" + -1.0 * p3.doubleValue()
+                       + outOfSpec);
+                }
+                assertEquals(p2.doubleValue(), -1.0 * p3.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+
+                // 1/p4 to p3
+                outOfSpec = outOfSpec(1.0 / p4.doubleValue(), p3.doubleValue(), COMPARE_PRECISION);
+                if (outOfSpec.length() > 0) {
+                    oosCount++;
+                    System.out.println("i=" + i + ", posit=" + p3 
+                       + ", 1.0/p4=" + 1.0 / p4.doubleValue() + ", p3=" + p3.doubleValue()
+                       + outOfSpec);
+                }
+            }
+            System.out.println("fourBitSymmetry out of spec count=" + oosCount + "/" + EXPECTED_FOURBIT_ES2.length + ".");
+        }        
+    }
+
+    // Check that expected values invert and negate symmetrically.
+    @Test
+    public void fourBitExpectedValueSymmetry() {
+        int oosCount = 0;
+        final int FULL = EXPECTED_FOURBIT_ES2.length;
+        final int HALF = FULL / 2;
+        final int QUARTER = FULL / 4;
+        for (int maxEs = 0; maxEs < 3; maxEs++) {
+            System.out.println("fourBitExpectedValueSymmetry of maxEs=" + maxEs + ".");
+            
+            double[] EXPECTED_VALUE = EXPECTED_FOURBIT_ES0;
+            switch ( maxEs ) {
+                case 0 : EXPECTED_VALUE = EXPECTED_FOURBIT_ES0; break;
+                case 1 : EXPECTED_VALUE = EXPECTED_FOURBIT_ES1; break;
+                case 2 : EXPECTED_VALUE = EXPECTED_FOURBIT_ES2; break;
+                default: throw new IllegalArgumentException( "do not know how to validate four bit maxEs=" + maxEs);
+            }
+            for (int i = 1; i < QUARTER; i++) {
+                final double d1 = EXPECTED_VALUE[ i ];
+                final double d2 = EXPECTED_VALUE[ HALF - i ];
+                final double d3 = EXPECTED_VALUE[ HALF + i ];
+                final double d4 = EXPECTED_VALUE[ FULL - i ];
+            
+                // 1/d1 to d2
+                String outOfSpec = outOfSpec(1.0 / d1, d2, COMPARE_PRECISION);
+                if (outOfSpec.length() > 0) {
+                    oosCount++;
+                    System.out.println("i=" + i  + ", 1.0/d1=" + 1.0 / d1 + ", d2=" + d2
+                       + outOfSpec);
+                }
+                assertEquals(1.0 / d1, d2, PositDomainTest.COMPARE_PRECISION);
+                
+                // d1 to -d4
+                outOfSpec = outOfSpec(d1, -1.0 * d4, COMPARE_PRECISION);
+                if (outOfSpec.length() > 0) {
+                    oosCount++;
+                    System.out.println("i=" + i  + ", d1=" + d1 + ", -p4=" + -1.0 * d4
+                       + outOfSpec);
+                }
+                assertEquals(d1, -1.0 * d4, PositDomainTest.COMPARE_PRECISION);
+
+                // p2 to -p3
+                outOfSpec = outOfSpec(d2, -1.0 * d3, COMPARE_PRECISION);
+                if (outOfSpec.length() > 0) {
+                    oosCount++;
+                    System.out.println("i=" + i + ", d2=" + d2 + ", -d3=" + -1.0 * d3
+                       + outOfSpec);
+                }
+                assertEquals(d2, -1.0 * d3, PositDomainTest.COMPARE_PRECISION);
+
+                // 1/p4 to p3
+                outOfSpec = outOfSpec(1.0 / d4, d3, COMPARE_PRECISION);
+                if (outOfSpec.length() > 0) {
+                    oosCount++;
+                    System.out.println("i=" + i + ", 1.0/d4=" + 1.0 / d4 + ", d3=" + d3
+                       + outOfSpec);
+                }
+            }
+            System.out.println("fourBitExpectedValueSymmetry out of spec count=" + oosCount + "/" + EXPECTED_FOURBIT_ES2.length + ".");
+        }        
+    }
     
+    // es = 0, useed = 2^2^0 = 2
+    public static final double[] EXPECTED_FIVEBIT_ES0 = {
+            0.0, 1.0 / 8.0, 1.0 / 4.0, 1.0 / 3.0 , 1.0 / 2.0, 4.0 / 7.0, 4.0 / 6.0, 4.0 / 5.0,
+            1.0, 5.0 / 4.0, 6.0 / 4.0, 7.0 / 4.0, 2.0, 3.0, 4.0, 8.0,
+            Double.POSITIVE_INFINITY, -8.0, -4.0, -3.0, -2.0, -7.0/4.0, -6.0/4.0, -5.0/4.0,
+            -1.0, -4.0 / 5.0, -4.0 / 6.0, -4.0 / 7.0, -1.0 / 2.0, -1.0 / 3.0, -1.0 / 4.0, -1.0 / 8.0 };    
     @Test
     public void fiveBitES0() {
         int oosCount = 0;
@@ -529,6 +668,7 @@ public class PositDomainTest {
             final Posit p = new PositStringImpl(instance, 0);
             final String outOfSpec = outOfSpec(p.doubleValue(), EXPECTED_FIVEBIT_ES0[i], COMPARE_PRECISION);
             if (outOfSpec.length() > 0) {
+                System.out.println("val=" + p.doubleValue() );
                 oosCount++;
                 System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 0) + ",exp="
                         + EXPECTED_FIVEBIT_ES0[i] + outOfSpec);
@@ -538,12 +678,12 @@ public class PositDomainTest {
         System.out.println("fiveBitES0 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES1.length + ".");
     }
 
+    // es = 1, useed = 2^2^1 = 4
     public static final double[] EXPECTED_FIVEBIT_ES1 = {
-            0.0, 1.0 / 64.0, 1.0 / 16.0, 1.0 / 8.0, 1.0 / 4.0, 3.0 / 8.0, 1.0 / 2.0, 3.0 / 4.0,
+            0.0, 1.0 / 64.0, 1.0 / 16.0, 1.0 / 8.0, 1.0 / 4.0, 1.0 / 3.0, 1.0 / 2.0, 2.0 / 3.0,
             1.0, 3.0 / 2.0, 2.0, 3.0, 4.0, 8.0, 16.0, 64.0,
             Double.POSITIVE_INFINITY, -64.0, -16.0, -8.0, -4.0, -3.0, -2.0, -3.0 / 2.0,
-            -1.0, -3.0 / 4.0, -1.0 / 2.0, -3.0 / 8.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0 };
-
+            -1.0, -2.0 / 3.0, -1.0 / 2.0, -1.0 / 3.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0 };
     @Test
     public void fiveBitES1() {
         int oosCount = 0;
@@ -582,6 +722,7 @@ public class PositDomainTest {
             Double.POSITIVE_INFINITY,
             -4096.0, -256.0, -64.0, -16.0, -8.0, -4.0, -2.0, -1.0,
             -1.0 / 2.0, -1.0 / 4.0, -1.0 / 8.0, -1.0 / 16.0, -1.0 / 64.0, -1.0 / 256.0, -1.0 / 4096.0 };
+    
     @Test
     public void fiveBitES2() {
         int oosCount = 0;
@@ -594,8 +735,6 @@ public class PositDomainTest {
                 System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + ",exp="
                         + EXPECTED_FIVEBIT_ES2[i] + outOfSpec);
             }
-//            System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + ",exp="
-//                    + EXPECTED_FIVEBIT_ES2[i] + outOfSpec);
             assertEquals(EXPECTED_FIVEBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("fiveBitES2 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES2.length + ".");
@@ -937,7 +1076,7 @@ public class PositDomainTest {
                 System.out.println("sevenBitES1 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) +
                         ",exp=" + EXPECTED_SEVENBIT_ES1[i] + ",1.0/exp=" + 1.0 / EXPECTED_SEVENBIT_ES1[i] + outOfSpec);
             }
-            assertEquals(EXPECTED_SEVENBIT_ES1[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+            // assertEquals(EXPECTED_SEVENBIT_ES1[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("sevenBitES1 out of spec count=" + oosCount + "/" + EXPECTED_SEVENBIT_ES1.length + ".");
     }
@@ -1014,7 +1153,7 @@ public class PositDomainTest {
         int oosCount = 0;
         for (int i = 0; i < EXPECTED_SEVENBIT_ES2.length; i++) {
             final String instance = String.format("%7s", Integer.toBinaryString(i)).replace(" ", "0");
-            final Posit p = new PositStringImpl(instance, 1);
+            final Posit p = new PositStringImpl(instance, 2);
             final String outOfSpec = outOfSpec(p.doubleValue(), EXPECTED_SEVENBIT_ES2[i], COMPARE_PRECISION);
             if (outOfSpec.length() > 0) {
                 oosCount++;
@@ -1090,6 +1229,8 @@ public class PositDomainTest {
         assertEquals("11011101", PositDomain.getFraction(instance, MAX_ES));
         System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, MAX_ES));
         final Posit p = new PositStringImpl(instance, MAX_ES);
+        // from PositDomain val=3.355884879725086E-6
+        // from Julia 3.553926944732666e-6
         assertTrue(equals(p.doubleValue(), 0.000003553926944732, COMPARE_PRECISION));
     }
 
