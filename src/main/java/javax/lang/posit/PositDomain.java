@@ -510,7 +510,7 @@ public final class PositDomain {
         if (null != exponent && exponent.length() > 0) {
             final double expVal = PositDomain.getExponentVal(exponent, maxExponent);
             final double twoe = Math.pow(2.0, expVal);
-            sb.append(", e=\"" + exponent + " 2^e=" + twoe);
+            sb.append(", e=\"" + exponent + "\" 2^e=" + twoe);
         } else {
             sb.append(", e=\"\"");
         }

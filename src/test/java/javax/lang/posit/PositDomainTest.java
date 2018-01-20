@@ -1226,19 +1226,57 @@ public class PositDomainTest {
      */
     @Test
     public void sixteenBitES3PositPaperExample() {
-        final String instance = "0000110111011101";
-        final int i = Integer.parseInt(instance, 2);
         final int MAX_ES = 3;
+
+        // sign + regime
+        String instance = "0" + "0001" + "000" + "00000000";
+        int i = Integer.parseInt(instance, 2); // 2048
+        Posit p = new PositStringImpl(instance, MAX_ES);
+        
+        assertTrue(PositDomain.isPositive(instance));
+        assertEquals("0001", PositDomain.getRegime(instance));
+        assertEquals("000", PositDomain.getExponent(instance, MAX_ES));
+        assertEquals("00000000", PositDomain.getFraction(instance, MAX_ES));
+        System.out.println("i=" + i + ", p.double=" + p.doubleValue());
+        System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, MAX_ES));
+        // from PositDomain val=5.9604644775390625E-8
+        // from Julia           5.960464477539063e-8, "0 0001 000 00000000"
+        assertTrue(equals(p.doubleValue(), 0.000000059604644775390625, COMPARE_PRECISION));
+        
+        // sign + regime + exponent
+        instance = "0" + "0001" + "101" + "00000000";
+        i = Integer.parseInt(instance, 2); // 3328
+        p = new PositStringImpl(instance, MAX_ES);
+        
+        assertTrue(PositDomain.isPositive(instance));
+        assertEquals("0001", PositDomain.getRegime(instance));
+        assertEquals("101", PositDomain.getExponent(instance, MAX_ES));
+        assertEquals("00000000", PositDomain.getFraction(instance, MAX_ES));
+        System.out.println("i=" + i + ", p.double=" + p.doubleValue());
+        System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, MAX_ES));
+        // from PositDomain val=1.9073486328125E-6
+        // from Julia           1.9073486328125e-6, "0 0001 101 00000000"
+        assertTrue(equals(p.doubleValue(), 0.0000019073486328125, COMPARE_PRECISION));
+
+        // sign + regime + exponent + fraction
+        instance  = "0" + "0001" + "101" + "11011101";
+        i = Integer.parseInt(instance, 2); // 3549
+        p = new PositStringImpl(instance, MAX_ES);
 
         assertTrue(PositDomain.isPositive(instance));
         assertEquals("0001", PositDomain.getRegime(instance));
         assertEquals("101", PositDomain.getExponent(instance, MAX_ES));
         assertEquals("11011101", PositDomain.getFraction(instance, MAX_ES));
+        System.out.println("i=" + i + ", p.double=" + p.doubleValue());
         System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, MAX_ES));
-        final Posit p = new PositStringImpl(instance, MAX_ES);
+        // from paper           3.55393E−6
         // from PositDomain val=3.355884879725086E-6
-        // from Julia 3.553926944732666e-6
+        // from Julia           3.553926944732666e-6, "0 0001 101 11011101"
+        
+        // from paper 11011101 == 221/256 == 0.86328125, fm=1.~
+        
         assertTrue(equals(p.doubleValue(), 0.000003553926944732, COMPARE_PRECISION));
+        
     }
 
 
