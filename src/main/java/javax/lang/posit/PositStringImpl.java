@@ -124,7 +124,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
         }
         final boolean positive = isPositive();
         double sign = positive ? 1.0 : -1.0;
-        final BigInteger useed = getUseed();
+        final BigInteger useed = getUseed(); // 2^2^maxEs
         final String [] components = PositDomain.getComponents(internal, getMaxExponentSize(), false);
         String regime = components[PositEnum.REGIME.v()];
         String exponent = components[PositEnum.EXPONENT.v()];
@@ -138,8 +138,8 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
             exponent = components[PositEnum.EXPONENT.v()];
             fraction = components[PositEnum.FRACTION.v()];
         }
-        final int k = PositDomain.getRegimeK(regime);
-        double useedK = useed.pow(Math.abs(k)).doubleValue();
+        final int k = PositDomain.getRegimeK(regime); // run length exponent
+        double useedK = useed.pow(Math.abs(k)).doubleValue(); // useed^k
         double twoe = 1.0;
         if (null != exponent && exponent.length() > 0) {
             final double expVal = PositDomain.getExponentVal(exponent, getMaxExponentSize());
@@ -149,7 +149,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
         if (null != fraction && fraction.length() > 0) {
             fracMultiplier = PositDomain.getFractionMultiplier(fraction);
         }
-        // return sign * (useedK * twoe + (fracMultiplier * useedK));
+        // "calculation()" mentioned in comment
         if ( positive ) {
             if ( !twos ) {
                 return useedK * twoe * fracMultiplier;

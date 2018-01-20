@@ -382,7 +382,8 @@ public class PositDomainTest {
         }
     }
 
-    public static final String[] EXPECTED_ES1_SPACED_STRING = { "", // 0
+    public static final String[] EXPECTED_ES1_SPACED_STRING = { 
+            "", // 0
             "0", "1", // 1
             "0 0", "0 1", "1 0", "1 1", // 2
             "0 00", "0 01", "0 10", "0 11", "1 00", "1 01", "1 10", "1 11", // 3
@@ -408,50 +409,56 @@ public class PositDomainTest {
             "0", "1", // 1
             "0 0", "0 1", "1 0", "1 1", // 2
             "0 00", "0 01", "0 10", "0 11", "1 00", "1 01", "1 10", "1 11", // 3
-            "0 000", "0 001", "0 01 e0", "0 01 e1", "0 10 e0", "0 10 e1", "0 110", "0 111", // 4
-            "1 000", "1 001", "1 01 e0", "1 01 e1", "1 10 e0", "1 10 e1", "1 110", "1 111", // 4
-            "0 0000", "0 0001", "0 001 e0", "0 001 e1", "0 01 e00", "0 01 e01", "0 01 e10", "0 01 e11", // 5
-            "0 10 e00", "0 10 e01", "0 10 e10", "0 10 e11", "0 110 e0", "0 110 e1", "0 1110", "0 1111", // 5
-            "1 0000", "1 0001", "1 001 e0", "1 001 e1", "1 01 e00", "1 01 e01", "1 01 e10", "1 01 e11", // 5
-            "1 10 e00", "1 10 e01", "1 10 e10", "1 10 e11", "1 110 e0", "1 110 e1", "1 1110", "1 1111", // 5
+            "0 000", "0 001", "0 01 0", "0 01 1", "0 10 0", "0 10 1", "0 110", "0 111", // 4
+            "1 000", "1 001", "1 01 0", "1 01 1", "1 10 0", "1 10 1", "1 110", "1 111", // 4
+            "0 0000", "0 0001", "0 001 0", "0 001 1", "0 01 00", "0 01 01", "0 01 10", "0 01 11", // 5
+            "0 10 00", "0 10 01", "0 10 10", "0 10 11", "0 110 0", "0 110 1", "0 1110", "0 1111", // 5
+            "1 0000", "1 0001", "1 001 0", "1 001 1", "1 01 00", "1 01 01", "1 01 10", "1 01 11", // 5
+            "1 10 00", "1 10 01", "1 10 10", "1 10 11", "1 110 0", "1 110 1", "1 1110", "1 1111", // 5
     };
-    public static final String[] EXPECTED_ES2_SPACED_STRING_TWOS = { "", // 0
+    public static final String[] EXPECTED_ES2_SPACED_STRING_TWOS = { 
+            "", // 0
             "0", "1", // 1
-            "0 0", "0 1", "1 0", "1 1", // 2
-            "0 00", "0 01", "0 10", "0 11", "1 00", "1 11", "1 10", "1 01", // 3
-            "0 000", "0 001", "0 01 e0", "0 01 e1", "0 10 e0", "0 10 e1", "0 110", "0 111", // 4
-            "1 000", "1 111", "1 110", "1 10 e1", "1 10 e0", "1 01 e1", "1 01 e0", "1 001", // 4
-            "0 0000", "0 0001", "0 001 e0", "0 001 e1", "0 01 e00", "0 01 e01", "0 01 e10", "0 01 e11", // 5
-            "0 10 e00", "0 10 e01", "0 10 e10", "0 10 e11", "0 110 e0", "0 110 e1", "0 1110", "0 1111", // 5
-            "1 0000", "1 1111", "1 1110", "1 110 e1", "1 110 e0", "1 10 e11", "1 10 e10", "1 10 e01", // 5
-            "1 10 e00", "1 01 e11", "1 01 e10", "1 01 e01", "1 01 e00", "1 001 e1", "1 001 e0", "1 0001", // 5
+            "0 0 e_ f_", "0 1 e_ f_", "1 0 e_ f_", "1 1 e_ f_", // 2
+            "0 00 e_ f_", "0 01 e_ f_", "0 10 e_ f_", "0 11 e_ f_", "1 00 e_ f_", "1 11 e_ f_", "1 10 e_ f_", "1 01 e_ f_", // 3
+            "0 000 e_ f_", "0 001 e_ f_", "0 01 e0 f_", "0 01 e1 f_", "0 10 e0 f_", "0 10 e1 f_", "0 110 e_ f_", "0 111 e_ f_", // 4
+            "1 000 e_ f_", "1 111 e_ f_", "1 110 e_ f_", "1 10 e1 f_", "1 10 e0 f_", "1 01 e1 f_", "1 01 e0 f_", "1 001 e_ f_", // 4
+            "0 0000 e_ f_", "0 0001 e_ f_", "0 001 e0 f_", "0 001 e1 f_", "0 01 e00 f_", "0 01 e01 f_", "0 01 e10 f_", "0 01 e11 f_", // 5
+            "0 10 e00 f_", "0 10 e01 f_", "0 10 e10 f_", "0 10 e11 f_", "0 110 e0 f_", "0 110 e1 f_", "0 1110 e_ f_", "0 1111 e_ f_", // 5
+            "1 0000 e_ f_", "1 1111 e_ f_", "1 1110 e_ f_", "1 110 e1 f_", "1 110 e0 f_", "1 10 e11 f_", "1 10 e10 f_", "1 10 e01 f_", // 5
+            "1 10 e00 f_", "1 01 e11 f_", "1 01 e10 f_", "1 01 e01 f_", "1 01 e00 f_", "1 001 e1 f_", "1 001 e0 f_", "1 0001 e_ f_", // 5
     };
 
     @Test
     public void toSpacedString() {
         // Test ES1 spaced string with NO twos complement
+        // toSpacedString supports twosComplement, component markers, placeHolders
         for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
+            // System.out.println( "toSpacedString i=" + i + ", exp=\"" + EXPECTED_ES1_SPACED_STRING[i] + 
+            //         "\", got=\"" + PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1, false, true, false) + "\"");
             assertEquals("toSpacedString ES1 test on " + BINARY_TEST_CASES[i], EXPECTED_ES1_SPACED_STRING[i],
-                    PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1, false));
-            assertEquals("toSpacedString ES1 without spaces on " + BINARY_TEST_CASES[i], BINARY_TEST_CASES[i],
-                    PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1, false).replaceAll("[\\sef]", ""));
+                    PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1, false, true, false));
         }
         // Test ES1 spaced string with twos complement
         for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
+            // System.out.println( "toSpacedString i=" + i + ", exp=\"" + EXPECTED_ES1_SPACED_STRING_TWOS[i] + 
+            //         "\", got=\"" + PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1, true, true, false) + "\"");
             assertEquals("toSpacedString twos ES1 test on " + BINARY_TEST_CASES[i], EXPECTED_ES1_SPACED_STRING_TWOS[i],
-                    PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1, true));
+                    PositDomain.toSpacedString(BINARY_TEST_CASES[i], 1, true, true, false));
         }
-        // Test ES2 spaced string with NO twos complement
+        // Test ES2 spaced string with NO twos complement. Use a default/compact method.
         for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
+            // System.out.println( "toSpacedString i=" + i + ", exp=\"" + EXPECTED_ES2_SPACED_STRING[i] + 
+            //         "\", got=\"" + PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2, false) + "\"");
             assertEquals("toSpacedString ES2 test on " + BINARY_TEST_CASES[i], EXPECTED_ES2_SPACED_STRING[i],
                     PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2, false));
-            assertEquals("toSpacedString ES2 without stpaces on " + BINARY_TEST_CASES[i], BINARY_TEST_CASES[i],
-                    PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2, false).replaceAll("[ef\\s]", ""));
         }
-        // Test ES2 spaced string with twos complement
+        // Test ES2 spaced string with twos complement. Use markers and placeholders.
         for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
+            // System.out.println( "toSpacedString i=" + i + ", exp=\"" + EXPECTED_ES2_SPACED_STRING_TWOS[i] + 
+            //         "\", got=\"" + PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2, true, true, true) + "\"");
             assertEquals("toSpacedString twos ES2 test on " + BINARY_TEST_CASES[i], EXPECTED_ES2_SPACED_STRING_TWOS[i],
-                    PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2, true));
+                    PositDomain.toSpacedString(BINARY_TEST_CASES[i], 2, true, true, true));
         }
     }
     
@@ -820,7 +827,7 @@ public class PositDomainTest {
                 System.out.println("sixBitES0 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 0) + ",exp="
                         + EXPECTED_SIXBIT_ES0[i] + ",1.0/exp=" + 1.0 / EXPECTED_SIXBIT_ES0[i] + outOfSpec);
             }
-            // assertEquals(EXPECTED_SIXBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+            assertEquals(EXPECTED_SIXBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("sixBitES0 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES0.length + ".");
     }
@@ -902,10 +909,10 @@ public class PositDomainTest {
             final String outOfSpec = outOfSpec(p.doubleValue(), EXPECTED_SIXBIT_ES1[i], COMPARE_PRECISION);
             if (outOfSpec.length() > 0) {
                 oosCount++;
-                System.out.println("sixBitES1 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) + ",exp="
-                        + EXPECTED_SIXBIT_ES1[i] + ",1.0/exp=" + 1.0 / EXPECTED_SIXBIT_ES1[i] + outOfSpec);
             }
-            // assertEquals(EXPECTED_SIXBIT_ES1[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+            // System.out.println("sixBitES1 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) + ",exp="
+            //         + EXPECTED_SIXBIT_ES1[i] + ",1.0/exp=" + 1.0 / EXPECTED_SIXBIT_ES1[i] + outOfSpec);
+            assertEquals(EXPECTED_SIXBIT_ES1[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("sixBitES1 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES1.length + ".");
     }
@@ -990,7 +997,7 @@ public class PositDomainTest {
                 System.out.println("sixBitES2 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 2) + ",exp="
                         + EXPECTED_SIXBIT_ES2[i] + ",1.0/exp=" + 1.0 / EXPECTED_SIXBIT_ES2[i] + outOfSpec);
             }
-            // assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
+            assertEquals(EXPECTED_SIXBIT_ES2[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("sixBitES2 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES2.length + ".");
     }

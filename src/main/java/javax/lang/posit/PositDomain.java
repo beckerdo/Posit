@@ -397,28 +397,74 @@ public final class PositDomain {
         return previous;
     }
 
-    /** Return string with spaces between the sign,regime,exponent, and fraction. */
-    public static String toSpacedString(String instance, int maxExponent, boolean flipNegative) {
+    // 
+    /**
+     * Return string with spaces between the sign,regime,exponent, and fraction.
+     * @param instance is the String to render
+     * @param maxExponent the maximum exponent
+     * @param flipNegative will twos complement the regime/exponent/fraction.
+     * @param markers will place names before components
+     * @param placeHolders will place placeholders in empty components
+     * @return
+     */
+    public static String toSpacedString(String instance, int maxExponent, 
+            boolean flipNegative, boolean markers, boolean placeHolders) {
         if (null == instance || instance.length() < 1) {
             return "";
         }
         if (instance.length() == 1) {
             return instance;
         }
-        final String[] spacers = {""," "," e"," f"};
+        final String[] spacers = {""," "," "," "};
+        final String[] MARKERS = {"","","e","f"};
+        final String PLACEHOLDER = "_";
         final String[] components = getComponents(instance, maxExponent, flipNegative);
         final StringBuilder sb = new StringBuilder();
         // for SIGN, REGIME, EXPONENT, FRACTION
         for (final PositEnum component : PositEnum.values()) {
             final int position = component.ordinal();
-            sb.append(spacers[position]);
-            if (null == components[position] || components[position].length() < 1) {
-                sb.append("_"); // empty component
+            boolean empty = (null == components[position] || components[position].length() < 1);
+            
+            if ( empty ) {
+                if ( placeHolders) {
+                    sb.append(spacers[position]);
+                    if ( markers ) {
+                        sb.append(MARKERS[position]);                
+                    }                
+                    sb.append(PLACEHOLDER);
+                }                
             } else {
-                sb.append(components[position]);
+                sb.append(spacers[position]);
+                if ( markers ) {
+                    sb.append(MARKERS[position]);                
+                }                
+                sb.append(components[position]);                
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Simple version of toSpaceString with most common output.
+     * @param instance
+     * @param maxExponent
+     * @param flipNegative will twos complement the regime/exponent/fraction.
+     * @return
+     */
+    public static String toSpacedString(String instance, int maxExponent, boolean flipNegative ) {
+        return toSpacedString(instance, maxExponent, flipNegative, 
+                false, false); // markers, placeHolders
+    }
+
+    /**
+     * Simple version of toSpaceString with most common output.
+     * @param instance
+     * @param maxExponent
+     * @return
+     */
+    public static String toSpacedString(String instance, int maxExponent ) {
+        return toSpacedString(instance, maxExponent, 
+                false, false, false); // !twos, markers, placeHolders
     }
 
     /** Returns a very detailed view of the number. Exercises most APIs. */
