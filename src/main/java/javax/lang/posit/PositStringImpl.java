@@ -150,17 +150,18 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
             fracMultiplier = PositDomain.getFractionMultiplier(fraction);
         }
         // "calculation()" mentioned in comment
+        double calculation = useedK * twoe * fracMultiplier;
         if ( positive ) {
             if ( !twos ) {
-                return useedK * twoe * fracMultiplier;
+                return calculation;
             } else {
-                return sign / ( useedK * twoe * fracMultiplier );
+                return sign / calculation;
             }
         } else {
             if ( twos ) {
-                return sign * useedK * twoe * fracMultiplier;
+                return sign * calculation;
             } else {
-                return sign / ( useedK * twoe * fracMultiplier );
+                return sign / calculation;
             }            
         }
     }
