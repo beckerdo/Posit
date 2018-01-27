@@ -166,6 +166,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
         }
     }
 
+    // This is how John Gustafson/Isaac Yonemoto calculate = useed^k * 2^e * fm
 //    final String [] components = PositDomain.getComponents(internal, getMaxExponentSize(), true);
 //    double useedK = 1.0;
 //    if (k >= 0) {
@@ -394,17 +395,6 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
      * @see Posit#getUseed()
      */
     public BigInteger getUseed() {
-        // System.out.println( "Posit \"" + internal + "\", exponent=\"" + getExponent()
-        // + "\"");
-        // final String exponent = getExponent();
-        // if (null == exponent || exponent.length() < 1) {
-        // return BIGINT_2;
-        // }
-        // if (isPositive()) {
-        // return PositDomain.getUseed(Integer.parseInt(exponent, 2));
-        // }
-        // return PositDomain.getUseed(Integer.parseInt(Bit.twosComplement(exponent),
-        // 2));
         return PositDomain.getUseed(getMaxExponentSize());
     }
 }

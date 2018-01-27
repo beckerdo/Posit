@@ -910,8 +910,8 @@ public class PositDomainTest {
             if (outOfSpec.length() > 0) {
                 oosCount++;
             }
-            // System.out.println("sixBitES1 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) + ",exp="
-            //         + EXPECTED_SIXBIT_ES1[i] + ",1.0/exp=" + 1.0 / EXPECTED_SIXBIT_ES1[i] + outOfSpec);
+            System.out.println("sixBitES1 i=" + i + ", posit=" + PositDomain.toDetailsString(instance, 1) + ",exp="
+                    + EXPECTED_SIXBIT_ES1[i] + ",1.0/exp=" + 1.0 / EXPECTED_SIXBIT_ES1[i] + outOfSpec);
             assertEquals(EXPECTED_SIXBIT_ES1[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
         System.out.println("sixBitES1 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES1.length + ".");
@@ -1269,16 +1269,18 @@ public class PositDomainTest {
         assertEquals("11011101", PositDomain.getFraction(instance, MAX_ES));
         System.out.println("i=" + i + ", p.double=" + p.doubleValue());
         System.out.println("i=" + i + ", posit=" + PositDomain.toDetailsString(instance, MAX_ES));
-        // from paper           3.55393E−6
         // from PositDomain val=3.355884879725086E-6
+        // "0 0001 101 11011101" // k=-3, e=5, f=221/256, =256^-3 * 2^5 * 1.86
+        // "0 000110111011101"
+        // "0 111001000100010" // invert
+        // "0 111001000100011" // twos
+        // "0 1110 010 00100011" // k=2, e=2, f=35/256, =1.0 / 256^2 *2^2* * 1.13671875 
+                
+        // from paper           3.55393E−6
         // from Julia           3.553926944732666e-6, "0 0001 101 11011101"
-        
-        // from paper 11011101 == 221/256 == 0.86328125, fm=1.~
-        
-        assertTrue(equals(p.doubleValue(), 0.000003553926944732, COMPARE_PRECISION));
-        
+        System.out.println(  "Delta of Julia/PositDomain=" + p.doubleValue()/0.000003553926944732666);
+        assertTrue(equals(p.doubleValue(), 0.000003553926944732666, COMPARE_PRECISION));        
     }
-
 
     // Scalar product a.b = sum a1b1+a2b2+...+anbn
     // [1,3,-5].[4,-2,-2] = 1.4 + 3.-2 + (-5.-1)=3
