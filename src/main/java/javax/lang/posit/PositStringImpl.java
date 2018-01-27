@@ -104,10 +104,10 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
      * x=1*256^(-3)*2^(5)*(1+221/256)=477/134217728 ~=3.55393*10^(-6)
      * <p>
      * The calculation relies on certain reflections:
-     * pos,<1,  unflipped regime begins with 0, result = 1.0 * 1.0 / calculation( twosComp( regime, exponent, fraction ) )
+     * pos,<1,  unflipped regime begins with 0, result = 1.0 / calculation( twosComp( regime, exponent, fraction ) )
      * pos,>=1, unflipped regime begins with 1, result = 1.0 * calculation( regime, exponent, fraction )
      * neg,>=1, unflipped regime begins with 0, result = -1.0 * calculation( twosComp( regime, exponent, fraction ) 
-     * neg,<1,  unflipped regime begins with 1, result = -1.0 * 1.0 / calculation( regime, exponent, fraction ) 
+     * neg,<1,  unflipped regime begins with 1, result = -1.0 / calculation( regime, exponent, fraction ) 
      *
      * @see Posit#doubleValue()
      */
@@ -125,19 +125,12 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
         final boolean positive = isPositive();
         double sign = positive ? 1.0 : -1.0;
         final BigInteger useed = getUseed(); // 2^2^maxEs
-        final String [] components = PositDomain.getComponents(internal, getMaxExponentSize(), false);
+        // Use symmetry to adjust regime, exponent, fraction
+        boolean twos = null != internal && internal.length() > 1 && '0' == internal.charAt(1);
+        final String [] components = PositDomain.getComponentsFlipReflection(internal, getMaxExponentSize());
         String regime = components[PositEnum.REGIME.v()];
         String exponent = components[PositEnum.EXPONENT.v()];
         String fraction = components[PositEnum.FRACTION.v()];
-        // Use symmetry to adjust regime, exponent, fraction
-        boolean twos = false;
-        if ( null != regime && regime.length() > 0 && regime.charAt(0) == '0') {
-            PositDomain.getComponents(components, Bit.twosComplement( regime + exponent + fraction ), getMaxExponentSize());
-            twos = true;
-            regime = components[PositEnum.REGIME.v()];
-            exponent = components[PositEnum.EXPONENT.v()];
-            fraction = components[PositEnum.FRACTION.v()];
-        }
         final int k = PositDomain.getRegimeK(regime); // run length exponent
         double useedK = useed.pow(Math.abs(k)).doubleValue(); // useed^k
         double twoe = 1.0;
@@ -167,7 +160,7 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
     }
 
     // This is how John Gustafson/Isaac Yonemoto calculate = useed^k * 2^e * fm
-//    final String [] components = PositDomain.getComponents(internal, getMaxExponentSize(), true);
+//    final String [] components = PositDomain.getComponentsFlipNegative(internal, getMaxExponentSize());
 //    double useedK = 1.0;
 //    if (k >= 0) {
 //        useedK = useed.pow(k).doubleValue();
