@@ -33,4 +33,26 @@ public final class Bit {
 	public static char invert(char c) {
 		return (c == '0') ? '1' : '0';
 	}
+	
+    /**
+     * Integer power function, base^power
+     * @param base
+     * @param power
+     * @return
+     */
+    public static int pow( int base, int power) {
+        if (power < 0) {
+            throw new IllegalArgumentException( "power must be >= 0, power value was " + power);
+        }
+        if ( power == 0 ) {
+            return 1;
+        }
+        int result = base;
+        for ( int i = 1; i < power; i++ ) {
+            result *= base;
+        }
+        return result;
+    }
+    
+
 }

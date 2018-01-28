@@ -40,14 +40,35 @@ public class BitTest {
 		}
 	}
 
-	@Test
-	public void twosCompTest() {
-		// Test that parsing and toString are commutative.
-		for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
-			assertEquals("Twos complement test on " + BINARY_TEST_CASES[i], EXPECTED[i],
-					Bit.twosComplement(BINARY_TEST_CASES[i]));
-		}
+    @Test
+    public void twosCompTest() {
+        // Test that parsing and toString are commutative.
+        for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
+            assertEquals("Twos complement test on " + BINARY_TEST_CASES[i], EXPECTED[i],
+                    Bit.twosComplement(BINARY_TEST_CASES[i]));
+        }
 
-	}
+    }
+
+    @Test
+    public void powerTest() {
+        assertEquals("2^0", 1, Bit.pow(2,0));
+        assertEquals("2^5", 32, Bit.pow(2,5));
+        assertEquals("2^8", 256, Bit.pow(2,8));
+        assertEquals("13^2", 13 * 13, Bit.pow(13,2));
+        try {
+            Bit.pow(2,-1);            
+        } catch( Exception e ) {
+            assertEquals("2^-1", IllegalArgumentException.class, e.getClass());
+        }
+        
+        
+        // Test that parsing and toString are commutative.
+        for (int i = 0; i < BINARY_TEST_CASES.length; i++) {
+            assertEquals("Twos complement test on " + BINARY_TEST_CASES[i], EXPECTED[i],
+                    Bit.twosComplement(BINARY_TEST_CASES[i]));
+        }
+
+    }
 
 }
