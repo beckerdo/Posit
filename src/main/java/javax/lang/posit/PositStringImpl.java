@@ -421,6 +421,6 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
      * @see Posit#getUseed()
      */
     public BigInteger getUseed() {
-        return PositDomain.getUseed(getMaxExponentSize());
+        return PositImmutable.getUseed(getMaxExponentSize());
     }
 }

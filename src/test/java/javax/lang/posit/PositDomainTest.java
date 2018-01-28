@@ -197,14 +197,13 @@ public class PositDomainTest {
 
     @Test
     public void positUseed() {
-        assertEquals("Exponent useed test on es -1", BigInteger.ZERO, PositDomain.getUseed(-1));
         // Useed is 2 ** 2 ** es
         for (int es = 0; es < 9; es++) {
             // Puny long runs out at es=6, puny double rounds at es=6.
             // System.out.println( "Es is " + es + ", useed is " + Math.pow(2, Math.pow(2,
             // es)));
             // Useed is 2 ** 2 ** es
-            assertEquals("Exponent useed test on es " + es, EXPECTED_USEED[es], PositDomain.getUseed(es));
+            assertEquals("Exponent useed test on es " + es, EXPECTED_USEED[es], PositImmutable.getUseed(es));
         }
     }
 

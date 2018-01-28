@@ -367,65 +367,10 @@ public final class PositDomain {
             return 1.0;
         }
         final double fnumerator = Long.parseUnsignedLong(fraction, 2);
-        final double fdenominator = powerN(2, fraction.length());
+        final double fdenominator = Bit.pow(2, fraction.length());
         final double fmultiplier = 1.0 + fnumerator / fdenominator;
         // final double fmultiplier = fnumerator / fdenominator;
         return fmultiplier;
-    }
-
-    /** Return base^exp. Only 0..MAX_LONG exps are supported. */
-    public static long powerN(long base, long exp) {
-        if (exp < 1) {
-            return 1; // no fractions here
-        }
-        long result = base;
-
-        while (exp > 1) {
-            result *= base;
-            exp--;
-        }
-        return result;
-    }
-
-    /*
-     * A lookup table of 2^2^N. 
-     * <table>
-     * <th><td>N<td>2^2^N</td>
-     * <tr><td>0<td>2^2^0=2^1=2</tr>
-     * <tr><td>1<td>2^2^1=2^2=4</tr>
-     * <tr><td>2<td>2^2^2=2^4=16</tr>
-     * <tr><td>3<td>2^2^3=2^8=256</tr>
-     * <tr><td>4<td>2^2^4=2^16=65536</tr>
-     * </table>
-     * <p>
-     * Puny long runs out at N=6, puny double rounds at N=6.
-     */
-    public static final BigInteger[] LOOKUP_2_2_N = new BigInteger[]{BIGINT_2,new BigInteger("4"),
-            new BigInteger("16"),new BigInteger("256"),new BigInteger("65536"),new BigInteger("4294967296"),
-            new BigInteger("18446744073709551616"),new BigInteger("340282366920938463463374607431768211456"),
-            new BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639936")};
-
-    /**
-     * Get the useed value of a given exponent size es.
-     * <p>
-     * Useed is a scaling component equal to 2^2^es.
-     * <p>
-     * Implementation detail.
-     * Consider making es part of factory method or class/static value.
-     */
-    public static BigInteger getUseed(int es) {
-        if (es < 0) {
-            return BigInteger.ZERO;
-        }
-        if (es < LOOKUP_2_2_N.length) {
-            return LOOKUP_2_2_N[es];
-        }
-        // Perform a loop of squaring 2, n times.
-        BigInteger previous = BigInteger.valueOf(2);
-        for (int i = 0; i < es; i++) {
-            previous = previous.pow(2);
-        }
-        return previous;
     }
 
     // 
@@ -488,7 +433,7 @@ public final class PositDomain {
 
     /** Returns a very detailed view of the number. Exercises most APIs. */
     public static String toDetailsString(String instance, int maxExponent) {
-        final BigInteger useed = getUseed(maxExponent);
+        final BigInteger useed = PositImmutable.getUseed(maxExponent);
         if (null == instance) {
             return "null es" + maxExponent + "us" + useed.toString();
         }
