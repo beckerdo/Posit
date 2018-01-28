@@ -682,9 +682,52 @@ public class PositDomainTest {
             }
             assertEquals(EXPECTED_FIVEBIT_ES0[i], p.doubleValue(), PositDomainTest.COMPARE_PRECISION);
         }
-        System.out.println("fiveBitES0 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES1.length + ".");
+        System.out.println("fiveBitES0 out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES0.length + ".");
+    }
+    
+    // es = 0, useed = 2^2^0 = 2
+    public static final double[] EXPECTED_FIVEBIT_ES0_GUSTAFSON = {
+            0.0, 1.0 / 8.0, 1.0 / 4.0, 3.0 / 8.0 , 1.0 / 2.0, 5.0 / 8.0, 3.0 / 4.0, 7.0 / 8.0,
+            1.0, 5.0 / 4.0, 6.0 / 4.0, 7.0 / 4.0, 2.0, 3.0, 4.0, 8.0,
+            Double.POSITIVE_INFINITY, -8.0, -4.0, -3.0, -2.0, -7.0/4.0, -6.0/4.0, -5.0/4.0,
+            -1.0, -7.0 / 8.0, -3.0 / 4.0, -5.0 / 8.0, -1.0 / 2.0, -3.0 / 8.0, -1.0 / 4.0, -1.0 / 8.0 };    
+    @Test
+    public void fiveBitES0Gustafson() {
+        int oosCount = 0;
+        for (int i = 0; i < EXPECTED_FIVEBIT_ES0.length; i++) {
+            final String instance = String.format("%5s", Integer.toBinaryString(i)).replace(" ", "0");
+            final Posit p = new PositStringImpl(instance, 0);
+            final String outOfSpec = outOfSpec(p.doubleValueGustafson(), EXPECTED_FIVEBIT_ES0_GUSTAFSON[i], COMPARE_PRECISION);
+            if (outOfSpec.length() > 0) {
+                System.out.println("val=" + p.doubleValueGustafson() );
+                oosCount++;
+                System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 0) + ",exp="
+                        + EXPECTED_FIVEBIT_ES0_GUSTAFSON[i] + outOfSpec);
+            }
+            assertEquals(EXPECTED_FIVEBIT_ES0_GUSTAFSON[i], p.doubleValueGustafson(), PositDomainTest.COMPARE_PRECISION);
+        }
+        System.out.println("fiveBitES0Gustafson out of spec count=" + oosCount + "/" + EXPECTED_FIVEBIT_ES0.length + ".");
     }
 
+    @Test
+    public void fiveBitES0Difference() {
+        int BITS = 5;
+        int MAXES = 0;
+        int LIMIT = Bit.pow( 2, BITS); 
+        int oosCount = 0;
+        for (int i = 0; i < LIMIT; i++) {
+            final String instance = String.format("%5s", Integer.toBinaryString(i)).replace(" ", "0");
+            final Posit p = new PositStringImpl(instance, MAXES);
+            final String outOfSpec = outOfSpec(p.doubleValueGustafson(), p.doubleValue(), COMPARE_PRECISION);
+            if (outOfSpec.length() > 0) {
+                oosCount++;
+                System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 0) + ",gustafson="
+                        + p.doubleValueGustafson() + outOfSpec);
+            }
+        }
+        System.out.println("fiveBitES0Gustafson out of spec count=" + oosCount + "/" + LIMIT + ".");
+    }
+    
     // es = 1, useed = 2^2^1 = 4
     public static final double[] EXPECTED_FIVEBIT_ES1 = {
             0.0, 1.0 / 64.0, 1.0 / 16.0, 1.0 / 8.0, 1.0 / 4.0, 1.0 / 3.0, 1.0 / 2.0, 2.0 / 3.0,
@@ -916,6 +959,26 @@ public class PositDomainTest {
         }
         System.out.println("sixBitES1 out of spec count=" + oosCount + "/" + EXPECTED_SIXBIT_ES1.length + ".");
     }
+
+    @Test
+    public void sixBitES1Difference() {
+        int BITS = 6;
+        int MAXES = 1;
+        int LIMIT = Bit.pow( 2, BITS); 
+        int oosCount = 0;
+        for (int i = 0; i < LIMIT; i++) {
+            final String instance = String.format("%5s", Integer.toBinaryString(i)).replace(" ", "0");
+            final Posit p = new PositStringImpl(instance, MAXES);
+            final String outOfSpec = outOfSpec(p.doubleValueGustafson(), p.doubleValue(), COMPARE_PRECISION);
+            if (outOfSpec.length() > 0) {
+                oosCount++;
+                System.out.println("testcase=" + i + ", posit=" + PositDomain.toDetailsString(instance, 0) + ",gustafson="
+                        + p.doubleValueGustafson() + outOfSpec);
+            }
+        }
+        System.out.println("sixBitES1Gustafson out of spec count=" + oosCount + "/" + LIMIT + ".");
+    }
+    
 
     // es = 2, useed = 2^2^2 = 16
     public static final double[] EXPECTED_SIXBIT_ES2 = { 

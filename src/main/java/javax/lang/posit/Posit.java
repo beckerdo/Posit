@@ -147,16 +147,30 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 */
 	public abstract float floatValue();
 
-	@Override
-	/**
-	 * Returns value of this {@code Posit} as a {@code double} after a primitive
-	 * conversion.
-	 *
-	 * @return the {@code Posit} value represented by this object converted to type
-	 *         {@code double}
-	 * @jls 5.1.3 Narrowing Primitive Conversions
-	 */
-	public abstract double doubleValue();
+    @Override
+    /**
+     * Returns value of this {@code Posit} as a {@code double} after a primitive
+     * conversion.
+     * <p>
+     * This method uses the Becker method of calculating fractions.
+     *
+     * @return the {@code Posit} value represented by this object converted to type
+     *         {@code double}
+     * @jls 5.1.3 Narrowing Primitive Conversions
+     */
+    public abstract double doubleValue();
+
+    /**
+     * Returns value of this {@code Posit} as a {@code double} after a primitive
+     * conversion.
+     * <p>
+     * This method uses the Gustafson method of calculating fractions.
+     *
+     * @return the {@code Posit} value represented by this object converted to type
+     *         {@code double}
+     * @jls 5.1.3 Narrowing Primitive Conversions
+     */
+    public abstract double doubleValueGustafson();
 
 	/**
 	 * Returns value of this {@code Posit} as a {@code String} after a primitive

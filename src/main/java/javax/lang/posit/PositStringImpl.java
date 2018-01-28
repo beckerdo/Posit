@@ -100,7 +100,20 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
      * any let f be the fraction bits, represented by 1.f1...fn, if any Then x=0, when p=0 x=±∞, when p=-2^(n-1)
      * x=sign(p)*useed^k*2^e*f,all other p."
      * <p>
-     * For example p="0 0001 101 11011101" with es=3<br/>
+     * This is the Becker method of calculating fractions, which is the same as Gustafson from 1 to infinity (∞) to -1.
+     * The method differs from Gustafson in that the Becker method reflects points on the top half of the
+     * number circle to the bottom half. Thus, for 5 bit, es1, we see the following fractions around 1.0:
+     * <table>
+     * <thead><th>4</th><th>6</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th></thead>
+     * <tr><td>binary</td><td>0 01 0 0</td><td>0 01 0 1</td><td>0 01 1 0</td><td>0 01 1 1</td>
+     * <td>0 10 0 0</td><td>0 10 0 1</td><td>0 10 1 0</td><td>0 10 1 1</td></tr>
+     * <tr><td>Gustafson</td></tr><td>1.0/4.0</td><td>3.0/8.0</td><td>1.0/2.0</td><td>3.0/4.0</td>
+     * <td>1.0</td><td>3.0/2.0<td><td>2.0</td><td>3.0</td><td>4.0</td></tr>
+     * <tr><td>Becker</td><td>1.0/4.0</td><td>1.0/3.0</td><td>1.0/2.0</td><td>2.0/3.0</td>
+     * <td>1.0</td><td>3.0/2.0<td><td>2.0</td><td>3.0</td><td>4.0</td></tr>
+     * </table>
+     * <p>
+     * For example, Gustafson caclulates p="0 0001 101 11011101" with es=3<br/>
      * x=1*256^(-3)*2^(5)*(1+221/256)=477/134217728 ~=3.55393*10^(-6)
      * <p>
      * The calculation relies on certain reflections:
@@ -109,7 +122,8 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
      * neg,>=1, unflipped regime begins with 0, result = -1.0 * calculation( twosComp( regime, exponent, fraction ) 
      * neg,<1,  unflipped regime begins with 1, result = -1.0 / calculation( regime, exponent, fraction ) 
      *
-     * @see Posit#doubleValue()
+     * @see Posit#doubleValueGustafson()
+     * @return nearest double value (using reflection calculated fractions)
      */
     public double doubleValue() {
         // Temp implementation Should be compacted, more native.
@@ -159,29 +173,48 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
         }
     }
 
-    // This is how John Gustafson/Isaac Yonemoto calculate = useed^k * 2^e * fm
-//    final String [] components = PositDomain.getComponentsFlipNegative(internal, getMaxExponentSize());
-//    double useedK = 1.0;
-//    if (k >= 0) {
-//        useedK = useed.pow(k).doubleValue();
-//    } else {
-//        useedK = 1.0 / useed.pow(Math.abs(k)).doubleValue();
-//    }
-//    final String exponent = components[PositEnum.EXPONENT.v()];
-//    double twoe = 1.0;
-//    if (null != exponent && exponent.length() > 0) {
-//        final double expVal = PositDomain.getExponentVal(exponent, getMaxExponentSize());
-//        twoe = Math.pow(2.0, expVal);
-//    }
-//    final String fraction = components[PositEnum.FRACTION.v()];
-//    double fracMultiplier = 1.0;
-//    if (null != fraction && fraction.length() > 0) {
-//        fracMultiplier = PositDomain.getFractionMultiplier(fraction);
-//    }
-//    // return sign * (useedK * twoe + (fracMultiplier * useedK));
-//    return sign * useedK * twoe * fracMultiplier;
-    
-    
+    /**
+     * 
+     * @see Posit#doubleValueGustafson()
+     * @return nearest double value (using Gustafson calculated fractions)
+     */
+    public double doubleValueGustafson() {
+        // Temp implementation Should be compacted, more native.
+        if (null == internal || internal.length() == 0) {
+            return 0.0;
+        }
+        if (isZero()) {
+            return 0.0;
+        }
+        if (isInfinite()) {
+            return Double.POSITIVE_INFINITY;
+        }
+        final boolean positive = isPositive();
+        double sign = positive ? 1.0 : -1.0;
+        final BigInteger useed = getUseed(); // 2^2^maxEs
+        final String [] components = PositDomain.getComponentsFlipNegative(internal, getMaxExponentSize());
+        String regime = components[PositEnum.REGIME.v()];
+        final int k = PositDomain.getRegimeK(regime); // run length exponent
+        double useedK = 1.0;
+        if (k >= 0) {
+            useedK = useed.pow(k).doubleValue();
+        } else {
+            useedK = 1.0 / useed.pow(Math.abs(k)).doubleValue();
+        }
+        double twoe = 1.0;
+        String exponent = components[PositEnum.EXPONENT.v()];
+        if (null != exponent && exponent.length() > 0) {
+            final double expVal = PositDomain.getExponentVal(exponent, getMaxExponentSize());
+            twoe = Math.pow(2.0, expVal);
+        }
+        double fracMultiplier = 1.0;
+        String fraction = components[PositEnum.FRACTION.v()];
+        if (null != fraction && fraction.length() > 0) {
+            fracMultiplier = PositDomain.getFractionMultiplier(fraction);
+        }
+        return sign * useedK * twoe * fracMultiplier;
+    }
+
     @Override
     /**
      * @see Posit#stringValue()
