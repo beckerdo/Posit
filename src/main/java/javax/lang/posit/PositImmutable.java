@@ -1,9 +1,12 @@
 package javax.lang.posit;
 
 import java.math.BigInteger;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
- * Posit elements that are immutable or generally not changed
+ * Posit elements that are immutable or generally not changed.
+ * Typically these are data of the Posit class or type.
  * <p>
  * The following elements are generally not changed in an instance of Posit.
  * <ul>
@@ -17,29 +20,57 @@ import java.math.BigInteger;
  * <ul>
  * <li>useed = 2^2^es
  * </ul>
+ * <p>
+ * A @see KeyPair class is defined to allow these PositImmutable
+ * to be uniquely identified by bits and maxExponentSize
  *
  * @see Posit
  * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
  */
 public final class PositImmutable implements Comparable<PositImmutable> {
+    /** This is a registry of immutable classes that all instances can share. */
+    private static ConcurrentMap<PositImmutable.KeyPair,PositImmutable> REGISTRY = new ConcurrentHashMap<>();
 
-    private final byte bits;
-    private final byte maxExponentSize;
+    private byte bits;
+    private byte maxExponentSize;
     
     private final byte containerBits;
     private final Class<?> containerClass;
 
     private final BigInteger useed;
-    
+
     // Constructors
     @SuppressWarnings("unused")
     private PositImmutable() {
         throw new AssertionError();
     }
 
+    /** Returns a singleton PositImmutable for this {bits,maxExponentSize}.
+     * The PositImmutable is constructed if it is not in the REGISTRY.
+     * (This implementation is similar to REGISTRY.computeIfAbsent().)
+     * @param bits
+     * @param maxExponentSize
+     * @return
+     */
+    public static PositImmutable getPositImmutable(byte bits, byte maxExponentSize) {
+        PositImmutable.KeyPair key = new PositImmutable.KeyPair(bits,maxExponentSize);
+        PositImmutable oldValue = REGISTRY.get(key);
+        if (null==oldValue) {
+            // PositImmutable newValue = mappingFunction.apply(key);
+            PositImmutable newValue = new PositImmutable(bits,maxExponentSize);
+            oldValue = REGISTRY.putIfAbsent(key, newValue);
+            return null == oldValue ? newValue : oldValue;
+        }
+        return oldValue;
+    }
+       
+    /** Returns PositImmutable.REGISTRY.size()     */
+    public static int getRegistrySize() {
+        return REGISTRY.size();
+    }
+       
     public PositImmutable(byte bits, byte maxExponentSize) {
         // check inputs
-        // Consider hashMap of these elements
         this.bits = bits;
         this.maxExponentSize = maxExponentSize;
         
@@ -66,18 +97,30 @@ public final class PositImmutable implements Comparable<PositImmutable> {
     }
         
     // Object methods
+    /**
+     * Returns the hash code value for this map entry.
+     */
     @Override
     public int hashCode() {
         return 1023 * bits + maxExponentSize;
     }
 
+    /**
+     * Compares the specified object with this entry for equality.
+     */
     @Override
-    public boolean equals(final Object obj) {
-        if (obj instanceof PositImmutable) {
-            final PositImmutable other = (PositImmutable) obj;
-            return bits == other.bits && maxExponentSize == other.maxExponentSize;
+    public boolean equals(final Object other) {
+        if (other instanceof PositImmutable) {
+            return equals((PositImmutable) other);
         }
         return false;
+    }
+    
+    /**
+     * Compares the specified object with this entry for equality.
+     */
+    public boolean equals(final PositImmutable other) {
+       return bits == other.bits && maxExponentSize == other.maxExponentSize;
     }
     
     @Override
@@ -87,11 +130,11 @@ public final class PositImmutable implements Comparable<PositImmutable> {
 
     // Comparable
     @Override
-    public int compareTo(PositImmutable o) {
-        if ( this.bits == o.bits) {
-            return this.maxExponentSize - o.maxExponentSize;
+    public int compareTo(PositImmutable other) {
+        if ( this.bits == other.bits) {
+            return this.maxExponentSize - other.maxExponentSize;
         }
-        return this.bits - o.bits;
+        return this.bits - other.bits;
     }
 
     /*
@@ -135,4 +178,66 @@ public final class PositImmutable implements Comparable<PositImmutable> {
         return previous;
     }
 
+    /**
+     * Defines a unique pair of keys based on bits and maxExponentSize. 
+     */
+    public static class KeyPair {
+        private byte bits;
+        private byte maxExponentSize;
+
+        @SuppressWarnings("unused")
+        private KeyPair() {
+            throw new AssertionError();
+        }
+
+        public KeyPair( byte bits, byte maxExponentSize ) {
+            this.bits = bits;
+            this.maxExponentSize = maxExponentSize;
+        }
+        
+        public byte getBitSize() {
+            return bits;
+        }
+        public byte getMaxExponentSize() {
+            return maxExponentSize;
+        }
+        
+        /**
+         * Compares the specified object with this entry for equality.
+         */
+        @Override
+        public boolean equals(Object other) {
+            if (other instanceof KeyPair) {
+                return equals((KeyPair) other);
+            }
+            return false;            
+        }
+
+        /**
+         * Compares the specified object with this entry for equality.
+         */
+        public boolean equals(KeyPair other) {
+            return bits == other.bits && maxExponentSize == other.maxExponentSize;
+        }
+
+        /**
+         * Returns the hash code value for this map entry.
+         */
+        public int hashCode() {
+            return 1023 * bits + maxExponentSize;
+        }
+        
+        @Override
+        public String toString() {
+            return "PositImmutable.KeyPair: bits=" + bits + ", maxEs=" +maxExponentSize;
+        }
+        
+        // Comparable
+        public int compareTo(KeyPair other) {
+            if ( this.bits == other.bits) {
+                return this.maxExponentSize - other.maxExponentSize;
+            }
+            return this.bits - other.bits;
+        }
+    } // KeyPair
 }
