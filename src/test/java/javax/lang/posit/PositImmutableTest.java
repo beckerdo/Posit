@@ -14,7 +14,7 @@ import org.junit.Test;
  * Tests in this class should work with all implementations of Posits. More
  * specific tests may be in specific test implementations.
  *
- * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
  */
 public class PositImmutableTest {
     @Test

@@ -7,7 +7,7 @@ import org.junit.Test;
 /**
  * General test of this class.
  *
- * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
  */
 public class BitTest {
 	public static final String[] BINARY_TEST_CASES = { 

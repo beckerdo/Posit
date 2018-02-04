@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentMap;
  * to be uniquely identified by bits and maxExponentSize
  *
  * @see Posit
- * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
  */
 public final class PositImmutable implements Comparable<PositImmutable> {
     /** This is a registry of immutable classes that all instances can share. */
@@ -179,7 +179,7 @@ public final class PositImmutable implements Comparable<PositImmutable> {
     }
 
     /**
-     * Defines a unique pair of keys based on bits and maxExponentSize. 
+     * Defines a pair of keys (based on bits and maxExponentSize) that uniquely identify PositImmutable characteristics. 
      */
     public static class KeyPair {
         private byte bits;

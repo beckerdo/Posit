@@ -12,11 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Demo
- * <p>
  * Runs a Posit demo from the command line.
  *
- * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
  */
 public abstract class Demo extends Number implements Comparable<Demo> {
 	/** Serialization version */

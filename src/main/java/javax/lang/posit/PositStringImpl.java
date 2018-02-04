@@ -1,8 +1,6 @@
 package javax.lang.posit;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-
 
 /**
  * Posit implementation based on String
@@ -13,7 +11,7 @@ import java.math.BigInteger;
  * String may represent any Posit binary String, the bit size is determined by the length of the String.
  *
  * @see Posit
- * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
  */
 public final class PositStringImpl extends Posit implements Comparable<Posit> {
     /** Serialization version */
@@ -26,21 +24,21 @@ public final class PositStringImpl extends Posit implements Comparable<Posit> {
 
     // Constructors
     /**
-     * @see Posit#()
+     * @see Posit#Posit()
      */
     public PositStringImpl() {
         parse("");
     }
 
     /**
-     * @see Posit#(Object)
+     * @see Posit#Posit(Object)
      */
     public PositStringImpl(final String s) throws NumberFormatException {
         parse(s);
     }
 
     /**
-     * @see Posit#(Object,byte)
+     * @see Posit#Posit(Object,int)
      */
     public PositStringImpl(final String s, int es) throws NumberFormatException {
         setMaxExponentSize((byte) es);

@@ -1,11 +1,9 @@
 package javax.lang.posit;
 
 /**
- * Bit
- * <p>
  * Utility methods for bit manipulations.
  *
- * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
  */
 public final class Bit {
 	// Utility

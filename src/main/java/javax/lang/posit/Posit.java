@@ -6,9 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Posit
- * <p>
- * An implementation of Posit numbers for Java
+ * An implementation of Posit numbers for Java. Deines base class methods.
  * <p>
  * In addition, this class provides several methods for converting a
  * {@code Posit} to a {@code String} and a {@code String} to a {@code Posit}, as
@@ -40,16 +38,15 @@ import org.slf4j.LoggerFactory;
  * implementation
  * </ul>
  *
- * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
  */
 public abstract class Posit extends Number implements Comparable<Posit> {
 	/** Serialization version */
 	private static final long serialVersionUID = 1L;
 
-	/** LOGGER */
+	/** Write to the console log. */
 	public static final Logger LOGGER = LoggerFactory.getLogger(Posit.class);
 
-	/** Some interesting Posit strings */
 	public static final String PLUS_MINUS = "±";
 	public static final String PLUS = "+";
 	public static final String NEG = "-";
@@ -70,7 +67,7 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 	 * Constructs a newly allocated {@code Posit} object from the given input.
 	 * representation given by the instance.
 	 *
-	 * @param s a legal implementation instance
+	 * @param a legal implementation instance
 	 * @throws NumberFormatException
 	 *             if the string does not contain a parsable number.
 	 */
@@ -168,7 +165,6 @@ public abstract class Posit extends Number implements Comparable<Posit> {
      *
      * @return the {@code Posit} value represented by this object converted to type
      *         {@code double}
-     * @jls 5.1.3 Narrowing Primitive Conversions
      */
     public abstract double doubleValueGustafson();
 
@@ -242,7 +238,10 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 
 	// Object methods
 	/**
-	 * Compares the two specified {@code Posit} values.
+     * Compares the two specified {@code Posit} values.
+	 * @param p1 first parameter
+	 * @param p2 second parameter
+	 * @return 0 if p1 == p2, &lt;0 if p2&lt;p1, &gt;0 if p2&gt;p1
 	 */
 	public static int compare(final Posit p1, final Posit p2) {
 		return 0;
@@ -360,6 +359,7 @@ public abstract class Posit extends Number implements Comparable<Posit> {
 
 	/**
 	 * Sets the maximum exponent size or em in this Posit.
+	 * @param maxExponentSize a value of 0 to 255 for maximum exponent size.
 	 */
 	public abstract void setMaxExponentSize(byte maxExponentSize);
 

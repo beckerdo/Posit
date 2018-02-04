@@ -12,7 +12,7 @@ import org.junit.Test;
 /**
  * General test of this class.
  *
- * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
  */
 public class PositDomainTest {
     // Seven bit ES2 have this range ............. 0.00000095367431640625 to 1048576.0

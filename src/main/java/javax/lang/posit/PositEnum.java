@@ -1,10 +1,7 @@
 package javax.lang.posit;
 
 /**
- * PositEnum
- * <p>
- * This enum is used to enumerate components of a Posit number
- * <p>
+ * A utility enum to describe components of a Posit number.
  * <ul>
  * <li>sign - sign of the number (first bit)
  * <li>regime - regime of the number (second bit to end or first flip)
@@ -12,7 +9,7 @@ package javax.lang.posit;
  * <li>fraction - fraction ( rs + es to end )
  * </ul>
  *
- * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
  */
 public enum PositEnum {
     SIGN(0),

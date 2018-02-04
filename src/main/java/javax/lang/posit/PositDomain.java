@@ -4,9 +4,7 @@ import java.math.BigInteger;
 
 
 /**
- * Posit data and method
- * <p>
- * Encodes information from Posit papers. Items in this class should be usable by all Posit classes: Posit,
+ * Encodes forumulas and information from Posit papers. Items in this class should be usable by all Posit implementation classes: Posit,
  * PositStringImpl, etc.
  * <p>
  * More information from John Gustafson: <a href="http://www.johngustafson.net/pdfs/BeatingFloatingPoint.pdf">Beating
@@ -17,11 +15,11 @@ import java.math.BigInteger;
  * be the fraction bits, represented by 1.f1...fn, if any Then x=0, when p=0 x=±∞, when p=-2^(n-1)
  * x=sign(p)*useed^k*2^e*f,all other p."
  * <p>
- * For example p="0 0001 101 11011101" with es=3<br/>
+ * For example p="0 0001 101 11011101" with es=3<p>
  * x=1*256^(-3)*2^(5)*(1+221/256)=477/134217728 ~=3.55393*10^(-6)
  *
  * @see Posit
- * @author <a href="mailto://dan@danbecker.info>Dan Becker</a>
+ * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
  */
 public final class PositDomain {
     /** Lots of exponents evaluate to this. */
@@ -140,10 +138,10 @@ public final class PositDomain {
      * <p>
      * Will twos complement the regime/exponent/fraction based on the quadrant:
      * <ul>
-     * pos,<1,  unflipped regime begins with 0, result = 1.0 / calculation( twosComp( regime, exponent, fraction ) )
-     * pos,>=1, unflipped regime begins with 1, result = 1.0 * calculation( regime, exponent, fraction )
-     * neg,>=1, unflipped regime begins with 0, result = -1.0 * calculation( twosComp( regime, exponent, fraction ) 
-     * neg,<1,  unflipped regime begins with 1, result = -1.0 / calculation( regime, exponent, fraction )
+     * <li>pos,&lt;1,  unflipped regime begins with 0, result = 1.0 / calculation( twosComp( regime, exponent, fraction ) )
+     * <li>pos,&gt;=1, unflipped regime begins with 1, result = 1.0 * calculation( regime, exponent, fraction )
+     * <li>neg,&gt;=1, unflipped regime begins with 0, result = -1.0 * calculation( twosComp( regime, exponent, fraction ) 
+     * <li>neg,&lt;1,  unflipped regime begins with 1, result = -1.0 / calculation( regime, exponent, fraction )
      * </ul> 
      * <p>
      * Components are not interpreted, simply grouped.
@@ -378,7 +376,6 @@ public final class PositDomain {
      * Return string with spaces between the sign,regime,exponent, and fraction.
      * @param instance is the String to render
      * @param maxExponent the maximum exponent
-     * @param flipNegative will twos complement the regime/exponent/fraction.
      * @param markers will place names before components
      * @param placeHolders will place placeholders in empty components
      * @return
