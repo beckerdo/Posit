@@ -4,7 +4,7 @@ package javax.lang.posit;
 * Unary operation signatures
 * @author <a href="mailto://dan@danbecker.info">Dan Becker</a>
 */
-public interface UnaryOperations {
+public interface UniArgOperations {
     /**
      * Reciprocal or 1/x
      *
