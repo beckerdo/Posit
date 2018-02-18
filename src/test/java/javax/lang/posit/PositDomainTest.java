@@ -203,7 +203,7 @@ public class PositDomainTest {
             // System.out.println( "Es is " + es + ", useed is " + Math.pow(2, Math.pow(2,
             // es)));
             // Useed is 2 ** 2 ** es
-            assertEquals("Exponent useed test on es " + es, EXPECTED_USEED[es], PositImmutable.getUseed(es));
+            assertEquals("Exponent useed test on es " + es, EXPECTED_USEED[es], PositEnv.getUseed(es));
         }
     }
 

@@ -52,5 +52,23 @@ public final class Bit {
         return result;
     }
     
-
+    /**
+     * Integer power function, base^power
+     * @param base
+     * @param power
+     * @return
+     */
+    public static long pow( long base, long power) {
+        if (power < 0L) {
+            throw new IllegalArgumentException( "power must be >= 0, power value was " + power);
+        }
+        if ( power == 0L ) {
+            return 1L;
+        }
+        long result = base;
+        for ( long i = 1L; i < power; i++ ) {
+            result *= base;
+        }
+        return result;
+    }
 }

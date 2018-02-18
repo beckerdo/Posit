@@ -430,7 +430,7 @@ public final class PositDomain {
 
     /** Returns a very detailed view of the number. Exercises most APIs. */
     public static String toDetailsString(String instance, int maxExponent) {
-        final BigInteger useed = PositImmutable.getUseed(maxExponent);
+        final BigInteger useed = PositEnv.getUseed(maxExponent);
         if (null == instance) {
             return "null es" + maxExponent + "us" + useed.toString();
         }
